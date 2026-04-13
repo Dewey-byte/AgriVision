@@ -1,0 +1,5 @@
+ultralytics
+opencv-python
+pyqt5
+numpy
+pyautogui
