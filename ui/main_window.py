@@ -108,6 +108,8 @@ class MainWindow(QWidget):
     # 🔄 FRAME UPDATE
     def update_frame(self):
         frame = get_frame()
+        if frame is None or frame.size == 0:
+            return
         frame, detections, ndvi = process_frame(frame)
 
         # Draw YOLO boxes
