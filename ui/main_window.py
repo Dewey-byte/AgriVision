@@ -99,15 +99,20 @@ class MainWindow(QWidget):
     def stop(self):
         self.timer.stop()
 
+    def _exclude_screen_rect(self):
+        """Global screen rect of this window (frame) for masking out of mss captures."""
+        fg = self.frameGeometry()
+        return (fg.x(), fg.y(), fg.width(), fg.height())
+
     # 📸 Capture Frame
     def capture_frame(self):
-        frame = get_frame()
+        frame = get_frame(exclude_screen_rect=self._exclude_screen_rect())
         cv2.imwrite("captured_frame.jpg", frame)
         self.sidebar.add_log("Frame captured and saved")
 
     # 🔄 FRAME UPDATE
     def update_frame(self):
-        frame = get_frame()
+        frame = get_frame(exclude_screen_rect=self._exclude_screen_rect())
         if frame is None or frame.size == 0:
             return
         frame, detections, ndvi = process_frame(frame)
