@@ -12,13 +12,27 @@ def detection_category(label: str) -> str:
     if any(
         k in L
         for k in (
+            "not_banana",
+            "not banana",
+            "unknown",
+            "uncertain",
+            "no banana",
+        )
+    ):
+        return "none"
+    if any(
+        k in L
+        for k in (
             "fusarium",
             "bbtv",
+            "bunchy_top",
+            "bunchy top",
             "virus",
             "disease",
             "diseased",
             "wilt",
             "panama",
+            "moko",
         )
     ):
         return "diseased"
@@ -31,6 +45,8 @@ def detection_category(label: str) -> str:
             "spot",
             "mildew",
             "yellow",
+            "black_sigatoka",
+            "yellow_sigatoka",
         )
     ):
         return "stressed"
@@ -49,6 +65,26 @@ def draw_subtle_grid(frame: np.ndarray, step: int = 96) -> np.ndarray:
     return cv2.addWeighted(overlay, 0.35, frame, 0.65, 0)
 
 
+def format_box_label(det: dict) -> str:
+    """Short label on each bounding box."""
+    label = (det.get("label") or det.get("display") or "Plant").strip()
+    if "(" in label:
+        label = label.split("(")[0].strip()
+    cat = detection_category(label)
+    if cat == "diseased":
+        prefix = "Diseased"
+    elif cat == "stressed":
+        prefix = "Stressed"
+    elif cat == "healthy":
+        prefix = "Healthy"
+    else:
+        return label
+    # Show disease name when we have one (e.g. Black Sigatoka)
+    if label.lower() not in ("healthy", "stressed", "diseased", "plant"):
+        return label if len(label) <= 22 else label[:20] + "…"
+    return prefix
+
+
 def draw_boxes(frame, detections):
     if not frame.flags["C_CONTIGUOUS"]:
         frame = np.ascontiguousarray(frame)
@@ -58,15 +94,17 @@ def draw_boxes(frame, detections):
         label = det.get("label", "object")
         cat = detection_category(label)
 
+        if cat == "none":
+            continue
+
         if cat == "diseased":
             color = BGR_DISEASED
-            short = "Diseased"
         elif cat == "stressed":
             color = BGR_STRESSED
-            short = "Stressed"
         else:
             color = BGR_HEALTHY
-            short = "Healthy"
+
+        short = format_box_label(det)
 
         x1, y1, x2, y2 = map(int, (x1, y1, x2, y2))
 

@@ -1,0 +1,316 @@
+<mxfile host="app.diagrams.net" agent="AgriVision">
+  <diagram id="erd-clean" name="ERD - AgriVision">
+    <mxGraphModel dx="3142" dy="1829" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" background="light-dark(#FFFFFF,#FFFFFF)" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontFamily=Helvetica;fontSize=16;fontStyle=1;fontColor=#1b4332;" value="Figure 4. Entity-Relationship Diagram (Conceptual)&#xa;AgriVision — Banana Disease Detection &amp; Crop Stress Mapping" vertex="1">
+          <mxGeometry height="50" width="900" x="350" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontFamily=Helvetica;fontSize=11;fontStyle=2;fontColor=#52796f;" value="Logical model · In-memory runtime + file exports · No relational database" vertex="1">
+          <mxGeometry height="24" width="500" x="550" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="grp-input" parent="1" style="swimlane;startSize=28;fillColor=#eef4ec;strokeColor=#52b788;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1b4332;rounded=1;arcSize=4;" value="  INPUT &amp; CAPTURE" vertex="1">
+          <mxGeometry height="184" width="740" x="40" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vs" parent="grp-input" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontSize=11;fontColor=#1f3a5f;rounded=1;arcSize=6;verticalAlign=top;" value="VIDEO_SOURCE" vertex="1">
+          <mxGeometry height="138" width="165" x="20" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vs-t" parent="e-vs" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#1f3a5f;" value="&lt;u&gt;source_id&lt;/u&gt;  PK&#xa;platform (ios|android)&#xa;window_title&#xa;device_ip&#xa;quality, started_at" vertex="1">
+          <mxGeometry height="106" width="165" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ls" parent="grp-input" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontSize=11;fontColor=#1f3a5f;rounded=1;arcSize=6;verticalAlign=top;" value="LIVE_SESSION" vertex="1">
+          <mxGeometry height="138" width="160" x="205" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ls-t" parent="e-ls" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#1f3a5f;" value="&lt;u&gt;session_id&lt;/u&gt;  PK&#xa;source_id  FK&#xa;frames_processed&#xa;started_at, ended_at" vertex="1">
+          <mxGeometry height="106" width="160" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vf" parent="grp-input" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontSize=11;fontColor=#1f3a5f;rounded=1;arcSize=6;verticalAlign=top;" value="VIDEO_FRAME" vertex="1">
+          <mxGeometry height="138" width="150" x="385" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vf-t" parent="e-vf" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#1f3a5f;" value="&lt;u&gt;frame_id&lt;/u&gt;  PK&#xa;session_id  FK&#xa;width, height&#xa;captured_at" vertex="1">
+          <mxGeometry height="106" width="150" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-pf" parent="grp-input" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontSize=11;fontColor=#1f3a5f;rounded=1;arcSize=6;verticalAlign=top;" value="PREPROCESSED_FRAME" vertex="1">
+          <mxGeometry height="138" width="155" x="555" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-pf-t" parent="e-pf" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#1f3a5f;" value="&lt;u&gt;frame_id&lt;/u&gt;  PK&#xa;parent_frame_id  FK&#xa;denoise, CLAHE&#xa;align" vertex="1">
+          <mxGeometry height="106" width="155" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="grp-analysis" parent="1" style="swimlane;startSize=28;fillColor=#eef4ec;strokeColor=#52b788;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1b4332;rounded=1;arcSize=4;" value="  ANALYSIS &amp; ML" vertex="1">
+          <mxGeometry height="184" width="940" x="40" y="324" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ym" parent="grp-analysis" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontColor=#7a4f00;rounded=1;arcSize=6;verticalAlign=top;" value="YOLO_MODEL" vertex="1">
+          <mxGeometry height="138" width="150" x="20" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ym-t" parent="e-ym" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#7a4f00;" value="&lt;u&gt;model_id&lt;/u&gt;  PK&#xa;file_path&#xa;&lt;i&gt;models/best.pt&lt;/i&gt;" vertex="1">
+          <mxGeometry height="106" width="150" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-dc" parent="grp-analysis" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontColor=#7a4f00;rounded=1;arcSize=6;verticalAlign=top;" value="DISEASE_CLASS" vertex="1">
+          <mxGeometry height="138" width="150" x="195" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-dc-t" parent="e-dc" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#7a4f00;" value="&lt;u&gt;class_id&lt;/u&gt;  PK&#xa;name&#xa;ui_category" vertex="1">
+          <mxGeometry height="106" width="150" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-det" parent="grp-analysis" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#e3efe0;strokeColor=#5a9367;fontSize=11;fontColor=#1b4332;rounded=1;arcSize=6;verticalAlign=top;" value="DETECTION" vertex="1">
+          <mxGeometry height="138" width="170" x="370" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-det-t" parent="e-det" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#1b4332;" value="&lt;u&gt;detection_id&lt;/u&gt;  PK&#xa;frame_id  FK&#xa;class_id  FK&#xa;confidence, bbox, label" vertex="1">
+          <mxGeometry height="106" width="170" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-sm" parent="grp-analysis" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#e3efe0;strokeColor=#5a9367;fontSize=11;fontColor=#1b4332;rounded=1;arcSize=6;verticalAlign=top;" value="STRESS_MAP" vertex="1">
+          <mxGeometry height="138" width="165" x="560" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-sm-t" parent="e-sm" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#1b4332;" value="&lt;u&gt;map_id&lt;/u&gt;  PK&#xa;frame_id  FK&#xa;algorithm: ExG&#xa;stress_ratio" vertex="1">
+          <mxGeometry height="106" width="165" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-hs" parent="grp-analysis" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#e3efe0;strokeColor=#5a9367;fontSize=11;fontColor=#1b4332;rounded=1;arcSize=6;verticalAlign=top;" value="HEALTH_SUMMARY" vertex="1">
+          <mxGeometry height="138" width="180" x="745" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-hs-t" parent="e-hs" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#1b4332;" value="&lt;u&gt;summary_id&lt;/u&gt;  PK&#xa;healthy, stressed&#xa;diseased&#xa;health_percentage" vertex="1">
+          <mxGeometry height="106" width="180" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="grp-output" parent="1" style="swimlane;startSize=28;fillColor=#eef4ec;strokeColor=#52b788;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1b4332;rounded=1;arcSize=4;" value="  EXPORT &amp; LOGGING" vertex="1">
+          <mxGeometry height="184" width="740" x="40" y="538" as="geometry" />
+        </mxCell>
+        <mxCell id="e-fr" parent="grp-output" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#fdebd6;strokeColor=#d79b00;fontSize=11;fontColor=#7a4f00;rounded=1;arcSize=6;verticalAlign=top;" value="FIELD_REPORT" vertex="1">
+          <mxGeometry height="138" width="165" x="20" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-fr-t" parent="e-fr" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#7a4f00;" value="&lt;u&gt;report_id&lt;/u&gt;  PK&#xa;frame_id  FK&#xa;exported_at&#xa;geo (lat, lon)" vertex="1">
+          <mxGeometry height="106" width="165" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ra" parent="grp-output" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#fdebd6;strokeColor=#d79b00;fontSize=11;fontColor=#7a4f00;rounded=1;arcSize=6;verticalAlign=top;" value="REPORT_ARTIFACT" vertex="1">
+          <mxGeometry height="138" width="175" x="210" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ra-t" parent="e-ra" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#7a4f00;" value="&lt;u&gt;artifact_id&lt;/u&gt;  PK&#xa;report_id  FK&#xa;type: jpg | png&#xa;json | csv" vertex="1">
+          <mxGeometry height="106" width="175" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-al" parent="grp-output" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;fontColor=#7a2b29;rounded=1;arcSize=6;verticalAlign=top;" value="ACTIVITY_LOG" vertex="1">
+          <mxGeometry height="138" width="145" x="410" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-al-t" parent="e-al" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#7a2b29;" value="&lt;u&gt;log_id&lt;/u&gt;  PK&#xa;session_id  FK" vertex="1">
+          <mxGeometry height="106" width="145" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-le" parent="grp-output" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;fontColor=#7a2b29;rounded=1;arcSize=6;verticalAlign=top;" value="LOG_ENTRY" vertex="1">
+          <mxGeometry height="138" width="150" x="575" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-le-t" parent="e-le" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#7a2b29;" value="&lt;u&gt;entry_id&lt;/u&gt;  PK&#xa;log_id  FK&#xa;timestamp&#xa;message" vertex="1">
+          <mxGeometry height="106" width="150" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="grp-train" parent="1" style="swimlane;startSize=28;fillColor=#f3f0ff;strokeColor=#9673a6;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#4a148c;rounded=1;arcSize=4;" value="  OFFLINE TRAINING (separate lifecycle)" vertex="1">
+          <mxGeometry height="184" width="740" x="40" y="752" as="geometry" />
+        </mxCell>
+        <mxCell id="e-tds" parent="grp-train" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#4a3168;rounded=1;arcSize=6;verticalAlign=top;" value="TRAINING_DATASET" vertex="1">
+          <mxGeometry height="138" width="155" x="20" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-tds-t" parent="e-tds" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#4a3168;" value="&lt;u&gt;dataset_id&lt;/u&gt;  PK&#xa;root_path&#xa;data.yaml" vertex="1">
+          <mxGeometry height="106" width="155" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-timg" parent="grp-train" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#4a3168;rounded=1;arcSize=6;verticalAlign=top;" value="TRAINING_IMAGE" vertex="1">
+          <mxGeometry height="138" width="155" x="195" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-timg-t" parent="e-timg" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#4a3168;" value="&lt;u&gt;image_id&lt;/u&gt;  PK&#xa;dataset_id  FK&#xa;split: train | val" vertex="1">
+          <mxGeometry height="106" width="155" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-yl" parent="grp-train" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#4a3168;rounded=1;arcSize=6;verticalAlign=top;" value="YOLO_LABEL" vertex="1">
+          <mxGeometry height="138" width="155" x="370" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-yl-t" parent="e-yl" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#4a3168;" value="&lt;u&gt;label_id&lt;/u&gt;  PK&#xa;image_id  FK&#xa;class_id  FK&#xa;bbox (norm)" vertex="1">
+          <mxGeometry height="106" width="155" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e-tr" parent="grp-train" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=24;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#4a3168;rounded=1;arcSize=6;verticalAlign=top;" value="TRAINING_RUN" vertex="1">
+          <mxGeometry height="138" width="155" x="545" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="e-tr-t" parent="e-tr" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=8;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#4a3168;" value="&lt;u&gt;run_id&lt;/u&gt;  PK&#xa;dataset_id  FK&#xa;epochs, metrics&#xa;&lt;i&gt;→ YOLO_MODEL&lt;/i&gt;" vertex="1">
+          <mxGeometry height="106" width="155" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" edge="1" parent="1" source="e-vs" style="endArrow=block;endFill=1;strokeColor=#4a6fa5;strokeWidth=1.5;rounded=1;" target="e-ls">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r1l" connectable="0" parent="r1" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="1:1" vertex="1">
+          <mxGeometry relative="1" x="-0.2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r2" edge="1" parent="1" source="e-ls" style="endArrow=block;endFill=1;strokeColor=#4a6fa5;strokeWidth=1.5;rounded=1;" target="e-vf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2l" connectable="0" parent="r2" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="1:N" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r3" edge="1" parent="1" source="e-vf" style="endArrow=block;endFill=1;strokeColor=#4a6fa5;strokeWidth=1.5;rounded=1;" target="e-pf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3l" connectable="0" parent="r3" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="1:1" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r4" edge="1" parent="1" source="e-pf" style="endArrow=block;endFill=1;strokeColor=#5a9367;strokeWidth=1.5;rounded=1;" target="e-det">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="787" y="304" />
+              <mxPoint x="495" y="304" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r4l" connectable="0" parent="r4" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="1:N" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r5" edge="1" parent="1" source="e-pf" style="endArrow=block;endFill=1;strokeColor=#5a9367;strokeWidth=1.5;rounded=1;" target="e-sm">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="787" y="312" />
+              <mxPoint x="682" y="312" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r5l" connectable="0" parent="r5" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="1:1" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r6" edge="1" parent="1" source="e-ym" style="endArrow=block;endFill=1;strokeColor=#d6b656;strokeWidth=1.5;dashed=1;rounded=1;" target="e-det">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r7" edge="1" parent="1" source="e-dc" style="endArrow=block;endFill=1;strokeColor=#d6b656;strokeWidth=1.5;dashed=1;rounded=1;" target="e-det">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8" edge="1" parent="1" source="e-det" style="endArrow=block;endFill=1;strokeColor=#5a9367;strokeWidth=1.5;rounded=1;" target="e-hs">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="675" y="430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r8l" connectable="0" parent="r8" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="aggregates" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r9" edge="1" parent="1" source="e-pf" style="endArrow=block;endFill=1;strokeColor=#d79b00;strokeWidth=1.5;rounded=1;" target="e-fr">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="787" y="520" />
+              <mxPoint x="142" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r9l" connectable="0" parent="r9" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="export" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r10" edge="1" parent="1" source="e-fr" style="endArrow=block;endFill=1;strokeColor=#d79b00;strokeWidth=1.5;rounded=1;" target="e-ra">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r10l" connectable="0" parent="r10" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="1:N" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r11" edge="1" parent="1" source="e-ls" style="endArrow=block;endFill=1;strokeColor=#b85450;strokeWidth=1.5;rounded=1;" target="e-al">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="285" y="528" />
+              <mxPoint x="522" y="528" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r11l" connectable="0" parent="r11" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="1:N" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r12" edge="1" parent="1" source="e-al" style="endArrow=block;endFill=1;strokeColor=#b85450;strokeWidth=1.5;rounded=1;" target="e-le">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r12l" connectable="0" parent="r12" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#52796f;labelBackgroundColor=#FFFFFF;" value="1:N" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r13" edge="1" parent="1" source="e-tds" style="endArrow=block;endFill=1;strokeColor=#9673a6;strokeWidth=1.5;dashed=1;rounded=1;" target="e-timg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r13l" connectable="0" parent="r13" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#7d5ba6;labelBackgroundColor=#FFFFFF;" value="1:N" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r14" edge="1" parent="1" source="e-timg" style="endArrow=block;endFill=1;strokeColor=#9673a6;strokeWidth=1.5;dashed=1;rounded=1;" target="e-yl">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r14l" connectable="0" parent="r14" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#7d5ba6;labelBackgroundColor=#FFFFFF;" value="1:N" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r15" edge="1" parent="1" source="e-tds" style="endArrow=block;endFill=1;strokeColor=#9673a6;strokeWidth=1.5;dashed=1;rounded=1;" target="e-tr">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="97" y="950" />
+              <mxPoint x="622" y="950" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r15l" connectable="0" parent="r15" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#7d5ba6;labelBackgroundColor=#FFFFFF;" value="1:N" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r16" edge="1" parent="1" source="e-tr" style="endArrow=block;endFill=1;strokeColor=#9673a6;strokeWidth=1.5;dashed=1;rounded=1;" target="e-ym">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="662" y="970" />
+              <mxPoint x="20" y="970" />
+              <mxPoint x="20" y="430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r16l" connectable="0" parent="r16" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=9;fontColor=#7d5ba6;labelBackgroundColor=#FFFFFF;" value="produces" vertex="1">
+          <mxGeometry relative="1" x="-0.5" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#fafcf9;strokeColor=#b7cbb8;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;fontFamily=Helvetica;fontStyle=1;fontSize=11;fontColor=#1b4332;" value="Legend" vertex="1">
+          <mxGeometry height="170" width="340" x="1020" y="538" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" parent="legend" style="rounded=1;fillColor=#dbe7f3;strokeColor=#4a6fa5;" value="" vertex="1">
+          <mxGeometry height="18" width="18" x="12" y="34" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="Input / capture pipeline" vertex="1">
+          <mxGeometry height="18" width="220" x="38" y="34" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" parent="legend" style="rounded=1;fillColor=#e3efe0;strokeColor=#5a9367;" value="" vertex="1">
+          <mxGeometry height="18" width="18" x="12" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="Analysis results" vertex="1">
+          <mxGeometry height="18" width="220" x="38" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" parent="legend" style="rounded=1;fillColor=#fdebd6;strokeColor=#d79b00;" value="" vertex="1">
+          <mxGeometry height="18" width="18" x="12" y="82" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="Exported reports" vertex="1">
+          <mxGeometry height="18" width="220" x="38" y="82" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" parent="legend" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="" vertex="1">
+          <mxGeometry height="18" width="18" x="12" y="106" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="Offline training" vertex="1">
+          <mxGeometry height="18" width="220" x="38" y="106" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontStyle=2;fontColor=#52796f;" value="PK = primary key   ·   FK = foreign key&#xa;Dashed = reference / produces" vertex="1">
+          <mxGeometry height="30" width="300" x="12" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="note-erd" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontStyle=2;fontColor=#6b7d70;" value="DISEASE_CLASS values: black_sigatoka (0), healthy (1), moko (2), panama (3).&#xa;No relational DB at runtime — this is a conceptual model for documentation." vertex="1">
+          <mxGeometry height="40" width="340" x="1020" y="716" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

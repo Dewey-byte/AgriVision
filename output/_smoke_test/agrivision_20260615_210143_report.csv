@@ -1,0 +1,12 @@
+section,field,value
+summary,total,1
+summary,healthy,1
+summary,stressed,0
+summary,diseased,0
+geo,latitude,7.3669
+geo,longitude,125.91
+geo,altitude_m,
+geo,source,manual
+
+label,confidence,class,bbox
+Healthy (0.9),0.9,0,10 10 50 50

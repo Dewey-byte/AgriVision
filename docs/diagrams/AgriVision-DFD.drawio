@@ -1,0 +1,244 @@
+<mxfile host="app.diagrams.net" agent="AgriVision" pages="2">
+  <diagram id="dfd-l0" name="DFD Level 0">
+    <mxGraphModel dx="1414" dy="823" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="820" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontFamily=Helvetica;fontSize=16;fontStyle=1;fontColor=#1b4332;" value="Figure 1. Data Flow Diagram — Level 0 (Context)" vertex="1">
+          <mxGeometry height="30" width="800" x="200" y="22" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontFamily=Helvetica;fontSize=11;fontStyle=2;fontColor=#52796f;" value="AgriVision — Drone-Based Banana Disease Detection &amp; Crop Stress Mapping" vertex="1">
+          <mxGeometry height="22" width="700" x="250" y="52" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7faf6;strokeColor=#b7cbb8;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;fontFamily=Helvetica;fontSize=11;fontStyle=1;fontColor=#1b4332;" value="Legend" vertex="1">
+          <mxGeometry height="120" width="220" x="60" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="lg1" parent="legend" style="ellipse;fillColor=#dbe7f3;strokeColor=#4a6fa5;" value="" vertex="1">
+          <mxGeometry height="20" width="20" x="12" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lg1t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="Process" vertex="1">
+          <mxGeometry height="20" width="160" x="40" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lg2" parent="legend" style="rounded=1;arcSize=18;fillColor=#eef4ec;strokeColor=#52796f;" value="" vertex="1">
+          <mxGeometry height="20" width="20" x="12" y="56" as="geometry" />
+        </mxCell>
+        <mxCell id="lg2t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="External entity" vertex="1">
+          <mxGeometry height="20" width="160" x="40" y="56" as="geometry" />
+        </mxCell>
+        <mxCell id="lg3" parent="legend" style="shape=partialRectangle;left=0;right=0;fillColor=#efe9f6;strokeColor=#7d5ba6;" value="" vertex="1">
+          <mxGeometry height="20" width="20" x="12" y="82" as="geometry" />
+        </mxCell>
+        <mxCell id="lg3t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="Data store" vertex="1">
+          <mxGeometry height="20" width="160" x="40" y="82" as="geometry" />
+        </mxCell>
+        <mxCell id="p0" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=1;fontSize=13;fontColor=#1f3a5f;" value="0&#xa;AgriVision&#xa;Processing System" vertex="1">
+          <mxGeometry height="200" width="200" x="490" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="eop" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#eef4ec;strokeColor=#52796f;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1b4332;" value="Farm Operator&#xa;/ Analyst" vertex="1">
+          <mxGeometry height="64" width="150" x="70" y="388" as="geometry" />
+        </mxCell>
+        <mxCell id="vsrc" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#eef4ec;strokeColor=#52796f;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1b4332;" value="Phone Screen Mirror&lt;br&gt;( Android scrcpy)" vertex="1">
+          <mxGeometry height="64" width="220" x="470" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" parent="1" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=0;right=0;fillColor=#efe9f6;strokeColor=#7d5ba6;fontFamily=Helvetica;fontStyle=1;fontSize=11;fontColor=#4a3168;" value="D1   Model Weights&#xa;models/best.pt" vertex="1">
+          <mxGeometry height="66" width="180" x="900" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" parent="1" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=0;right=0;fillColor=#efe9f6;strokeColor=#7d5ba6;fontFamily=Helvetica;fontStyle=1;fontSize=11;fontColor=#4a3168;" value="D2   Captured Image&#xa;captured_frame.jpg" vertex="1">
+          <mxGeometry height="66" width="180" x="900" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" edge="1" parent="1" source="vsrc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" target="p0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f1l" connectable="0" parent="f1" style="edgeLabel;html=1;align=center;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" value="Live video frames" vertex="1">
+          <mxGeometry relative="1" x="-0.1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f2" edge="1" parent="1" source="d1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" target="p0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f2l" connectable="0" parent="f2" style="edgeLabel;html=1;align=center;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" value="YOLO weights" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f3" edge="1" parent="1" source="eop" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" target="p0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f3l" connectable="0" parent="f3" style="edgeLabel;html=1;align=center;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" value="Source config,&#xa;start / stop" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f4" edge="1" parent="1" source="p0" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" target="eop">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="290" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f4l" connectable="0" parent="f4" style="edgeLabel;html=1;align=center;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" value="Annotated feed, counts,&#xa;stress heatmap, activity log" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" y="-18" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f5" edge="1" parent="1" source="p0" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" target="d2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f5l" connectable="0" parent="f5" style="edgeLabel;html=1;align=center;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" value="JPEG snapshot" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="caption" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontFamily=Helvetica;fontSize=10;fontStyle=2;fontColor=#6b7d70;" value="The system treats the wireless phone-screen mirror as the single live video source; model weights and captured images are file-based data stores." vertex="1">
+          <mxGeometry height="40" width="880" x="160" y="700" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="dfd-l1" name="DFD Level 1">
+    <mxGraphModel dx="1400" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="950" math="0" shadow="0" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Figure 2. Data Flow Diagram — Level 1 (Decomposition of Process 0)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontFamily=Helvetica;fontSize=16;fontStyle=1;fontColor=#1b4332;" vertex="1" parent="1">
+          <mxGeometry x="350" y="15" width="780" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="AgriVision — capture → preprocess → inference → stress → visualize / export" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontFamily=Helvetica;fontSize=11;fontStyle=2;fontColor=#52796f;" vertex="1" parent="1">
+          <mxGeometry x="400" y="45" width="680" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="op" value="Farm Operator" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#eef4ec;strokeColor=#52796f;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1b4332;" vertex="1" parent="1">
+          <mxGeometry x="40" y="420" width="130" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="src" value="Phone Screen Mirror&#xa;AirPlay / scrcpy" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#eef4ec;strokeColor=#52796f;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1b4332;" vertex="1" parent="1">
+          <mxGeometry x="190" y="96" width="160" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="p1" value="1.0&#xa;Capture&#xa;Video Frame" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1f3a5f;" vertex="1" parent="1">
+          <mxGeometry x="400" y="180" width="130" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" value="2.0&#xa;Preprocess&#xa;Frame" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1f3a5f;" vertex="1" parent="1">
+          <mxGeometry x="600" y="180" width="130" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p3" value="3.0&#xa;Run ML&#xa;Inference" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1f3a5f;" vertex="1" parent="1">
+          <mxGeometry x="860" y="100" width="130" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p4" value="4.0&#xa;Compute&#xa;Stress Map" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1f3a5f;" vertex="1" parent="1">
+          <mxGeometry x="860" y="320" width="130" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p5" value="5.0&#xa;Visualize &amp;&#xa;Aggregate" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1f3a5f;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="220" width="130" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p6" value="6.0&#xa;Export&#xa;Frame" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dbe7f3;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#1f3a5f;" vertex="1" parent="1">
+          <mxGeometry x="600" y="520" width="130" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" value="D1  YOLO Weights" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=0;right=0;fillColor=#efe9f6;strokeColor=#7d5ba6;fontFamily=Helvetica;fontStyle=1;fontSize=11;fontColor=#4a3168;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="55" width="120" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" value="D3  Cached Detections" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=0;right=0;fillColor=#efe9f6;strokeColor=#7d5ba6;fontFamily=Helvetica;fontStyle=1;fontSize=11;fontColor=#4a3168;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="150" width="140" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" value="D4  Cached Stress Map" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=0;right=0;fillColor=#efe9f6;strokeColor=#7d5ba6;fontFamily=Helvetica;fontStyle=1;fontSize=11;fontColor=#4a3168;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="400" width="140" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" value="D2  Captured Image" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=0;right=0;fillColor=#efe9f6;strokeColor=#7d5ba6;fontFamily=Helvetica;fontStyle=1;fontSize=11;fontColor=#4a3168;" vertex="1" parent="1">
+          <mxGeometry x="860" y="560" width="120" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="l1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="src" target="p1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l1t" value="Raw BGR frame" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="l1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="p1" target="p2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="p2" target="p3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l3t" value="Preprocessed frame" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="l3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="p2" target="p4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#7d5ba6;strokeWidth=1.5;dashed=1;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="d1" target="p3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="p3" target="d3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l6t" value="Detection list" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="l6">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="p4" target="d4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l7t" value="ExG stress array" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="l7">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="d3" target="p5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="d4" target="p5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="p2" target="p5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="p5" target="op">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l11t" value="UI: feed, stats, heatmap, log" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="l11">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint y="12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="op" target="p1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="100" y="245" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l12t" value="Start / stop" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="l12">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="op" target="p6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l13t" value="Capture command" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="l13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="p2" target="p6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#45685a;strokeWidth=1.5;labelBackgroundColor=#FFFFFF;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" edge="1" parent="1" source="p6" target="d2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l15t" value="JPEG file" style="edgeLabel;html=1;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="l15">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mod" value="Module mapping" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7faf6;strokeColor=#b7cbb8;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;fontFamily=Helvetica;fontSize=11;fontStyle=1;fontColor=#1b4332;" vertex="1" parent="1">
+          <mxGeometry x="40" y="690" width="420" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="modt" value="1.0  utils/screen_capture + utils/cast_manager&#xa;2.0  core/preprocess&#xa;3.0  core/detection + ui/inference_worker&#xa;4.0  core/ndvi + core/processor&#xa;5.0  ui/main_window + utils/drawing + sidebar&#xa;6.0  ui/main_window.capture_frame" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" vertex="1" parent="mod">
+          <mxGeometry x="10" y="30" width="400" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

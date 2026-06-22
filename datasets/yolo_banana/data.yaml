@@ -1,0 +1,8 @@
+path: C:/Users/Dewey-Byte/Documents/GitHub/AgriVision/datasets/yolo_banana
+train: images/train
+val: images/val
+names:
+  0: black_sigatoka
+  1: bunchy_top
+  2: healthy
+  3: panama

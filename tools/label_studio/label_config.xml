@@ -1,0 +1,10 @@
+<View>
+  <Header value="Banana disease detection — drag to fix model boxes"/>
+  <Image name="image" value="$image" zoom="true" zoomControl="true"/>
+  <RectangleLabels name="label" toName="image" model_score_threshold="0.35">
+    <Label value="black_sigatoka" background="#4535DC"/>
+    <Label value="healthy" background="#28A745"/>
+    <Label value="moko" background="#FFC107"/>
+    <Label value="panama" background="#DC7828"/>
+  </RectangleLabels>
+</View>
