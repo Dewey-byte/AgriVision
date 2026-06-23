@@ -1,145 +1,58 @@
 <mxfile host="app.diagrams.net" agent="AgriVision">
   <diagram id="use-case" name="Use Case Diagram">
-    <mxGraphModel dx="1414" dy="823" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1320" pageHeight="960" background="#ffffff" math="0" shadow="0">
+    <mxGraphModel dx="1414" dy="823" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="640" background="#ffffff" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontFamily=Helvetica;fontSize=16;fontStyle=1;fontColor=#1b4332;" value="Figure 3. Use Case Diagram" vertex="1">
-          <mxGeometry height="30" width="800" x="260" y="18" as="geometry" />
+        <mxCell id="bound" parent="1" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=14;spacingTop=8;dashed=1;dashPattern=8 4;fontFamily=Helvetica;fontStyle=1;fontSize=13;fontColor=#000000;" value="AgriVision System" vertex="1">
+          <mxGeometry height="420" width="820" x="200" y="76" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontFamily=Helvetica;fontSize=11;fontStyle=2;fontColor=#52796f;" value="AgriVision — Drone-Based Banana Disease Detection &amp; Crop Stress Mapping" vertex="1">
-          <mxGeometry height="22" width="700" x="310" y="48" as="geometry" />
+        <mxCell id="actor-pilot" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontFamily=Helvetica;fontStyle=1;fontSize=12;fontColor=#000000;" value="Drone Pilot" vertex="1">
+          <mxGeometry height="110" width="55" x="70" y="280" as="geometry" />
         </mxCell>
-        <mxCell id="bound" parent="1" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=14;spacingTop=8;fillColor=#fbfdfa;strokeColor=#52796f;dashed=1;dashPattern=8 4;fontFamily=Helvetica;fontStyle=1;fontSize=13;fontColor=#1b4332;" value="AgriVision System" vertex="1">
-          <mxGeometry height="560" width="980" x="240" y="80" as="geometry" />
+        <mxCell id="uc01" parent="1" style="ellipse;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=11;fontColor=#000000;" value="UC01&#xa;Connect Drone Video&#xa;(Start Mirror)" vertex="1">
+          <mxGeometry height="72" width="168" x="260" y="108" as="geometry" />
         </mxCell>
-        <mxCell id="actor-op" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontFamily=Helvetica;fontStyle=1;fontSize=11;fontColor=#1b4332;strokeColor=#2d6a4f;" value="Farm Operator&#xa;/ Analyst" vertex="1">
-          <mxGeometry height="100" width="50" x="70" y="300" as="geometry" />
+        <mxCell id="uc02" parent="1" style="ellipse;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=11;fontColor=#000000;" value="UC02&#xa;Start Live Detection" vertex="1">
+          <mxGeometry height="72" width="158" x="470" y="108" as="geometry" />
         </mxCell>
-        <mxCell id="actor-pilot" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontFamily=Helvetica;fontStyle=1;fontSize=11;fontColor=#1b4332;strokeColor=#2d6a4f;" value="Drone Pilot" vertex="1">
-          <mxGeometry height="100" width="50" x="70" y="120" as="geometry" />
+        <mxCell id="uc03" parent="1" style="ellipse;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=11;fontColor=#000000;" value="UC03&#xa;Stop Live Detection" vertex="1">
+          <mxGeometry height="72" width="158" x="620" y="200" as="geometry" />
         </mxCell>
-        <mxCell id="uc01" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e3efe0;strokeColor=#5a9367;fontFamily=Helvetica;fontSize=11;fontColor=#1b4332;" value="UC01&lt;br&gt;Select Mirror Source&lt;br&gt;( Android)" vertex="1">
-          <mxGeometry height="66" width="170" x="320" y="118" as="geometry" />
+        <mxCell id="uc04" parent="1" style="ellipse;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=11;fontColor=#000000;" value="UC04&#xa;Monitor Results&#xa;(feed · summary · map)" vertex="1">
+          <mxGeometry height="72" width="188" x="730" y="90" as="geometry" />
         </mxCell>
-        <mxCell id="uc02" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e3efe0;strokeColor=#5a9367;fontFamily=Helvetica;fontSize=11;fontColor=#1b4332;" value="UC02&#xa;Start Live Processing" vertex="1">
-          <mxGeometry height="66" width="160" x="540" y="118" as="geometry" />
+        <mxCell id="uc05" parent="1" style="ellipse;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=11;fontColor=#000000;" value="UC05&#xa;Set Plantation GPS" vertex="1">
+          <mxGeometry height="72" width="158" x="648" y="310" as="geometry" />
         </mxCell>
-        <mxCell id="uc03" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e3efe0;strokeColor=#5a9367;fontFamily=Helvetica;fontSize=11;fontColor=#1b4332;" value="UC03&#xa;Stop Live Processing" vertex="1">
-          <mxGeometry height="66" width="160" x="760" y="118" as="geometry" />
+        <mxCell id="uc06" parent="1" style="ellipse;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=11;fontColor=#000000;" value="UC06&#xa;Capture &amp;amp; Export Report" vertex="1">
+          <mxGeometry height="72" width="178" x="470" y="382" as="geometry" />
         </mxCell>
-        <mxCell id="uc04" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e3efe0;strokeColor=#5a9367;fontFamily=Helvetica;fontSize=11;fontColor=#1b4332;" value="UC04&#xa;View Live Feed&#xa;with Detections" vertex="1">
-          <mxGeometry height="66" width="190" x="400" y="270" as="geometry" />
-        </mxCell>
-        <mxCell id="uc05" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e3efe0;strokeColor=#5a9367;fontFamily=Helvetica;fontSize=11;fontColor=#1b4332;" value="UC05&#xa;View Detection Summary" vertex="1">
-          <mxGeometry height="66" width="170" x="640" y="270" as="geometry" />
-        </mxCell>
-        <mxCell id="uc06" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e3efe0;strokeColor=#5a9367;fontFamily=Helvetica;fontSize=11;fontColor=#1b4332;" value="UC06&#xa;View NDVI Stress Heatmap" vertex="1">
-          <mxGeometry height="66" width="180" x="870" y="270" as="geometry" />
-        </mxCell>
-        <mxCell id="uc07" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e3efe0;strokeColor=#5a9367;fontFamily=Helvetica;fontSize=11;fontColor=#1b4332;" value="UC07&#xa;Capture Frame to Disk" vertex="1">
-          <mxGeometry height="66" width="160" x="320" y="420" as="geometry" />
-        </mxCell>
-        <mxCell id="uc08" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e3efe0;strokeColor=#5a9367;fontFamily=Helvetica;fontSize=11;fontColor=#1b4332;" value="UC08&#xa;Monitor Activity Log" vertex="1">
-          <mxGeometry height="66" width="160" x="540" y="420" as="geometry" />
-        </mxCell>
-        <mxCell id="uc09" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e3efe0;strokeColor=#5a9367;fontFamily=Helvetica;fontSize=11;fontColor=#1b4332;" value="UC09&#xa;Train YOLO Model Offline" vertex="1">
-          <mxGeometry height="66" width="170" x="760" y="420" as="geometry" />
-        </mxCell>
-        <mxCell id="uc10" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fdebd6;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=11;fontColor=#7a4f00;" value="UC10&#xa;Mirror Android via scrcpy&#xa;(USB / Wi-Fi)" vertex="1">
-          <mxGeometry height="70" width="180" x="320" y="540" as="geometry" />
-        </mxCell>
-        <mxCell id="uc11" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fdebd6;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=11;fontColor=#7a4f00;" value="UC11&#xa;Start Built-in&#xa;Mirror Receiver" vertex="1">
-          <mxGeometry height="70" width="160" x="550" y="540" as="geometry" />
-        </mxCell>
-        <mxCell id="uc12" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fdebd6;strokeColor=#d79b00;fontFamily=Helvetica;fontSize=11;fontColor=#7a4f00;" value="UC12&#xa;Mirror iPhone&#xa;via AirPlay" vertex="1">
-          <mxGeometry height="70" width="180" x="760" y="540" as="geometry" />
-        </mxCell>
-        <mxCell id="a01" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc01">
+        <mxCell id="a01" edge="1" parent="1" source="actor-pilot" style="endArrow=none;html=1;strokeWidth=1.5;fontColor=#000000;" target="uc01">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="a02" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc02">
+        <mxCell id="a02" edge="1" parent="1" source="actor-pilot" style="endArrow=none;html=1;strokeWidth=1.5;fontColor=#000000;" target="uc02">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="a03" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc03">
+        <mxCell id="a03" edge="1" parent="1" source="actor-pilot" style="endArrow=none;html=1;strokeWidth=1.5;fontColor=#000000;" target="uc03">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="a04" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc04">
+        <mxCell id="a05" edge="1" parent="1" source="actor-pilot" style="endArrow=none;html=1;strokeWidth=1.5;fontColor=#000000;" target="uc05">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="a05" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc05">
+        <mxCell id="a06" edge="1" parent="1" source="actor-pilot" style="endArrow=none;html=1;strokeWidth=1.5;fontColor=#000000;" target="uc06">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="a06" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc06">
+        <mxCell id="inc1" edge="1" parent="1" source="uc02" style="endArrow=open;dashed=1;html=1;fontFamily=Helvetica;fontStyle=2;fontSize=9;fontColor=#000000;labelBackgroundColor=#FFFFFF;" target="uc04" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="a07" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc07">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="a08" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc08">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="a09" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc09">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="a10" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc11">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="a11" edge="1" parent="1" source="actor-op" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc12">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="a12" edge="1" parent="1" source="actor-pilot" style="endArrow=none;html=1;strokeColor=#6b7d70;strokeWidth=1.5;" target="uc10">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="inc1" edge="1" parent="1" source="uc02" style="endArrow=open;dashed=1;html=1;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=2;fontSize=9;fontColor=#4a6fa5;labelBackgroundColor=#FFFFFF;" target="uc04" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="inc2" edge="1" parent="1" source="uc02" style="endArrow=open;dashed=1;html=1;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=2;fontSize=9;fontColor=#4a6fa5;labelBackgroundColor=#FFFFFF;" target="uc05" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="inc3" edge="1" parent="1" source="uc02" style="endArrow=open;dashed=1;html=1;strokeColor=#4a6fa5;fontFamily=Helvetica;fontStyle=2;fontSize=9;fontColor=#4a6fa5;labelBackgroundColor=#FFFFFF;" target="uc06" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="ext1" edge="1" parent="1" source="uc01" style="endArrow=open;dashed=1;html=1;strokeColor=#b07d2b;fontFamily=Helvetica;fontStyle=2;fontSize=9;fontColor=#b07d2b;labelBackgroundColor=#FFFFFF;" target="uc02" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="dep2" edge="1" parent="1" source="uc11" style="endArrow=open;dashed=1;html=1;strokeColor=#b07d2b;fontFamily=Helvetica;fontStyle=2;fontSize=9;fontColor=#b07d2b;labelBackgroundColor=#FFFFFF;" target="uc02" value="&amp;lt;&amp;lt;enables&amp;gt;&amp;gt;">
+        <mxCell id="ext1" edge="1" parent="1" source="uc06" style="endArrow=open;dashed=1;html=1;fontFamily=Helvetica;fontStyle=2;fontSize=9;fontColor=#000000;labelBackgroundColor=#FFFFFF;" target="uc02" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="630" y="360" />
+              <mxPoint x="559" y="360" />
+              <mxPoint x="549" y="200" />
             </Array>
           </mxGeometry>
-        </mxCell>
-        <mxCell id="dep3" edge="1" parent="1" source="uc12" style="endArrow=open;dashed=1;html=1;strokeColor=#b07d2b;fontFamily=Helvetica;fontStyle=2;fontSize=9;fontColor=#b07d2b;labelBackgroundColor=#FFFFFF;" target="uc02" value="&amp;lt;&amp;lt;enables&amp;gt;&amp;gt;">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="850" y="360" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="legend" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7faf6;strokeColor=#b7cbb8;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;fontFamily=Helvetica;fontSize=11;fontStyle=1;fontColor=#1b4332;" value="Legend" vertex="1">
-          <mxGeometry height="120" width="430" x="240" y="690" as="geometry" />
-        </mxCell>
-        <mxCell id="lgu1" parent="legend" style="ellipse;fillColor=#e3efe0;strokeColor=#5a9367;" value="" vertex="1">
-          <mxGeometry height="20" width="20" x="12" y="32" as="geometry" />
-        </mxCell>
-        <mxCell id="lgu1t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="Core application use cases" vertex="1">
-          <mxGeometry height="20" width="360" x="40" y="32" as="geometry" />
-        </mxCell>
-        <mxCell id="lgu2" parent="legend" style="ellipse;fillColor=#fdebd6;strokeColor=#d79b00;" value="" vertex="1">
-          <mxGeometry height="20" width="20" x="12" y="58" as="geometry" />
-        </mxCell>
-        <mxCell id="lgu2t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="Built-in wireless mirror setup use cases" vertex="1">
-          <mxGeometry height="20" width="360" x="40" y="58" as="geometry" />
-        </mxCell>
-        <mxCell id="lgu3t" parent="legend" style="text;strokeColor=none;fillColor=none;align=left;fontFamily=Helvetica;fontSize=10;fontStyle=2;fontColor=#52796f;" value="Authentication: not applicable (single-operator local desktop app)" vertex="1">
-          <mxGeometry height="20" width="400" x="12" y="84" as="geometry" />
-        </mxCell>
-        <mxCell id="tbl" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f7faf6;strokeColor=#b7cbb8;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;fontFamily=Helvetica;fontSize=11;fontStyle=1;fontColor=#1b4332;" value="Use Case Summary" vertex="1">
-          <mxGeometry height="120" width="360" x="700" y="690" as="geometry" />
-        </mxCell>
-        <mxCell id="tblt" parent="tbl" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=10;fontColor=#33493d;" value="UC01  Select mirror source (iOS / Android)&#xa;UC02–03  Start / stop live processing&#xa;UC04–06  View feed, summary, NDVI heatmap&#xa;UC07  Save captured_frame.jpg&#xa;UC08  Activity log     UC09  Offline train.py&#xa;UC10–12  Built-in wireless mirror" vertex="1">
-          <mxGeometry height="88" width="345" x="10" y="28" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
