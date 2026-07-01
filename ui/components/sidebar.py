@@ -29,6 +29,7 @@ class Sidebar(QWidget):
     geo_updated = pyqtSignal()
     mirror_start_requested = pyqtSignal()
     mirror_stop_requested = pyqtSignal()
+    android_ip_detect_requested = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -213,19 +214,29 @@ class Sidebar(QWidget):
         """Built-in wireless mirror (Android via scrcpy)."""
         mm_hint = QLabel(
             "Let AgriVision start the wireless mirror for you. Android uses scrcpy "
-            "(USB or Wi-Fi, low delay, high resolution)."
+            "(USB or Wi-Fi). When the phone joins your laptop hotspot, AgriVision can "
+            "auto-detect its IP."
         )
         mm_hint.setWordWrap(True)
         mm_hint.setObjectName("mutedLabel")
         parent_lay.addWidget(mm_hint)
 
-        ip_label = QLabel("Phone IP for Wi-Fi (blank = USB cable)")
+        ip_row = QHBoxLayout()
+        ip_row.setSpacing(8)
+        ip_label = QLabel("Phone IP")
         ip_label.setObjectName("mutedLabel")
-        parent_lay.addWidget(ip_label)
+        ip_row.addWidget(ip_label)
+        ip_row.addStretch(1)
+        self.btn_detect_android_ip = QPushButton("Detect Phone")
+        self.btn_detect_android_ip.setObjectName("btnSecondary")
+        self.btn_detect_android_ip.setCursor(Qt.PointingHandCursor)
+        self.btn_detect_android_ip.clicked.connect(self.android_ip_detect_requested.emit)
+        ip_row.addWidget(self.btn_detect_android_ip)
+        parent_lay.addLayout(ip_row)
 
         self.android_ip_edit = QLineEdit()
         self.android_ip_edit.setObjectName("androidIpEdit")
-        self.android_ip_edit.setPlaceholderText("192.168.1.50  (Wireless debugging)")
+        self.android_ip_edit.setPlaceholderText("Auto-detect on hotspot, or blank for USB")
         self.android_ip_edit.setText(os.environ.get("AGRIVISION_ANDROID_IP", "").strip())
         parent_lay.addWidget(self.android_ip_edit)
 
@@ -260,6 +271,12 @@ class Sidebar(QWidget):
 
     def mirror_android_ip(self) -> str:
         return self.android_ip_edit.text().strip()
+
+    def set_android_ip(self, ip: str) -> None:
+        self.android_ip_edit.setText((ip or "").strip())
+
+    def set_android_ip_detect_enabled(self, enabled: bool) -> None:
+        self.btn_detect_android_ip.setEnabled(enabled)
 
     def mirror_quality(self) -> str:
         idx = self.mirror_quality_combo.currentIndex()

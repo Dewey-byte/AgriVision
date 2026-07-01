@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>AgriVision — Field Map</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+
+    html, body, #map { margin: 0; height: 100%; width: 100%; }
+
+    .leaflet-container { font: 12px/1.4 system-ui, sans-serif; }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+
+    const center = [7.668272, 126.10016];
+
+    const markers = [{"lat": 7.6684716, "lon": 126.0999041, "label": "healthy (0.45)", "category": "healthy", "confidence": 0.448486328125}, {"lat": 7.6685471, "lon": 126.0998975, "label": "healthy (0.44)", "category": "healthy", "confidence": 0.437744140625}, {"lat": 7.6684317, "lon": 126.0998626, "label": "healthy (0.36)", "category": "healthy", "confidence": 0.36474609375}];
+
+    const colors = {"healthy": "#40916c", "stressed": "#d4a373", "diseased": "#bc4749"};
+
+
+
+    const map = L.map('map', { zoomControl: true }).setView(center, 17);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+      maxZoom: 19,
+
+      attribution: '&copy; OpenStreetMap'
+
+    }).addTo(map);
+
+
+
+    L.circleMarker(center, {
+
+      radius: 7,
+
+      color: '#1b4332',
+
+      fillColor: '#52b788',
+
+      fillOpacity: 0.95,
+
+      weight: 2
+
+    }).addTo(map).bindPopup('<b>Drone / field anchor</b><br>Lat: ' + center[0] + '<br>Lon: ' + center[1]);
+
+
+
+    markers.forEach(m => {
+
+      const c = colors[m.category] || '#40916c';
+
+      L.circleMarker([m.lat, m.lon], {
+
+        radius: 6,
+
+        color: c,
+
+        fillColor: c,
+
+        fillOpacity: 0.85,
+
+        weight: 2
+
+      }).addTo(map).bindPopup('<b>' + m.label + '</b><br>' + (m.category || '') +
+
+        (m.confidence != null ? '<br>conf: ' + Number(m.confidence).toFixed(2) : ''));
+
+    });
+
+
+
+    if (markers.length) {
+
+      const group = L.featureGroup();
+
+      markers.forEach(m => group.addLayer(L.circleMarker([m.lat, m.lon])));
+
+      try { map.fitBounds(group.getBounds().pad(0.15)); } catch (e) {}
+
+    }
+
+  </script>
+
+</body>
+
+</html>
+

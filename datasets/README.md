@@ -9,8 +9,16 @@ datasets/yolo_banana/
   data.yaml
   images/train/
   images/val/
+  images/test/
   labels/train/
   labels/val/
+  labels/test/
+```
+
+After merging exports, apply an **80-10-10** partition:
+
+```powershell
+python tools/split_yolo_dataset.py --dataset datasets/yolo_banana
 ```
 
 ## Export from Label Studio

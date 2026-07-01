@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSplitter
 from PyQt5.QtCore import QTimer, Qt
 
 from utils.screen_capture import LiveMirrorCapture, pick_mirror_cast_window
-from utils.cast_manager import MirrorManager
+from utils.cast_manager import MirrorManager, resolve_android_device_ip
 from utils.win_util import configure_background_capture
 from utils.phone_frame import is_live_video_frame
 from utils.frame_quality import is_analyzable_frame
@@ -24,6 +24,7 @@ from ui.components.feed_panel import PrimaryFeedPanel
 from ui.components.sidebar import Sidebar
 from ui.inference_worker import InferenceWorker
 from ui.geo_worker import GeoLocateWorker
+from ui.android_ip_worker import AndroidIpWorker
 from ui.browser_geo import BrowserGeoLocator, browser_geo_available
 from backend.geo import should_auto_detect_location, format_location_label
 
@@ -106,6 +107,9 @@ class MainWindow(QWidget):
         else:
             self._refresh_leaflet_map()
 
+        if not self.sidebar.mirror_android_ip():
+            QTimer.singleShot(500, self._start_android_ip_detect)
+
         self._infer = InferenceWorker()
         self._infer.ready.connect(self._on_inference_ready, type=Qt.QueuedConnection)
         self._infer.start()
@@ -159,6 +163,7 @@ class MainWindow(QWidget):
         self.feed.btn_capture.clicked.connect(self.capture_frame)
         self.sidebar.mirror_start_requested.connect(self._on_mirror_start)
         self.sidebar.mirror_stop_requested.connect(self._on_mirror_stop)
+        self.sidebar.android_ip_detect_requested.connect(self._start_android_ip_detect)
 
         self._splitter.addWidget(self.feed)
         self._splitter.addWidget(self.sidebar)
@@ -279,10 +284,47 @@ class MainWindow(QWidget):
         if summary:
             self._session.record_analysis(summary)
 
+    def _start_android_ip_detect(self) -> None:
+        worker = getattr(self, "_android_ip_worker", None)
+        if worker is not None and worker.isRunning():
+            return
+        self.sidebar.set_android_ip_detect_enabled(False)
+        self.sidebar.set_mirror_status("Mirror: detecting phone on hotspot…")
+        self._android_ip_worker = AndroidIpWorker()
+        self._android_ip_worker.ready.connect(self._on_android_ip_detected, type=Qt.QueuedConnection)
+        self._android_ip_worker.failed.connect(self._on_android_ip_failed, type=Qt.QueuedConnection)
+        self._android_ip_worker.finished.connect(
+            lambda: self.sidebar.set_android_ip_detect_enabled(True),
+            type=Qt.QueuedConnection,
+        )
+        self._android_ip_worker.start()
+
+    def _on_android_ip_detected(self, ip: str, source: str) -> None:
+        self.sidebar.set_android_ip(ip)
+        label = {"adb": "ADB", "mdns": "wireless debugging", "hotspot": "laptop hotspot"}.get(
+            source, source
+        )
+        self.sidebar.set_mirror_status(f"Phone detected: {ip} ({label})")
+        self.sidebar.add_log(log(f"Android IP auto-detected: {ip} ({label})"))
+
+    def _on_android_ip_failed(self, message: str) -> None:
+        self.sidebar.set_mirror_status("Mirror: phone not found (USB or enter IP manually)")
+        self.sidebar.add_log(log(message))
+
     def _on_mirror_start(self) -> None:
         self.sidebar.set_mirror_status("Mirror: starting…")
+        device_ip = self.sidebar.mirror_android_ip()
+        if not device_ip:
+            resolved_ip, source = resolve_android_device_ip("")
+            if resolved_ip:
+                self.sidebar.set_android_ip(resolved_ip)
+                device_ip = resolved_ip
+                label = {"adb": "ADB", "mdns": "wireless debugging", "hotspot": "laptop hotspot"}.get(
+                    source, source
+                )
+                self.sidebar.add_log(log(f"Using detected Android IP: {resolved_ip} ({label})"))
         result = self._mirror.start_android(
-            device_ip=self.sidebar.mirror_android_ip(),
+            device_ip=device_ip,
             quality=self.sidebar.mirror_quality(),
         )
 

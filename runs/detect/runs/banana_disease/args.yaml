@@ -2,7 +2,7 @@ task: detect
 mode: train
 model: C:\Users\Dewey-Byte\Documents\GitHub\AgriVision\yolov8n.pt
 data: C:\Users\Dewey-Byte\Documents\GitHub\AgriVision\datasets\yolo_banana\data.yaml
-epochs: 80
+epochs: 100
 time: null
 patience: 100
 batch: 16

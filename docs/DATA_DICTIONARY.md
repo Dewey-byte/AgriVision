@@ -94,13 +94,55 @@
 
 | Split | Images | Labels |
 |-------|--------|--------|
-| **Train** | 226 | 226 |
-| **Validation** | 57 | 57 |
-| **Total** | **283** | **283** |
+| **Train** | 252 | 252 |
+| **Validation** | 32 | 32 |
+| **Test** | 31 | 31 |
+| **Total** | **315** | **315** |
+
+De-duplicated by original `DJI_xxxx` filename (Label Studio re-exports each photo with a
+fresh hash prefix); no image appears in more than one split. Partition: **80-10-10**
+via `tools/split_yolo_dataset.py`. Merge new exports with `tools/merge_yolo_export.py`.
 
 **Classes** (`data.yaml`): `black_sigatoka`, `bunchy_top`, `healthy`, `panama`
 
+**Class distribution (bounding boxes):**
+
+| Class | Train boxes | Val boxes | Train images |
+|-------|-------------|-----------|--------------|
+| `healthy` | 3,108 | 1,058 | 232 |
+| `black_sigatoka` | 137 | 52 | 81 |
+| `panama` | 119 | 52 | 70 |
+| `bunchy_top` | 3 | 2 | 3 |
+
+> **Imbalance note:** ~92% of labels are `healthy`. Disease classes — especially
+> `bunchy_top` (3 training boxes) — are under-represented and need more labeled
+> samples before per-class accuracy can improve.
+
 **Expected growth:** +50–200 images per labeling batch from new drone flights (Label Studio export).
+
+### 6.3 Latest training run (`runs/detect/runs/banana_disease`)
+
+| Setting | Value |
+|---------|-------|
+| Base model | `yolov8n.pt` |
+| Epochs / imgsz / batch | 100 / 640 / 16 |
+| Hardware | NVIDIA RTX 4050 (CUDA), ~1.46 h |
+| Output | `models/best.pt` (auto-deployed) |
+
+**Validation metrics (`best.pt`, 32-image val split):**
+
+| Class | mAP50 | mAP50-95 |
+|-------|-------|----------|
+| **all** | **0.177** | **0.046** |
+| `healthy` | 0.501 | 0.143 |
+| `black_sigatoka` | 0.182 | 0.035 |
+| `panama` | 0.026 | 0.007 |
+| `bunchy_top` | 0.000 | 0.000 |
+
+Training curves: `output/model_history_keras_style.png` and
+`runs/detect/runs/banana_disease/results.png`.
+
+**Graph narrative (thesis-ready):** see [TESTING_RESULTS.md](TESTING_RESULTS.md).
 
 ---
 
@@ -390,4 +432,5 @@ A detection is **accepted** only if confidence ≥ 0.35 and area ≥ 400 px².
 | [WORKFLOW_ERD.md](WORKFLOW_ERD.md) | Entity workflow and JSON schemas |
 | [STORAGE_DESIGN.md](STORAGE_DESIGN.md) | File paths and retention |
 | [MODEL_TRAINING.md](MODEL_TRAINING.md) | Training procedure (if present) |
+| [NAVIGATING_THE_SYSTEM.md](NAVIGATING_THE_SYSTEM.md) | Live demo script mapped to functional requirements |
 | [OUTLINE_DEFENSE_STATUS.md](OUTLINE_DEFENSE_STATUS.md) | Completion checklist |

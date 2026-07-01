@@ -49,11 +49,31 @@ def main() -> int:
     from core.preprocess import FramePreprocessor, apply_clahe_lab, denoise_bgr, resize_max_side
     from core.processor import process_frame, reset_preprocessor
     from utils.drawing import detection_category, draw_boxes, draw_subtle_grid
-    from utils.cast_manager import MirrorManager, QUALITY_PRESETS
+    from utils.cast_manager import (
+        MirrorManager,
+        QUALITY_PRESETS,
+        _hotspot_host_ips_from_ipconfig,
+        _parse_wireless_adb_serials,
+    )
 
     mm = MirrorManager()
     check("MirrorManager android_available bool", lambda: isinstance(mm.android_available(), bool))
     check("MirrorManager quality presets", lambda: "high" in QUALITY_PRESETS)
+    check(
+        "parse wireless adb devices",
+        lambda: _parse_wireless_adb_serials(
+            "List of devices attached\n192.168.137.42:5555\tdevice\n"
+        )
+        == ["192.168.137.42:5555"],
+    )
+    check(
+        "hotspot ipconfig parse",
+        lambda: "192.168.137.1"
+        in _hotspot_host_ips_from_ipconfig(
+            "Wireless LAN adapter Local Area Connection* 10:\n"
+            "   IPv4 Address. . . . . . . . . . . : 192.168.137.1\n"
+        ),
+    )
 
     check("detection_category diseased", lambda: detection_category("Fusarium wilt") == "diseased")
     check("detection_category bbtv", lambda: detection_category("Banana Bunchy Top Virus") == "diseased")

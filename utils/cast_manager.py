@@ -18,7 +18,9 @@ from __future__ import annotations
 
 import glob
 import os
+import re
 import shutil
+import socket
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -28,6 +30,9 @@ ANDROID_WINDOW_TITLE = "AgriVision Android Mirror"
 
 # scrcpy wireless debugging default port (Android "tcpip" mode).
 _DEFAULT_ADB_PORT = 5555
+
+# Common Windows mobile-hotspot subnets (laptop as AP).
+_HOTSPOT_PREFIXES = ("192.168.137.", "192.168.43.")
 
 # Hide child console windows on Windows (adb spawns a console otherwise).
 _NO_WINDOW = 0
@@ -150,6 +155,196 @@ def _normalize_serial(device_ip: str) -> str:
     return f"{ip}:{_DEFAULT_ADB_PORT}"
 
 
+def _serial_to_display_ip(serial: str) -> str:
+    """``192.168.1.5:5555`` -> ``192.168.1.5`` for the UI field."""
+    serial = (serial or "").strip()
+    if not serial:
+        return ""
+    if ":" in serial:
+        host, port = serial.rsplit(":", 1)
+        if port.isdigit() and int(port) == _DEFAULT_ADB_PORT:
+            return host
+        return serial
+    return serial
+
+
+def _parse_wireless_adb_serials(adb_devices_text: str) -> list[str]:
+    serials: list[str] = []
+    for line in (adb_devices_text or "").splitlines():
+        line = line.strip()
+        if not line or line.lower().startswith("list of devices"):
+            continue
+        parts = line.split()
+        if len(parts) < 2 or parts[1] != "device":
+            continue
+        serial = parts[0]
+        if ":" in serial and not serial.startswith("emulator-"):
+            serials.append(serial)
+    return serials
+
+
+def _parse_mdns_adb_serials(mdns_text: str) -> list[str]:
+    serials: list[str] = []
+    for line in (mdns_text or "").splitlines():
+        line = line.strip()
+        if not line or line.lower().startswith("list of discovered"):
+            continue
+        match = re.search(r"(\d{1,3}(?:\.\d{1,3}){3}:\d+)", line)
+        if match:
+            serials.append(match.group(1))
+    return serials
+
+
+def _ipv4_addresses_from_ipconfig(text: str) -> list[str]:
+    return re.findall(r"IPv4 Address[^:]*:\s*([\d.]+)", text, flags=re.I)
+
+
+def _hotspot_host_ips_from_ipconfig(text: str) -> list[str]:
+    hosts: list[str] = []
+    blocks = re.split(r"\n(?=\S)", text or "")
+    for block in blocks:
+        block_ips = _ipv4_addresses_from_ipconfig(block)
+        low = block.lower()
+        hotspot_block = any(
+            token in low
+            for token in (
+                "hotspot",
+                "wi-fi direct",
+                "wifi direct",
+                "local area connection",
+                "mobile hotspot",
+            )
+        ) or any(ip.startswith(_HOTSPOT_PREFIXES) for ip in block_ips)
+        if not hotspot_block:
+            continue
+        for ip in block_ips:
+            if ip.startswith(_HOTSPOT_PREFIXES) or ip.endswith(".1"):
+                hosts.append(ip)
+    if not hosts:
+        for ip in _ipv4_addresses_from_ipconfig(text):
+            if ip.startswith(_HOTSPOT_PREFIXES):
+                hosts.append(ip)
+    return list(dict.fromkeys(hosts))
+
+
+def _arp_neighbors_for_interface(interface_ip: str, arp_text: str) -> list[str]:
+    neighbors: list[str] = []
+    section = False
+    for line in (arp_text or "").splitlines():
+        stripped = line.strip()
+        if stripped.lower().startswith("interface:"):
+            section = interface_ip in stripped
+            continue
+        if not section:
+            continue
+        parts = stripped.split()
+        if len(parts) >= 2 and parts[0].count(".") == 3:
+            ip = parts[0]
+            if ip != interface_ip and not ip.endswith(".255"):
+                neighbors.append(ip)
+    return neighbors
+
+
+def _tcp_reachable(host: str, port: int, timeout: float = 0.35) -> bool:
+    try:
+        with socket.create_connection((host, int(port)), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
+def _adb_devices_text(adb: str) -> str:
+    try:
+        out = _run_adb(adb, ["devices"], timeout=6.0)
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    return (out.stdout or "") + (out.stderr or "")
+
+
+def _adb_mdns_text(adb: str) -> str:
+    try:
+        out = _run_adb(adb, ["mdns", "services"], timeout=8.0)
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    return (out.stdout or "") + (out.stderr or "")
+
+
+def _hotspot_neighbor_ips() -> list[str]:
+    if sys.platform != "win32":
+        return []
+    try:
+        ipcfg = subprocess.run(
+            ["ipconfig"],
+            capture_output=True,
+            text=True,
+            timeout=6.0,
+            check=False,
+            creationflags=_NO_WINDOW,
+        )
+        arp = subprocess.run(
+            ["arp", "-a"],
+            capture_output=True,
+            text=True,
+            timeout=6.0,
+            check=False,
+            creationflags=_NO_WINDOW,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+
+    ipcfg_text = (ipcfg.stdout or "") + (ipcfg.stderr or "")
+    arp_text = (arp.stdout or "") + (arp.stderr or "")
+    neighbors: list[str] = []
+    for host_ip in _hotspot_host_ips_from_ipconfig(ipcfg_text):
+        neighbors.extend(_arp_neighbors_for_interface(host_ip, arp_text))
+    return list(dict.fromkeys(neighbors))
+
+
+def _try_adb_connect_serial(adb: str, serial: str) -> bool:
+    try:
+        _run_adb(adb, ["start-server"], timeout=8.0)
+        out = _run_adb(adb, ["connect", serial], timeout=8.0)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    text = ((out.stdout or "") + (out.stderr or "")).lower()
+    return "connected to" in text or "already connected" in text
+
+
+def discover_android_device_ip() -> tuple[str, str]:
+    """Find a wireless Android device IP for scrcpy.
+
+    Returns ``(ip_or_serial, source)`` where *source* is a short label such as
+    ``adb``, ``mdns``, or ``hotspot``. Empty strings when nothing is found.
+    """
+    adb = find_adb()
+    if not adb:
+        return "", ""
+
+    for serial in _parse_wireless_adb_serials(_adb_devices_text(adb)):
+        return _serial_to_display_ip(serial), "adb"
+
+    for serial in _parse_mdns_adb_serials(_adb_mdns_text(adb)):
+        if _try_adb_connect_serial(adb, serial):
+            return _serial_to_display_ip(serial), "mdns"
+
+    for ip in _hotspot_neighbor_ips():
+        if not _tcp_reachable(ip, _DEFAULT_ADB_PORT):
+            continue
+        serial = f"{ip}:{_DEFAULT_ADB_PORT}"
+        if _try_adb_connect_serial(adb, serial):
+            return _serial_to_display_ip(serial), "hotspot"
+
+    return "", ""
+
+
+def resolve_android_device_ip(device_ip: str = "") -> tuple[str, str]:
+    """Use manual IP when set; otherwise auto-discover on laptop hotspot."""
+    manual = (device_ip or "").strip()
+    if manual:
+        return manual, "manual"
+    return discover_android_device_ip()
+
+
 @dataclass
 class MirrorManager:
     """Spawns and tracks the mirror receiver child processes."""
@@ -178,7 +373,8 @@ class MirrorManager:
                 "then retry. Wireless also needs adb.",
             )
 
-        serial = _normalize_serial(device_ip)
+        resolved_ip, resolve_source = resolve_android_device_ip(device_ip)
+        serial = _normalize_serial(resolved_ip)
         if serial:
             connected, msg = self._adb_connect(serial)
             if not connected:
@@ -213,7 +409,11 @@ class MirrorManager:
 
         self._procs.append(proc)
         self.last_window_title = window_title
-        where = f"wireless ({serial})" if serial else "USB"
+        if serial:
+            src = resolve_source if resolve_source != "manual" else "wireless"
+            where = f"wireless ({serial}, {src})"
+        else:
+            where = "USB"
         return MirrorResult(
             True,
             f"Android mirror starting via scrcpy [{where}, {preset['label']}].",
