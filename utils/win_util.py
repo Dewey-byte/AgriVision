@@ -24,6 +24,7 @@ the Qt event loop.
 from __future__ import annotations
 
 import ctypes
+import os
 import sys
 from ctypes import wintypes
 
@@ -112,11 +113,22 @@ def configure_background_capture(scrcpy_hwnd: int, agrivision_hwnd: int) -> bool
     exstyle = (exstyle | _WS_EX_TOOLWINDOW | _WS_EX_NOACTIVATE) & ~_WS_EX_APPWINDOW
     u.SetWindowLongW(scrcpy_hwnd, _GWL_EXSTYLE, exstyle)
 
-    # 4. Resize to fill the primary monitor (maximises capture resolution).
+    # 4. Resize for capture. Filling the whole monitor maximises resolution but
+    #    makes the per-frame PrintWindow grab copy more pixels than the feed can
+    #    use (it is downscaled to AGRIVISION_WINDOW_MAX_W anyway). Cap the render
+    #    size to that target so capture stays fast with no visible quality loss.
     mw, mh = get_primary_monitor_size()
+    tw, th = mw, mh
+    try:
+        cap_w = int(os.environ.get("AGRIVISION_WINDOW_MAX_W", "0") or "0")
+    except ValueError:
+        cap_w = 0
+    if 0 < cap_w < mw:
+        tw = cap_w
+        th = max(1, round(mh * cap_w / mw))
     u.SetWindowPos(
         scrcpy_hwnd, 0,
-        0, 0, mw, mh,
+        0, 0, tw, th,
         _SWP_NOZORDER | _SWP_NOACTIVATE | _SWP_FRAMECHANGED | _SWP_SHOWWINDOW,
     )
 

@@ -2,6 +2,7 @@ import os
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 import cv2
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSplitter, QFrame
 from PyQt5.QtCore import QTimer, Qt
@@ -18,33 +19,42 @@ from core.preprocess import FramePreprocessor
 
 from backend.report import export_field_report
 from backend.session import SessionRecorder
-from backend.map_export import build_map_html, write_map_html
+from backend.map_export import build_map_html, build_map_payload, write_map_html
 
 from ui.components.feed_panel import PrimaryFeedPanel
 from ui.components.sidebar import Sidebar
 from ui.inference_worker import InferenceWorker
+from ui.capture_worker import MirrorCaptureThread
 from ui.geo_worker import GeoLocateWorker
 from ui.android_ip_worker import AndroidIpWorker
 from ui.browser_geo import BrowserGeoLocator, browser_geo_available
-from backend.geo import should_auto_detect_location, format_location_label
+from backend.geo import should_auto_detect_location, format_location_label, default_field_bounds
 
 
 def _apply_mirror_app_defaults() -> None:
+    """Tuned for aerial banana canopy: more boxes per frame on small datasets."""
     for key, val in (
         ("AGRIVISION_TIMER_MS", "16"),
-        ("AGRIVISION_INFER_EVERY", "25"),
-        ("AGRIVISION_IMGSZ", "224"),
-        ("AGRIVISION_INFER_MAX_SIDE", "320"),
-        ("AGRIVISION_WINDOW_MAX_W", "0"),
-        ("AGRIVISION_INFER_FRAME_MAX_W", "640"),
+        ("AGRIVISION_INFER_EVERY", "12"),
+        ("AGRIVISION_IMGSZ", "640"),
+        ("AGRIVISION_INFER_MAX_SIDE", "1280"),
+        ("AGRIVISION_WINDOW_MAX_W", "1920"),
+        ("AGRIVISION_INFER_FRAME_MAX_W", "1280"),
         ("AGRIVISION_GRID", "0"),
         ("AGRIVISION_PHONE_CROP", "1"),
-        ("AGRIVISION_PREPROC_ALIGN", "0"),
-        ("AGRIVISION_CLS_MIN_CONF", "0.55"),
+        ("AGRIVISION_PREPROC_ALIGN", "1"),
+        ("AGRIVISION_CLS_MIN_CONF", "0.45"),
         ("AGRIVISION_INFER_MODE", "both"),
-        ("AGRIVISION_DET_TILES", "3"),
-        ("AGRIVISION_MAX_DET", "80"),
+        ("AGRIVISION_DET_TILES", "4"),
+        ("AGRIVISION_DET_TILE_OVERLAP", "0.25"),
+        ("AGRIVISION_MAX_DET", "300"),
+        ("AGRIVISION_DET_CONF", "0.30"),
+        ("AGRIVISION_DET_IOU", "0.55"),
         ("AGRIVISION_DET_MIN_CONF", "0.35"),
+        ("AGRIVISION_DET_MIN_AREA", "300"),
+        ("AGRIVISION_MIN_TREE_BOXES", "6"),
+        ("AGRIVISION_GRID_CLS", "5"),
+        ("AGRIVISION_GRID_FALLBACK", "0"),
     ):
         os.environ.setdefault(key, val)
 
@@ -67,10 +77,11 @@ class MainWindow(QWidget):
 
         self._frame_n = 0
         self._cached_dets = []
+        self._last_stress = None
         self._exclude_rect = None
         self._timer_ms = int(os.environ.get("AGRIVISION_TIMER_MS", "16"))
         self._infer_every = max(1, int(os.environ.get("AGRIVISION_INFER_EVERY", "4")))
-        self._geo_map_every = max(1, int(os.environ.get("AGRIVISION_GEO_MAP_EVERY", "30")))
+        self._geo_map_every = max(1, int(os.environ.get("AGRIVISION_GEO_MAP_EVERY", "90")))
         self._exclude_refresh_every = max(
             1, int(os.environ.get("AGRIVISION_EXCLUDE_REFRESH_EVERY", "15"))
         )
@@ -78,6 +89,8 @@ class MainWindow(QWidget):
         self._mirror = MirrorManager()
         self._capture_window_title = ""
         self._capture = LiveMirrorCapture()
+        self._capture_thread = MirrorCaptureThread(self._capture)
+        self._last_capture_ver = -1
         self._analyzable_cached = False
         self._live_cached = False
         self._quality_every = max(
@@ -101,6 +114,13 @@ class MainWindow(QWidget):
             self._browser_geo.failed.connect(self._on_browser_geo_failed, type=Qt.QueuedConnection)
         self.sidebar.btn_detect_geo.clicked.connect(self._start_geo_detect)
         self.sidebar.geo_updated.connect(self._refresh_leaflet_map)
+        self.sidebar.report_export_requested.connect(self._on_export_field_report)
+        self.sidebar.btn_open_map.clicked.connect(self._open_map_in_browser)
+        self.sidebar.map_panel.field_area_drawn.connect(self._on_field_area_drawn)
+        self.sidebar.map_panel.field_area_cleared.connect(self._on_field_area_cleared)
+        self.sidebar.map_panel.manual_tag_added.connect(self._on_manual_tag_added)
+        self.sidebar.map_panel.manual_tag_removed.connect(self._on_manual_tag_removed)
+        self.sidebar.map_panel.manual_tags_cleared.connect(self._on_manual_tags_cleared)
 
         if should_auto_detect_location():
             QTimer.singleShot(300, self._start_geo_detect)
@@ -249,10 +269,13 @@ class MainWindow(QWidget):
         self._frame_n = 0
         self._cast_ok_streak = 0
         self._exclude_rect = None
+        self._last_capture_ver = -1
         self._capture.reset()
         self._preprocessor.reset()
         self._session.reset()
         self._infer.set_active(True)
+        self._capture_thread.set_title(self._capture_window_title)
+        self._capture_thread.start_capture()
         self.timer.start(max(1, self._timer_ms))
         self.feed.set_running(True)
         self._set_status_dot(self._drone_dot, False)
@@ -263,12 +286,15 @@ class MainWindow(QWidget):
         self._cast_ok_streak = 0
         self._infer.set_active(False)
         self.timer.stop()
+        self._capture_thread.stop_capture()
         self.feed.set_running(False)
         self._set_status_dot(self._drone_dot, False)
         self._set_status_dot(self._processing_dot, False)
 
     def closeEvent(self, event):
         try:
+            if getattr(self, "_capture_thread", None) is not None:
+                self._capture_thread.stop_capture()
             if getattr(self, "_geo_worker", None) is not None and self._geo_worker.isRunning():
                 self._geo_worker.wait(3000)
             if getattr(self, "_infer", None) is not None:
@@ -279,10 +305,12 @@ class MainWindow(QWidget):
         finally:
             super().closeEvent(event)
 
-    def _on_inference_ready(self, dets, summary):
+    def _on_inference_ready(self, dets, stress_map, summary, vegetation):
         self._cached_dets = dets
+        if stress_map is not None:
+            self._last_stress = stress_map
         if summary:
-            self._session.record_analysis(summary)
+            self._session.record_analysis(summary, vegetation)
 
     def _start_android_ip_detect(self) -> None:
         worker = getattr(self, "_android_ip_worker", None)
@@ -306,6 +334,16 @@ class MainWindow(QWidget):
         )
         self.sidebar.set_mirror_status(f"Phone detected: {ip} ({label})")
         self.sidebar.add_log(log(f"Android IP auto-detected: {ip} ({label})"))
+        QTimer.singleShot(800, self._retry_phone_gps_if_needed)
+
+    def _retry_phone_gps_if_needed(self) -> None:
+        geo = self.sidebar.geo_tag()
+        if geo.source == "android_gps":
+            return
+        if self._geo_worker.isRunning():
+            return
+        self.sidebar.add_log(log("Phone connected — reading GPS from phone…"))
+        self._start_geo_detect()
 
     def _on_android_ip_failed(self, message: str) -> None:
         self.sidebar.set_mirror_status("Mirror: phone not found (USB or enter IP manually)")
@@ -364,11 +402,16 @@ class MainWindow(QWidget):
         ok = configure_background_capture(scrcpy_hwnd, agrivision_hwnd)
         if ok:
             # Force cache reset so LiveMirrorCapture re-resolves at the new size
-            self._capture.reset()
+            self._capture_thread.set_title(self._capture_window_title)
+            if self._capture_thread.isRunning():
+                self._capture_thread.request_reset()
+            else:
+                self._capture.reset()
             self.sidebar.add_log(log("Mirror window configured: full-screen background capture active."))
 
     def _on_mirror_stop(self) -> None:
         self._mirror.stop()
+        self._capture_thread.stop_capture()
         self._capture_window_title = ""
         self.sidebar.set_mirror_running(False)
         self.sidebar.set_mirror_status("Mirror: stopped")
@@ -422,42 +465,116 @@ class MainWindow(QWidget):
         new_h = max(1, int(round(raw_capture.shape[0] * scale)))
         return cv2.resize(raw_capture, (max_w, new_h), interpolation=cv2.INTER_AREA)
 
-    def capture_frame(self):
+    def _annotated_capture_frame(self, frame, detections):
+        """Match live-feed overlays: optional grid + detection bounding boxes."""
+        vis = frame.copy()
+        grid_on = (os.environ.get("AGRIVISION_GRID") or "1").strip().lower() not in (
+            "0",
+            "false",
+            "no",
+            "off",
+        )
+        if grid_on:
+            vis = draw_subtle_grid(vis)
+        return draw_boxes(vis, detections)
+
+    def _latest_frame_bgr(self, *, fresh: bool = False):
+        """Best available BGR frame for export (display cache, capture thread, or direct grab)."""
+        if not fresh and self._last_display_frame is not None and self._last_display_frame.size > 0:
+            return self._last_display_frame
+        if self._capture_thread.isRunning():
+            frame, _ = self._capture_thread.latest()
+            if frame is not None and frame.size > 0:
+                return self._display_frame(frame)
         frame = self._capture_source_bgr()
         if frame is None or frame.size == 0:
-            self.sidebar.add_log("Capture skipped (no frame)")
-            return
-        frame = self._preprocess_frame(frame)
-        cv2.imwrite("captured_frame.jpg", frame)
+            return None
+        return self._display_frame(frame)
+
+    def _run_field_report_export(self, *, save_captured_jpg: bool = False) -> dict[str, str] | None:
+        frame = self._latest_frame_bgr(fresh=save_captured_jpg)
+        if frame is None or frame.size == 0:
+            return None
+        detections = list(self._cached_dets)
+        annotated = self._annotated_capture_frame(frame, detections)
+        if save_captured_jpg:
+            cv2.imwrite("captured_frame.jpg", annotated)
 
         paths = export_field_report(
-            frame,
-            self._cached_dets,
+            annotated,
+            detections,
+            self._last_stress,
             video_source=self.sidebar.video_source(),
             geo=self.sidebar.geo_tag(),
             session=self._session.to_dict(),
+            vegetation=self._session.last_vegetation,
+            heat_points=self._session.heatmap_for_display(),
             geo_markers=self._session.geo_markers,
+            field_bounds=self._field_bounds_for_session(),
+            manual_tags=self._session.manual_tags,
         )
-        self.sidebar.add_log("Frame captured and saved as captured_frame.jpg")
-        self.sidebar.add_log(f"Report exported: {paths.get('json', 'output/reports')}")
+        return paths
+
+    def _log_export_paths(self, paths: dict[str, str]) -> None:
+        self.sidebar.add_log(f"Report JSON: {paths.get('json', '')}")
+        self.sidebar.add_log(f"Report CSV: {paths.get('csv', '')}")
         if paths.get("map"):
             self.sidebar.add_log(f"Leaflet map: {paths['map']}")
+        if paths.get("frame"):
+            self.sidebar.add_log(f"Annotated frame: {paths['frame']}")
+
+    def _reveal_export_folder(self, paths: dict[str, str]) -> None:
+        folder = Path(paths.get("json") or paths.get("map") or "output/reports").parent
+        try:
+            if sys.platform == "win32":
+                os.startfile(str(folder.resolve()))  # noqa: S606
+            elif sys.platform == "darwin":
+                import subprocess
+
+                subprocess.Popen(["open", str(folder.resolve())])
+            else:
+                import subprocess
+
+                subprocess.Popen(["xdg-open", str(folder.resolve())])
+        except OSError:
+            self.sidebar.add_log(f"Reports folder: {folder.resolve()}")
+
+    def _on_export_field_report(self) -> None:
+        self.sidebar.btn_export_report.setEnabled(False)
+        try:
+            paths = self._run_field_report_export()
+            if not paths:
+                self.sidebar.add_log("Export skipped (no frame — start mirror or feed first)")
+                return
+            self._log_export_paths(paths)
+            self._reveal_export_folder(paths)
+            self.feed.set_last_updated(f"Last updated: {self._clock_str()}")
+        finally:
+            self.sidebar.btn_export_report.setEnabled(True)
+
+    def capture_frame(self):
+        paths = self._run_field_report_export(save_captured_jpg=True)
+        if not paths:
+            self.sidebar.add_log("Capture skipped (no frame)")
+            return
+        self.sidebar.add_log("Frame captured and saved as captured_frame.jpg")
+        self._log_export_paths(paths)
         self.feed.set_last_updated(f"Last updated: {self._clock_str()}")
 
     def _start_geo_detect(self) -> None:
         if self._geo_worker.isRunning():
             return
+        self._browser_geo_tried = False
         self.sidebar.set_geo_detect_enabled(False)
-        self.sidebar.set_geo_status("Location: detecting (high accuracy GPS / Wi‑Fi)…")
-        if self._browser_geo is not None:
-            self._browser_geo.locate()
-        else:
-            self._geo_worker.start()
+        self.sidebar.set_geo_status("Location: detecting phone GPS / Wi‑Fi…")
+        self._geo_worker.start()
 
     def _apply_geo_result(
         self, lat: float, lon: float, label: str, source: str, accuracy_m: float = 0.0
     ) -> None:
-        self.sidebar.set_geo_coordinates(lat, lon, label=label, source=source)
+        self.sidebar.set_geo_coordinates(
+            lat, lon, label=label, source=source, accuracy_m=accuracy_m
+        )
         self.sidebar.set_geo_detect_enabled(True)
         self.sidebar.add_log(log(f"Location: {label} ({lat:.5f}, {lon:.5f})"))
         if accuracy_m >= 2000:
@@ -466,21 +583,21 @@ class MainWindow(QWidget):
             )
 
     def _on_browser_geo_ready(self, lat: float, lon: float, accuracy_m: float) -> None:
+        if self.sidebar.geo_tag().source == "android_gps":
+            self.sidebar.set_geo_detect_enabled(True)
+            return
         label = format_location_label("Browser GPS", accuracy_m, "browser_gps")
         self._apply_geo_result(lat, lon, label, "browser_gps", accuracy_m)
 
     def _on_browser_geo_failed(self, message: str) -> None:
-        self.sidebar.set_geo_status(f"Location: browser GPS failed — trying Windows…")
+        self.sidebar.set_geo_status(f"Location: browser GPS failed")
         self.sidebar.add_log(log(f"Browser GPS: {message}"))
-        if not self._geo_worker.isRunning():
-            self._geo_worker.start()
+        self._finish_geo_failed(
+            "GPS unavailable. Connect phone via hotspot + ADB, enable Location on phone, "
+            "or enter lat/lon manually."
+        )
 
-    def _on_geo_detected(
-        self, lat: float, lon: float, label: str, source: str, accuracy_m: float
-    ) -> None:
-        self._apply_geo_result(lat, lon, label, source, accuracy_m)
-
-    def _on_geo_failed(self, message: str) -> None:
+    def _finish_geo_failed(self, message: str) -> None:
         from backend.geo import DEFAULT_LAT, DEFAULT_LON
 
         if not self.sidebar.lat_edit.text().strip():
@@ -494,21 +611,124 @@ class MainWindow(QWidget):
         self.sidebar.set_geo_detect_enabled(True)
         self.sidebar.add_log(log(message))
 
-    def _refresh_leaflet_map(self) -> None:
+    def _on_geo_detected(
+        self, lat: float, lon: float, label: str, source: str, accuracy_m: float
+    ) -> None:
+        self._apply_geo_result(lat, lon, label, source, accuracy_m)
+
+    def _on_geo_failed(self, message: str) -> None:
+        if self.sidebar.geo_tag().source == "android_gps":
+            self.sidebar.set_geo_detect_enabled(True)
+            return
+        if self._browser_geo is not None and not getattr(self, "_browser_geo_tried", False):
+            self._browser_geo_tried = True
+            self.sidebar.set_geo_status("Location: trying laptop Wi‑Fi GPS…")
+            self._browser_geo.locate()
+            return
+        self._finish_geo_failed(message)
+
+    def _field_bounds_for_session(self):
+        bounds = self.sidebar.field_bounds()
+        if bounds is not None:
+            return bounds
+        return default_field_bounds(self.sidebar.geo_tag())
+
+    def _on_field_area_drawn(
+        self, south: float, west: float, north: float, east: float
+    ) -> None:
+        self.sidebar.set_field_bounds_quiet(south, west, north, east)
+        self._session.heatmap_points = []
+        self.sidebar.add_log(log("Field area set on map."))
+
+    def _on_field_area_cleared(self) -> None:
+        self.sidebar.clear_field_bounds()
+        self._session.heatmap_points = []
+        self.sidebar.add_log(log("Field area cleared."))
+        self._refresh_leaflet_map()
+
+    def _on_manual_tag_added(self, lat: float, lon: float, category: str) -> None:
+        self._session.add_manual_tag(lat, lon, category)
+        labels = {"healthy": "Healthy", "stressed": "Moderate", "diseased": "High stress"}
+        self.sidebar.set_manual_tag_status(len(self._session.manual_tags))
+        self.sidebar.add_log(
+            log(f"Manual tag: {labels.get(category, category)} at {lat:.6f}, {lon:.6f}")
+        )
+
+    def _on_manual_tag_removed(self, lat: float, lon: float, category: str) -> None:
+        if self._session.remove_manual_tag(lat, lon, category):
+            labels = {"healthy": "Healthy", "stressed": "Moderate", "diseased": "High stress"}
+            self.sidebar.set_manual_tag_status(len(self._session.manual_tags))
+            self.sidebar.add_log(
+                log(f"Removed tag: {labels.get(category, category)} at {lat:.6f}, {lon:.6f}")
+            )
+            if not self._session.manual_tags:
+                self._refresh_leaflet_map()
+
+    def _on_manual_tags_cleared(self) -> None:
+        self._session.clear_manual_tags()
+        self.sidebar.set_manual_tag_status(0)
+        self.sidebar.add_log(log("Manual tags cleared."))
+        self._refresh_leaflet_map()
+
+    def _map_payload(self) -> dict:
+        geo = self.sidebar.geo_tag()
+        payload = build_map_payload(
+            center_lat=geo.latitude,
+            center_lon=geo.longitude,
+            heat_points=self._session.heatmap_for_display(),
+            markers=[],
+            manual_tags=self._session.manual_tags,
+            field_bounds=self._field_bounds_for_session(),
+            accuracy_m=geo.accuracy_m,
+            altitude_m=geo.altitude_m,
+            source=geo.source,
+        )
+        return payload
+
+    def _write_live_map_file(self, map_data: dict) -> Path:
+        from backend.map_export import build_map_html, write_map_html
+
         geo = self.sidebar.geo_tag()
         html = build_map_html(
             center_lat=geo.latitude,
             center_lon=geo.longitude,
-            markers=self._session.geo_markers,
+            heat_points=map_data["heatPoints"],
+            markers=[],
+            manual_tags=self._session.manual_tags,
+            field_bounds=self._field_bounds_for_session(),
+            accuracy_m=geo.accuracy_m,
+            altitude_m=geo.altitude_m,
+            source=geo.source,
         )
         path = write_map_html(html, "output/maps/live_map.html")
-        self.sidebar.update_leaflet_map(html, path)
+        self.sidebar.map_panel.set_map_file(path)
+        return Path(path)
+
+    def _open_map_in_browser(self) -> None:
+        map_data = self._map_payload()
+        self._write_live_map_file(map_data)
+        self.sidebar.map_panel.open_in_browser()
+
+    def _refresh_leaflet_map(self) -> None:
+        map_data = self._map_payload()
+        path = self._write_live_map_file(map_data)
+        if not self.sidebar.map_panel.needs_map_reload() and self.sidebar.map_panel.update_map_data(map_data):
+            self.sidebar.set_manual_tag_status(len(self._session.manual_tags))
+            return
+
+        html = path.read_text(encoding="utf-8")
+        self.sidebar.update_leaflet_map(html, path, map_data)
+        self.sidebar.set_manual_tag_status(len(self._session.manual_tags))
 
     def update_frame(self):
-        raw_capture = self._capture_source_bgr()
+        raw_capture, ver = self._capture_thread.latest()
         if raw_capture is None or raw_capture.size == 0:
             self._update_cast_status(False)
             return
+        # Skip redundant work when the capture thread has no new frame yet.
+        if ver == self._last_capture_ver:
+            return
+        self._last_capture_ver = ver
 
         frame = self._display_frame(raw_capture)
         self._last_display_frame = frame
@@ -581,12 +801,6 @@ class MainWindow(QWidget):
             self._last_det_total = total
             self._last_log_t = now_wall
             self.sidebar.add_log(log(f"{total} object(s) in frame"))
-
-        if analyzable and detections and self._frame_n % self._geo_map_every == 0:
-            geo = self.sidebar.geo_tag()
-            fh, fw = frame.shape[:2]
-            self._session.record_geo_markers(geo, detections, (fh, fw))
-            self._refresh_leaflet_map()
 
         self._update_cast_status(self._live_cached)
         self._frame_n += 1

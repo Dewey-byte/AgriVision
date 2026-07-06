@@ -1,10 +1,11 @@
 import cv2
 import numpy as np
 
-# BGR — mockup palette (#28a745, #ffc107, #dc3545)
-BGR_HEALTHY = (69, 167, 40)
-BGR_STRESSED = (7, 193, 255)
-BGR_DISEASED = (69, 53, 220)
+from utils.stress_palette import CATEGORY_COLOR_BGR
+
+BGR_HEALTHY = CATEGORY_COLOR_BGR["healthy"]
+BGR_STRESSED = CATEGORY_COLOR_BGR["stressed"]
+BGR_DISEASED = CATEGORY_COLOR_BGR["diseased"]
 
 
 def detection_category(label: str) -> str:

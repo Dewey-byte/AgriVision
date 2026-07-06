@@ -367,7 +367,7 @@ def _scale_frame_max_w(frame_bgr: np.ndarray, max_width: int) -> np.ndarray:
     scale = mw / float(frame_bgr.shape[1])
     new_w = mw
     new_h = max(1, int(round(frame_bgr.shape[0] * scale)))
-    return cv2.resize(frame_bgr, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    return cv2.resize(frame_bgr, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
 
 
 def get_frame(

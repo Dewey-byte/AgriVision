@@ -1,0 +1,38 @@
+{
+  "system": "AgriVision",
+  "exported_at": "2026-07-02T18:00:32",
+  "video_source": "unknown",
+  "geo": {
+    "latitude": 7.3669,
+    "longitude": 125.91,
+    "altitude_m": null,
+    "accuracy_m": null,
+    "source": "manual"
+  },
+  "detection_summary": {
+    "total": 1,
+    "healthy": 1,
+    "stressed": 0,
+    "diseased": 0
+  },
+  "detections": [
+    {
+      "bbox": [
+        10,
+        10,
+        50,
+        50
+      ],
+      "label": "Healthy (0.9)",
+      "confidence": 0.9,
+      "class": 0
+    }
+  ],
+  "vegetation": {},
+  "session": {},
+  "artifacts": {
+    "frame": "output\\_smoke_test\\agrivision_20260702_180032_frame.jpg",
+    "leaflet_map": "output\\_smoke_test\\agrivision_20260702_180032_map.html",
+    "report_json": "output\\_smoke_test\\agrivision_20260702_180032_report.json"
+  }
+}

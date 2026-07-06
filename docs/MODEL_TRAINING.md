@@ -218,6 +218,43 @@ Use the same dataset-export pattern; segmentation needs polygon/mask labels inst
 
 ---
 
+## Low-data dataset: detect more banana trees
+
+When labels are limited (~300 images), use this pipeline before retraining:
+
+```powershell
+# 1. Oversample rare disease images in train split
+python tools/balance_yolo_dataset.py --dataset datasets/yolo_banana
+
+# 2. Keep 80-10-10 split
+python tools/split_yolo_dataset.py
+
+# 3. Retrain (stop AgriVision first to free GPU)
+python train.py --epochs 100 --imgsz 640 --batch 16 --device 0
+
+# 4. Restart AgriVision — loads models/best.pt with new inference defaults
+python main.py
+```
+
+**Live inference tuning** (no retrain needed — restart `main.py`):
+
+| Setting | Default | Effect |
+|---------|---------|--------|
+| `AGRIVISION_INFER_MAX_SIDE` | 1280 | Keeps aerial detail (was 320) |
+| `AGRIVISION_IMGSZ` | 640 | Higher YOLO resolution |
+| `AGRIVISION_DET_TILES` | 4 | 4×4 tiled inference → more boxes |
+| `AGRIVISION_DET_MIN_CONF` | 0.35 | Reject weak / non-banana boxes |
+| `AGRIVISION_MAX_DET` | 300 | Allow more trees per frame |
+| `AGRIVISION_GRID_FALLBACK` | 0 | **Off** — grid classifier boxes weeds/soil as banana; only enable after training a `not_banana` class |
+
+> **Avoiding false positives on non-banana:** the trained YOLO model decides what is
+> a banana tree. The classifier grid fallback (`AGRIVISION_GRID_FALLBACK=1`) will box
+> any green region — including grass and weeds — so keep it **off** unless your model
+> struggles and you accept extra false positives. The real fix for missed trees is
+> more labeled banana images, then retrain.
+
+---
+
 ## Troubleshooting
 
 | Problem | Fix |

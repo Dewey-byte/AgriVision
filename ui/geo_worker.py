@@ -13,7 +13,8 @@ class GeoLocateWorker(QThread):
         found = detect_my_location()
         if found is None:
             self.failed.emit(
-                "GPS unavailable. Turn on Windows Location, allow browser GPS, or enter lat/lon manually."
+                "GPS unavailable. Connect phone to laptop hotspot with ADB, turn on phone "
+                "Location, or enter lat/lon manually."
             )
             return
         tag = found.tag

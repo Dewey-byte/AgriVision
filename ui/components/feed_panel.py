@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 
 from ui.components.video_feed import VideoFeed
-from utils.phone_frame import display_aspect_ratio
 
 
 class PrimaryFeedPanel(QFrame):
@@ -79,10 +78,13 @@ class PrimaryFeedPanel(QFrame):
         self._fit_landscape_display()
 
     def _fit_landscape_display(self) -> None:
-        """Size the video widget to a landscape aspect (default 16:9)."""
-        ar = display_aspect_ratio()
-        avail_w = max(120, self._video_viewport.width() - 8)
-        avail_h = max(80, self._video_viewport.height() - 8)
+        """Size the video to the frame's real aspect ratio: fills the panel as much
+        as possible with no zoom/crop and no pixelation."""
+        ar = self.video.source_aspect()
+        if ar <= 0:
+            ar = 16.0 / 9.0
+        avail_w = max(120, self._video_viewport.width())
+        avail_h = max(80, self._video_viewport.height())
 
         w = avail_w
         h = max(1, int(round(w / ar)))

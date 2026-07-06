@@ -54,8 +54,9 @@ def train_model(
     name: str,
     resume: str | None = None,
     workers: int = 0,
+    model_name: str = "yolov8n.pt",
 ) -> Path:
-    weights = resume or str(BASE_WEIGHTS)
+    weights = resume or str(ROOT / model_name)
     if not Path(weights).is_file():
         raise FileNotFoundError(f"Missing weights: {weights}")
 
@@ -73,6 +74,17 @@ def train_model(
         resume=bool(resume),
         workers=workers,
         verbose=True,
+        # Small / imbalanced aerial datasets: stronger aug + class emphasis
+        mosaic=1.0,
+        mixup=0.1,
+        copy_paste=0.1,
+        degrees=5.0,
+        translate=0.15,
+        scale=0.6,
+        fliplr=0.5,
+        cls=1.0,
+        box=7.5,
+        patience=50,
     )
 
     best_weights = Path(results.save_dir) / "weights" / "best.pt"
@@ -93,14 +105,15 @@ def default_device() -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--epochs", type=int, default=50)
-    parser.add_argument("--imgsz", type=int, default=512)
+    parser.add_argument("--epochs", type=int, default=100)
+    parser.add_argument("--imgsz", type=int, default=640)
     parser.add_argument("--batch", type=int, default=16)
     parser.add_argument("--device", default=default_device())
     parser.add_argument("--project", default="runs")
     parser.add_argument("--name", default="banana_disease")
     parser.add_argument("--resume", default=None, help="Path to last.pt to resume training")
     parser.add_argument("--workers", type=int, default=0)
+    parser.add_argument("--model", default="yolov8n.pt", help="Base weights (yolov8n.pt or yolov8s.pt)")
     return parser.parse_args()
 
 
@@ -117,6 +130,7 @@ def main() -> None:
         name=args.name,
         resume=args.resume,
         workers=args.workers,
+        model_name=args.model,
     )
 
 

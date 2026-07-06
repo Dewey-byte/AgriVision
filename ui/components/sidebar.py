@@ -19,6 +19,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from ui.components.card import create_card
 from ui.components.map_panel import MapPanel
 from utils.cast_manager import QUALITY_PRESETS, DEFAULT_QUALITY
+from utils.stress_palette import CATEGORY_COLOR_HEX
 
 
 def _dot(color: str) -> str:
@@ -30,9 +31,14 @@ class Sidebar(QWidget):
     mirror_start_requested = pyqtSignal()
     mirror_stop_requested = pyqtSignal()
     android_ip_detect_requested = pyqtSignal()
+    report_export_requested = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+        self._geo_accuracy_m: float | None = None
+        self._geo_altitude_m: float | None = None
+        self._geo_source = "sidebar"
+        self._field_bounds: dict[str, float] | None = None
         self.setObjectName("sidebar")
         self.setMinimumWidth(260)
         self.setMaximumWidth(360)
@@ -91,9 +97,9 @@ class Sidebar(QWidget):
         boxes_hint.setObjectName("mutedLabel")
         l1.addWidget(boxes_hint)
 
-        self.healthy_row = self._stat_row("#40916c", "Healthy", "0")
-        self.stressed_row = self._stat_row("#d4a373", "Stressed", "0")
-        self.diseased_row = self._stat_row("#bc4749", "Diseased", "0")
+        self.healthy_row = self._stat_row(CATEGORY_COLOR_HEX["healthy"], "Healthy", "0")
+        self.stressed_row = self._stat_row(CATEGORY_COLOR_HEX["stressed"], "Stressed", "0")
+        self.diseased_row = self._stat_row(CATEGORY_COLOR_HEX["diseased"], "Diseased", "0")
         l1.addLayout(self.healthy_row["layout"])
         l1.addLayout(self.stressed_row["layout"])
         l1.addLayout(self.diseased_row["layout"])
@@ -132,8 +138,9 @@ class Sidebar(QWidget):
 
         card_geo, l_geo = create_card("Geo Tag (GPS)")
         geo_hint = QLabel(
-            "High-accuracy mode uses browser GPS / Wi‑Fi first, then Windows Location. "
-            "For exact plantation mapping, paste drone or field GPS coordinates."
+            "With your phone on the laptop hotspot, click Detect My Location to read phone GPS "
+            "over ADB (Wireless debugging). Otherwise uses laptop Wi‑Fi / Windows Location. "
+            "For exact plantation mapping, paste field or drone coordinates."
         )
         geo_hint.setWordWrap(True)
         geo_hint.setObjectName("mutedLabel")
@@ -148,9 +155,10 @@ class Sidebar(QWidget):
         lat_row.addWidget(QLabel("Latitude"))
         self.lat_edit = QLineEdit()
         self.lat_edit.setObjectName("geoLat")
-        self.lat_edit.setPlaceholderText("Auto-detecting…")
+        self.lat_edit.setPlaceholderText("e.g. 7.668806 or 7°40'07.7\"N")
         if default_lat:
             self.lat_edit.setText(default_lat)
+        self.lat_edit.editingFinished.connect(self._normalize_geo_fields)
         lat_row.addWidget(self.lat_edit)
         l_geo.addLayout(lat_row)
 
@@ -158,9 +166,10 @@ class Sidebar(QWidget):
         lon_row.addWidget(QLabel("Longitude"))
         self.lon_edit = QLineEdit()
         self.lon_edit.setObjectName("geoLon")
-        self.lon_edit.setPlaceholderText("Auto-detecting…")
+        self.lon_edit.setPlaceholderText("e.g. 126.102028 or 126°06'07.3\"E")
         if default_lon:
             self.lon_edit.setText(default_lon)
+        self.lon_edit.editingFinished.connect(self._normalize_geo_fields)
         lon_row.addWidget(self.lon_edit)
         l_geo.addLayout(lon_row)
 
@@ -177,23 +186,50 @@ class Sidebar(QWidget):
         l_geo.addWidget(self.btn_detect_geo)
         layout.addWidget(card_geo)
 
-        card3, l3 = create_card("Field Map (Leaflet)")
+        card3, l3 = create_card("Field Map (Leaflet + Heatmap)")
+        field_hint = QLabel(
+            "1. Set plantation GPS above.\n"
+            "2. Optional: draw field area on the map.\n"
+            "3. Click Tag Healthy / Moderate / High Stress on the map, then click spots.\n"
+            "4. Export Field Report saves JSON, CSV, map HTML, and annotated frame."
+        )
+        field_hint.setWordWrap(True)
+        field_hint.setObjectName("mutedLabel")
+        l3.addWidget(field_hint)
+
+     
+
+        self.field_status_label = QLabel("Field area: not set — draw on map")
+        self.field_status_label.setObjectName("mutedLabel")
+        self.field_status_label.setWordWrap(True)
+        l3.addWidget(self.field_status_label)
+
+        self.tag_status_label = QLabel("Manual tags: none — use map toolbar above the map")
+        self.tag_status_label.setObjectName("mutedLabel")
+        self.tag_status_label.setWordWrap(True)
+        l3.addWidget(self.tag_status_label)
+
         self.map_panel = MapPanel()
         self.map_panel.setMinimumHeight(190)
         self.map_panel.setMaximumHeight(230)
         l3.addWidget(self.map_panel)
 
+        self.btn_export_report = QPushButton("Export Field Report")
+        self.btn_export_report.setObjectName("btnPrimary")
+        self.btn_export_report.setCursor(Qt.PointingHandCursor)
+        self.btn_export_report.clicked.connect(self.report_export_requested.emit)
+        l3.addWidget(self.btn_export_report)
+
         self.btn_open_map = QPushButton("Open Map in Browser")
         self.btn_open_map.setObjectName("btnSecondary")
         self.btn_open_map.setCursor(Qt.PointingHandCursor)
-        self.btn_open_map.clicked.connect(self.map_panel.open_in_browser)
         l3.addWidget(self.btn_open_map)
 
         legend = QHBoxLayout()
         legend.setSpacing(12)
-        legend.addWidget(self._legend_item("#40916c", "Healthy"))
-        legend.addWidget(self._legend_item("#d4a373", "Moderate"))
-        legend.addWidget(self._legend_item("#bc4749", "Stressed"))
+        legend.addWidget(self._legend_item(CATEGORY_COLOR_HEX["healthy"], "Healthy"))
+        legend.addWidget(self._legend_item(CATEGORY_COLOR_HEX["stressed"], "Moderate"))
+        legend.addWidget(self._legend_item(CATEGORY_COLOR_HEX["diseased"], "Stressed"))
         legend.addStretch(1)
         l3.addLayout(legend)
         layout.addWidget(card3)
@@ -344,10 +380,100 @@ class Sidebar(QWidget):
     def add_log(self, message: str) -> None:
         self.log_box.append(message)
 
+    def _on_draw_field_clicked(self) -> None:
+        self.map_panel.enable_field_draw()
+        self.field_status_label.setText("Field area: click two opposite corners on the map…")
+
+    def clear_field_bounds(self) -> None:
+        self._field_bounds = None
+        self.field_status_label.setText("Field area: not set — draw on map")
+
+    def _on_clear_field_clicked(self) -> None:
+        self.clear_field_bounds()
+        self.map_panel.clear_field_on_map()
+        self.geo_updated.emit()
+
+    def set_field_bounds(self, south: float, west: float, north: float, east: float) -> None:
+        self._field_bounds = {
+            "south": south,
+            "west": west,
+            "north": north,
+            "east": east,
+        }
+        self.field_status_label.setText(
+            f"Field area: {south:.5f}–{north:.5f} N, {west:.5f}–{east:.5f} E"
+        )
+
+    def set_field_bounds_quiet(self, south: float, west: float, north: float, east: float) -> None:
+        """Update bounds label without triggering a full map reload."""
+        self.set_field_bounds(south, west, north, east)
+
+    def field_bounds(self):
+        from backend.geo import FieldBounds
+
+        return FieldBounds.from_dict(self._field_bounds)
+
+    def set_manual_tag_status(self, count: int) -> None:
+        if count:
+            self.tag_status_label.setText(
+                f"Manual tags: {count} — click Remove tag, then click a pin to delete one"
+            )
+        else:
+            self.tag_status_label.setText("Manual tags: none — use map toolbar above the map")
+
+    def _normalize_geo_fields(self) -> None:
+        """Accept pasted Google Maps DMS or combined 'lat, lon' and show decimals."""
+        from backend.geo import dms_to_decimal, parse_latlon_pair
+
+        lat_text = self.lat_edit.text().strip()
+        lon_text = self.lon_edit.text().strip()
+
+        pair = None
+        if lat_text and not lon_text:
+            pair = parse_latlon_pair(lat_text)
+        if pair is None and lat_text:
+            combined = f"{lat_text} {lon_text}".strip() if lon_text else lat_text
+            pair = parse_latlon_pair(combined)
+
+        if pair is not None:
+            lat, lon = pair
+        else:
+            lat = dms_to_decimal(lat_text)
+            lon = dms_to_decimal(lon_text)
+
+        changed = False
+        if lat is not None:
+            lat = max(-90.0, min(90.0, lat))
+            formatted = f"{lat:.6f}"
+            if formatted != lat_text:
+                self.lat_edit.blockSignals(True)
+                self.lat_edit.setText(formatted)
+                self.lat_edit.blockSignals(False)
+                changed = True
+        if lon is not None:
+            lon = max(-180.0, min(180.0, lon))
+            formatted = f"{lon:.6f}"
+            if formatted != lon_text:
+                self.lon_edit.blockSignals(True)
+                self.lon_edit.setText(formatted)
+                self.lon_edit.blockSignals(False)
+                changed = True
+
+        if changed:
+            self._geo_source = "manual"
+            self._geo_accuracy_m = None
+            self.geo_updated.emit()
+
     def geo_tag(self):
         from backend.geo import resolve_geo_tag
 
-        return resolve_geo_tag(self.lat_edit.text(), self.lon_edit.text(), source="sidebar")
+        return resolve_geo_tag(
+            self.lat_edit.text(),
+            self.lon_edit.text(),
+            altitude_m=self._geo_altitude_m,
+            accuracy_m=self._geo_accuracy_m,
+            source=self._geo_source or "sidebar",
+        )
 
     def set_geo_coordinates(
         self,
@@ -356,9 +482,17 @@ class Sidebar(QWidget):
         *,
         label: str = "",
         source: str = "",
+        accuracy_m: float | None = None,
+        altitude_m: float | None = None,
     ) -> None:
         self.lat_edit.setText(f"{latitude:.6f}")
         self.lon_edit.setText(f"{longitude:.6f}")
+        if accuracy_m is not None and accuracy_m > 0:
+            self._geo_accuracy_m = float(accuracy_m)
+        if altitude_m is not None:
+            self._geo_altitude_m = float(altitude_m)
+        if source:
+            self._geo_source = source
         if label and source:
             self.geo_status_label.setText(f"Location: {label} ({source})")
         elif label:
@@ -373,8 +507,8 @@ class Sidebar(QWidget):
     def set_geo_detect_enabled(self, enabled: bool) -> None:
         self.btn_detect_geo.setEnabled(enabled)
 
-    def update_leaflet_map(self, html: str, file_path=None) -> None:
-        self.map_panel.load_map_html(html, file_path)
+    def update_leaflet_map(self, html: str, file_path=None, map_data: dict | None = None) -> None:
+        self.map_panel.load_map_html(html, file_path, map_data)
 
     def video_source(self) -> str:
         return "scrcpy"

@@ -1,103 +1,647 @@
-"""Leaflet geo-tagged marker export."""
-
-from __future__ import annotations
-
-import json
-from pathlib import Path
-from typing import Any
-
-from backend.geo import GeoTag
-
-_CATEGORY_COLOR = {
-    "healthy": "#40916c",
-    "stressed": "#d4a373",
-    "diseased": "#bc4749",
-}
-
-
-def build_map_html(
-    *,
-    center_lat: float,
-    center_lon: float,
-    markers: list[dict[str, Any]] | None = None,
-    title: str = "AgriVision — Field Map",
-) -> str:
-    """Build a standalone Leaflet HTML page with geo-tagged detection markers."""
-    marks = markers or []
-    center = [center_lat, center_lon]
-
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{title}</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style>
-    html, body, #map {{ margin: 0; height: 100%; width: 100%; }}
-    .leaflet-container {{ font: 12px/1.4 system-ui, sans-serif; }}
-  </style>
-</head>
-<body>
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    const center = {json.dumps(center)};
-    const markers = {json.dumps(marks)};
-    const colors = {json.dumps(_CATEGORY_COLOR)};
-
-    const map = L.map('map', {{ zoomControl: true }}).setView(center, 17);
-    L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap'
-    }}).addTo(map);
-
-    L.circleMarker(center, {{
-      radius: 7,
-      color: '#1b4332',
-      fillColor: '#52b788',
-      fillOpacity: 0.95,
-      weight: 2
-    }}).addTo(map).bindPopup('<b>Drone / field anchor</b><br>Lat: ' + center[0] + '<br>Lon: ' + center[1]);
-
-    markers.forEach(m => {{
-      const c = colors[m.category] || '#40916c';
-      L.circleMarker([m.lat, m.lon], {{
-        radius: 6,
-        color: c,
-        fillColor: c,
-        fillOpacity: 0.85,
-        weight: 2
-      }}).addTo(map).bindPopup('<b>' + m.label + '</b><br>' + (m.category || '') +
-        (m.confidence != null ? '<br>conf: ' + Number(m.confidence).toFixed(2) : ''));
-    }});
-
-    if (markers.length) {{
-      const group = L.featureGroup();
-      markers.forEach(m => group.addLayer(L.circleMarker([m.lat, m.lon])));
-      try {{ map.fitBounds(group.getBounds().pad(0.15)); }} catch (e) {{}}
-    }}
-  </script>
-</body>
-</html>
-"""
-
-
-def write_map_html(html: str, path: str | Path) -> Path:
-    out = Path(path)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(html, encoding="utf-8")
-    return out.resolve()
-
-
-def export_leaflet_map(
-    center: GeoTag,
-    markers: list[dict[str, Any]],
-    out_path: str | Path,
-) -> Path:
-    html = build_map_html(
-        center_lat=center.latitude,
-        center_lon=center.longitude,
-        markers=markers,
-    )
-    return write_map_html(html, out_path)
+"""Leaflet stress heatmap + geo-tagged marker export."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+from backend.geo import FieldBounds, GeoTag
+from utils.stress_palette import (
+    CATEGORY_COLOR_HEX,
+    CATEGORY_HEAT,
+    CATEGORY_LABEL,
+    HEAT_GRADIENT,
+)
+
+_CATEGORY_COLOR = CATEGORY_COLOR_HEX
+_CATEGORY_HEAT = CATEGORY_HEAT
+_CATEGORY_LABEL = CATEGORY_LABEL
+
+_MAP_JS_VERSION = 7
+
+
+def manual_tags_to_heat_points(
+    tags: list[dict[str, Any]] | None,
+    *,
+    spread: float = 0.000028,
+) -> list[list[float]]:
+    """Convert manually tagged map pins into leaflet.heat points."""
+    if not tags:
+        return []
+    points: list[list[float]] = []
+    for tag in tags:
+        lat = float(tag["lat"])
+        lon = float(tag["lon"])
+        cat = str(tag.get("category") or "healthy")
+        weight = float(_CATEGORY_HEAT.get(cat, 0.5))
+        points.append([round(lat, 7), round(lon, 7), round(weight, 3)])
+        for dlat, dlon in ((spread, 0), (-spread, 0), (0, spread), (0, -spread)):
+            points.append([round(lat + dlat, 7), round(lon + dlon, 7), round(weight * 0.82, 3)])
+    return points
+
+
+def manual_tag_record(lat: float, lon: float, category: str) -> dict[str, Any]:
+    import uuid
+
+    cat = category if category in _CATEGORY_HEAT else "healthy"
+    return {
+        "id": str(uuid.uuid4())[:8],
+        "lat": round(lat, 7),
+        "lon": round(lon, 7),
+        "category": cat,
+        "label": f"{_CATEGORY_LABEL[cat]} (manual)",
+        "source": "manual_tag",
+    }
+
+_MAP_DRAW_JS = """
+    let fieldRect = null;
+    let drawMode = false;
+    let drawCorner1 = null;
+    let drawCornerMarker = null;
+
+    function renderFieldBounds(bounds, fitView) {
+      if (fieldRect != null) {
+        map.removeLayer(fieldRect);
+        fieldRect = null;
+      }
+      if (!bounds) return;
+      fieldRect = L.rectangle(
+        [[bounds.south, bounds.west], [bounds.north, bounds.east]],
+        { color: '#1b4332', weight: 2, fillColor: '#52b788', fillOpacity: 0.12 }
+      ).addTo(map).bindPopup('<b>Field area</b>');
+      if (fitView) {
+        try { map.fitBounds(fieldRect.getBounds().pad(0.08)); } catch (e) {}
+      }
+    }
+
+    window.agriVisionSetFieldBounds = function(bounds, fitView) {
+      window.__agriVisionFieldBounds = bounds || null;
+      renderFieldBounds(bounds, !!fitView);
+    };
+
+    window.agriVisionEnableDrawMode = function(on) {
+      drawMode = !!on;
+      drawCorner1 = null;
+      if (drawCornerMarker != null) {
+        map.removeLayer(drawCornerMarker);
+        drawCornerMarker = null;
+      }
+      if (on && typeof window.agriVisionSetTagMode === 'function') {
+        window.agriVisionSetTagMode(null);
+      }
+      map.getContainer().style.cursor = drawMode ? 'crosshair' : '';
+      const btn = document.getElementById('drawFieldBtn');
+      if (btn) {
+        btn.textContent = drawMode ? 'Click 2 corners…' : 'Draw field area';
+        btn.style.background = drawMode ? '#d4a373' : '#1b4332';
+      }
+    };
+
+    function finishFieldDraw(corner1, corner2) {
+      const bounds = L.latLngBounds(corner1, corner2);
+      if (bounds.getNorth() - bounds.getSouth() < 1e-6) return;
+      if (bounds.getEast() - bounds.getWest() < 1e-6) return;
+      const payload = {
+        south: bounds.getSouth(),
+        west: bounds.getWest(),
+        north: bounds.getNorth(),
+        east: bounds.getEast()
+      };
+      window.__agriVisionFieldBounds = payload;
+      renderFieldBounds(payload, true);
+      window.agriVisionEnableDrawMode(false);
+      if (window.agriVisionBridge && window.agriVisionBridge.onFieldAreaDrawn) {
+        window.agriVisionBridge.onFieldAreaDrawn(
+          payload.south, payload.west, payload.north, payload.east
+        );
+      }
+    }
+
+    window.agriVisionHandleMapClick = function(lat, lon) {
+      const latlng = L.latLng(lat, lon);
+      if (drawMode) {
+        if (!drawCorner1) {
+          drawCorner1 = latlng;
+          if (drawCornerMarker != null) map.removeLayer(drawCornerMarker);
+          drawCornerMarker = L.circleMarker(drawCorner1, {
+            radius: 6, color: '#1b4332', fillColor: '#52b788', fillOpacity: 0.9, weight: 2
+          }).addTo(map);
+          return;
+        }
+        finishFieldDraw(drawCorner1, latlng);
+        drawCorner1 = null;
+        if (drawCornerMarker != null) {
+          map.removeLayer(drawCornerMarker);
+          drawCornerMarker = null;
+        }
+        return;
+      }
+      if (tagMode && typeof addManualTag === 'function') {
+        addManualTag(lat, lon, tagMode);
+      }
+    };
+
+    document.getElementById('drawFieldBtn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      window.agriVisionEnableDrawMode(!drawMode);
+    });
+    document.getElementById('clearFieldBtn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      window.agriVisionSetFieldBounds(null, false);
+      if (window.agriVisionBridge && window.agriVisionBridge.onFieldAreaCleared) {
+        window.agriVisionBridge.onFieldAreaCleared();
+      }
+    });
+"""
+
+_MAP_TAG_JS = """
+    let tagMode = null;
+    let removeTagMode = false;
+    let manualTags = [];
+    let tagIdCounter = 0;
+    const manualTagLayer = L.layerGroup().addTo(map);
+    const manualHeatLayer = L.layerGroup().addTo(map);
+
+    function raiseManualTagLayers() {
+      manualTagLayer.eachLayer(layer => {
+        if (layer && typeof layer.bringToFront === 'function') layer.bringToFront();
+      });
+      manualHeatLayer.eachLayer(layer => {
+        if (layer && typeof layer.bringToFront === 'function') layer.bringToFront();
+      });
+    }
+
+    function categoryLabel(cat) {
+      return ({ healthy: 'Healthy', stressed: 'Moderate', diseased: 'High stress' })[cat] || cat;
+    }
+
+    function tagColor(cat) {
+      return colors[cat] || '#40916c';
+    }
+
+    function styleTagButtons(activeCat) {
+      const removeBtn = document.getElementById('removeTagBtn');
+      if (removeBtn) {
+        removeBtn.style.background = removeTagMode ? '#52796f' : '#344e41';
+        removeBtn.style.outline = removeTagMode ? '2px solid #fff' : 'none';
+      }
+      ['tagHealthyBtn','tagModerateBtn','tagStressBtn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        const cat = btn.dataset.category;
+        btn.style.background = tagColor(cat);
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        btn.style.borderRadius = '6px';
+        btn.style.padding = '6px 8px';
+        btn.style.font = '11px system-ui';
+        btn.style.cursor = 'pointer';
+        btn.style.opacity = activeCat === cat ? '1' : '0.92';
+        btn.style.outline = activeCat === cat ? '2px solid #fff' : 'none';
+      });
+    }
+
+    function makeTagMarker(t) {
+      const c = tagColor(t.category);
+      const marker = L.circleMarker([t.lat, t.lon], {
+        radius: 9,
+        color: '#ffffff',
+        fillColor: c,
+        fillOpacity: 1.0,
+        weight: 3
+      });
+      marker.bindPopup(
+        '<b>' + categoryLabel(t.category) + '</b><br>Manual tag<br>' +
+        '<button type="button" style="margin-top:6px;padding:4px 8px;border:none;border-radius:4px;' +
+        'background:#52796f;color:#fff;cursor:pointer;" class="agri-remove-tag" data-id="' +
+        (t.id || '') + '">Remove this tag</button>'
+      );
+      marker.on('popupopen', () => {
+        const btn = document.querySelector('.agri-remove-tag[data-id="' + t.id + '"]');
+        if (btn) btn.onclick = () => removeManualTagById(t.id);
+      });
+      marker.on('click', (ev) => {
+        if (removeTagMode) {
+          L.DomEvent.stopPropagation(ev);
+          removeManualTagById(t.id);
+        }
+      });
+      return marker;
+    }
+
+    function updateManualHeatVisual(tags) {
+      manualHeatLayer.clearLayers();
+      tags.forEach(t => {
+        const c = tagColor(t.category);
+        L.circle([t.lat, t.lon], {
+          radius: 22,
+          color: c,
+          fillColor: c,
+          fillOpacity: 0.35,
+          weight: 1,
+          opacity: 0.9
+        }).addTo(manualHeatLayer);
+      });
+      raiseManualTagLayers();
+    }
+
+    function syncHeatLayer() {
+      if (heatLayer == null) return;
+      if (manualTags.length) {
+        heatLayer.setLatLngs([]);
+        updateManualHeatVisual(manualTags);
+      } else {
+        manualHeatLayer.clearLayers();
+        heatLayer.setLatLngs(window.__agriVisionAutoHeat || []);
+      }
+    }
+
+    function renderManualTags(tags, skipHeat) {
+      manualTags = (tags || []).map(t => ({
+        id: t.id || ('t' + (++tagIdCounter)),
+        lat: t.lat,
+        lon: t.lon,
+        category: t.category,
+        label: t.label || categoryLabel(t.category) + ' (manual)'
+      }));
+      manualTagLayer.clearLayers();
+      manualTags.forEach(t => makeTagMarker(t).addTo(manualTagLayer));
+      if (!skipHeat) syncHeatLayer();
+      raiseManualTagLayers();
+    }
+
+    window.agriVisionSetTagMode = function(category) {
+      tagMode = category || null;
+      if (tagMode) removeTagMode = false;
+      drawMode = false;
+      map.getContainer().style.cursor = tagMode ? 'crosshair' : (removeTagMode ? 'pointer' : '');
+      styleTagButtons(tagMode);
+    };
+
+    window.agriVisionSetRemoveTagMode = function(on) {
+      removeTagMode = !!on;
+      if (removeTagMode) {
+        tagMode = null;
+        drawMode = false;
+      }
+      map.getContainer().style.cursor = removeTagMode ? 'pointer' : '';
+      styleTagButtons(null);
+    };
+
+    function removeManualTagById(id) {
+      const idx = manualTags.findIndex(t => t.id === id);
+      if (idx < 0) return;
+      const removed = manualTags[idx];
+      manualTags.splice(idx, 1);
+      renderManualTags(manualTags);
+      map.closePopup();
+      if (window.agriVisionBridge && window.agriVisionBridge.onManualTagRemoved) {
+        window.agriVisionBridge.onManualTagRemoved(removed.lat, removed.lon, removed.category);
+      }
+    }
+
+    function findNearestTag(lat, lon, maxM) {
+      let best = null;
+      let bestD = maxM;
+      manualTags.forEach(t => {
+        const d = map.distance([lat, lon], [t.lat, t.lon]);
+        if (d < bestD) {
+          bestD = d;
+          best = t;
+        }
+      });
+      return best;
+    }
+
+    function addManualTag(lat, lon, category) {
+      const tag = {
+        id: 't' + (++tagIdCounter) + '-' + Date.now(),
+        lat, lon, category,
+        label: categoryLabel(category) + ' (manual)'
+      };
+      manualTags.push(tag);
+      makeTagMarker(tag).addTo(manualTagLayer);
+      syncHeatLayer();
+      raiseManualTagLayers();
+      if (window.agriVisionBridge && window.agriVisionBridge.onManualTagAdded) {
+        window.agriVisionBridge.onManualTagAdded(lat, lon, category);
+      }
+    }
+
+    map.on('click', (e) => {
+      if (removeTagMode) {
+        L.DomEvent.stopPropagation(e);
+        const lat = Math.round(e.latlng.lat * 1e7) / 1e7;
+        const lon = Math.round(e.latlng.lng * 1e7) / 1e7;
+        const near = findNearestTag(lat, lon, 35);
+        if (near) removeManualTagById(near.id);
+        return;
+      }
+      if (!drawMode && !tagMode) return;
+      L.DomEvent.stopPropagation(e);
+      const lat = Math.round(e.latlng.lat * 1e7) / 1e7;
+      const lon = Math.round(e.latlng.lng * 1e7) / 1e7;
+      window.agriVisionHandleMapClick(lat, lon);
+    });
+
+    document.getElementById('tagHealthyBtn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      window.agriVisionSetRemoveTagMode(false);
+      window.agriVisionSetTagMode(tagMode === 'healthy' ? null : 'healthy');
+    });
+    document.getElementById('tagModerateBtn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      window.agriVisionSetRemoveTagMode(false);
+      window.agriVisionSetTagMode(tagMode === 'stressed' ? null : 'stressed');
+    });
+    document.getElementById('tagStressBtn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      window.agriVisionSetRemoveTagMode(false);
+      window.agriVisionSetTagMode(tagMode === 'diseased' ? null : 'diseased');
+    });
+    document.getElementById('removeTagBtn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      window.agriVisionSetTagMode(null);
+      window.agriVisionSetRemoveTagMode(!removeTagMode);
+    });
+    styleTagButtons(null);
+"""
+
+
+def build_map_payload(
+    *,
+    center_lat: float,
+    center_lon: float,
+    heat_points: list[list[float]] | None = None,
+    markers: list[dict[str, Any]] | None = None,
+    manual_tags: list[dict[str, Any]] | None = None,
+    field_bounds: FieldBounds | dict[str, float] | None = None,
+    accuracy_m: float | None = None,
+    altitude_m: float | None = None,
+    source: str = "",
+) -> dict[str, Any]:
+    bounds = None
+    if isinstance(field_bounds, FieldBounds):
+        bounds = field_bounds.to_dict()
+    elif isinstance(field_bounds, dict):
+        bounds = field_bounds
+
+    return {
+        "center": [center_lat, center_lon],
+        "heatPoints": heat_points or [],
+        "markers": markers or [],
+        "manualTags": manual_tags or [],
+        "fieldBounds": bounds,
+        "colors": _CATEGORY_COLOR,
+        "categoryHeat": _CATEGORY_HEAT,
+        "heatGradient": HEAT_GRADIENT,
+        "manualOnly": bool(manual_tags),
+        "meta": {
+            "accuracy_m": accuracy_m,
+            "altitude_m": altitude_m,
+            "source": source,
+        },
+    }
+
+
+def build_map_html(
+    *,
+    center_lat: float,
+    center_lon: float,
+    heat_points: list[list[float]] | None = None,
+    markers: list[dict[str, Any]] | None = None,
+    manual_tags: list[dict[str, Any]] | None = None,
+    field_bounds: FieldBounds | dict[str, float] | None = None,
+    accuracy_m: float | None = None,
+    altitude_m: float | None = None,
+    source: str = "",
+    title: str = "AgriVision — Field Stress Map",
+    interactive: bool = True,
+) -> str:
+    """Build a standalone Leaflet HTML page with heat layer and geo markers."""
+    payload = build_map_payload(
+        center_lat=center_lat,
+        center_lon=center_lon,
+        heat_points=heat_points,
+        markers=markers,
+        manual_tags=manual_tags,
+        field_bounds=field_bounds,
+        accuracy_m=accuracy_m,
+        altitude_m=altitude_m,
+        source=source,
+    )
+
+    draw_toolbar = ""
+    draw_script = ""
+    qwebchannel_script = ""
+    if interactive:
+        draw_toolbar = """
+  <div id="mapToolbar" style="position:absolute;top:10px;left:10px;z-index:1000;display:flex;gap:6px;flex-wrap:wrap;max-width:70%;pointer-events:auto;">
+    <button id="tagHealthyBtn" data-category="healthy" type="button" style="padding:6px 8px;border:none;border-radius:6px;background:#40916c;color:#fff;font:11px system-ui;cursor:pointer;">Tag Healthy</button>
+    <button id="tagModerateBtn" data-category="stressed" type="button" style="padding:6px 8px;border:none;border-radius:6px;background:#d4a373;color:#fff;font:11px system-ui;cursor:pointer;">Tag Moderate</button>
+    <button id="tagStressBtn" data-category="diseased" type="button" style="padding:6px 8px;border:none;border-radius:6px;background:#bc4749;color:#fff;font:11px system-ui;cursor:pointer;">Tag High Stress</button>
+    <button id="removeTagBtn" type="button" style="padding:6px 8px;border:none;border-radius:6px;background:#344e41;color:#fff;font:11px system-ui;cursor:pointer;">Remove tag</button>
+  </div>
+  <div id="fieldToolbar" style="position:absolute;top:10px;right:10px;z-index:1000;display:flex;gap:6px;pointer-events:auto;">
+    <button id="drawFieldBtn" type="button" style="padding:6px 10px;border:none;border-radius:6px;background:#1b4332;color:#fff;font:12px system-ui;cursor:pointer;">Draw field area</button>
+    <button id="clearFieldBtn" type="button" style="padding:6px 10px;border:none;border-radius:6px;background:#52796f;color:#fff;font:12px system-ui;cursor:pointer;">Clear area</button>
+  </div>"""
+        qwebchannel_script = """
+  <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+  <script>
+    if (typeof qt !== 'undefined') {
+      new QWebChannel(qt.webChannelTransport, function(channel) {
+        window.agriVisionBridge = channel.objects.bridge;
+      });
+    }
+  </script>"""
+        draw_script = _MAP_DRAW_JS + _MAP_TAG_JS
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body, #map {{ margin: 0; height: 100%; width: 100%; }}
+    .leaflet-container {{ font: 12px/1.4 system-ui, sans-serif; }}
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  {draw_toolbar}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  {qwebchannel_script}
+  <script>
+    const initialPayload = {json.dumps(payload)};
+    const center = initialPayload.center;
+    const colors = initialPayload.colors;
+    const defaultHeatGradient = {json.dumps(HEAT_GRADIENT)};
+
+    function heatGradientFrom(payload) {{
+      return (payload && payload.heatGradient) || initialPayload.heatGradient || defaultHeatGradient;
+    }}
+
+    const map = L.map('map', {{ zoomControl: true, preferCanvas: true }}).setView(center, 17);
+    let heatLayer = null;
+    let anchorMarker = null;
+    let accuracyCircle = null;
+    let hasFitBounds = false;
+    let userMovedMap = false;
+    const markerLayer = L.layerGroup().addTo(map);
+    map.on('dragstart zoomstart', () => {{ userMovedMap = true; }});
+
+    const satellite = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{{z}}/{{y}}/{{x}}',
+      {{ maxZoom: 18, attribution: 'Tiles &copy; Esri' }}
+    );
+    satellite.addTo(map);
+
+    function anchorPopup(center, meta) {{
+      const anchorLines = [
+        '<b>Field anchor</b>',
+        'Lat: ' + center[0].toFixed(6),
+        'Lon: ' + center[1].toFixed(6)
+      ];
+      if (meta.altitude_m != null) anchorLines.push('Alt: ' + Number(meta.altitude_m).toFixed(1) + ' m');
+      if (meta.source) anchorLines.push('Source: ' + meta.source);
+      return anchorLines.join('<br>');
+    }}
+
+    function extendBounds(bounds, points, markers) {{
+      points.forEach(p => bounds.extend([p[0], p[1]]));
+      markers.forEach(m => bounds.extend([m.lat, m.lon]));
+      return bounds;
+    }}
+
+    window.agriVisionUpdateMap = function(payload) {{
+      const center = payload.center;
+      const heatPoints = payload.heatPoints || [];
+      const markers = payload.markers || [];
+      const meta = payload.meta || {{}};
+      if (!payload.manualOnly) {{
+        window.__agriVisionAutoHeat = heatPoints;
+      }}
+
+      if (anchorMarker == null) {{
+        anchorMarker = L.circleMarker(center, {{
+          radius: 7,
+          color: '#1b4332',
+          fillColor: '#52b788',
+          fillOpacity: 0.95,
+          weight: 2
+        }}).addTo(map);
+      }}
+      anchorMarker.setLatLng(center).bindPopup(anchorPopup(center, meta));
+
+      if (accuracyCircle != null) {{
+        map.removeLayer(accuracyCircle);
+        accuracyCircle = null;
+      }}
+      if (meta.accuracy_m != null && meta.accuracy_m > 0) {{
+        accuracyCircle = L.circle(center, {{
+          radius: meta.accuracy_m,
+          color: '#1b4332',
+          fillColor: '#52b788',
+          fillOpacity: 0.08,
+          weight: 1,
+          dashArray: '4 4'
+        }}).addTo(map).bindPopup('GPS accuracy radius');
+      }}
+
+      if (payload.fieldBounds) {{
+        window.agriVisionSetFieldBounds && window.agriVisionSetFieldBounds(payload.fieldBounds, false);
+      }}
+
+      if (heatLayer == null) {{
+        heatLayer = L.heatLayer([], {{
+        radius: 18,
+        blur: 14,
+        maxZoom: 17,
+        minOpacity: 0.4,
+        gradient: heatGradientFrom(payload)
+      }}).addTo(map);
+      }}
+      if (typeof renderManualTags === 'function') {{
+        renderManualTags(payload.manualTags || [], true);
+      }} else if (heatLayer != null) {{
+        heatLayer.setLatLngs(heatPoints);
+      }}
+      if (typeof syncHeatLayer === 'function') syncHeatLayer();
+      if (typeof raiseManualTagLayers === 'function') raiseManualTagLayers();
+
+      markerLayer.clearLayers();
+      if (!payload.manualOnly && markers.length > 0 && markers.length <= 40) {{
+      markers.forEach(m => {{
+        const c = colors[m.category] || '#40916c';
+        L.circleMarker([m.lat, m.lon], {{
+          radius: 6,
+          color: c,
+          fillColor: c,
+          fillOpacity: 0.85,
+          weight: 2
+        }}).addTo(markerLayer).bindPopup('<b>' + m.label + '</b><br>' + (m.category || '') +
+          (m.confidence != null ? '<br>conf: ' + Number(m.confidence).toFixed(2) : ''));
+      }});
+      }}
+
+      if (!hasFitBounds && !userMovedMap && payload.fieldBounds) {{
+        try {{
+          const b = payload.fieldBounds;
+          map.fitBounds([[b.south, b.west], [b.north, b.east]], {{ padding: [20, 20] }});
+          hasFitBounds = true;
+        }} catch (e) {{}}
+      }} else if (!hasFitBounds && !userMovedMap && (heatPoints.length || markers.length)) {{
+        try {{
+          const bounds = extendBounds(L.latLngBounds([]), heatPoints, markers);
+          map.fitBounds(bounds.pad(0.15));
+          hasFitBounds = true;
+        }} catch (e) {{}}
+      }}
+    }};
+
+    {draw_script}
+
+    window.agriVisionUpdateMap(initialPayload);
+    if (initialPayload.fieldBounds) {{
+      window.agriVisionSetFieldBounds(initialPayload.fieldBounds, !userMovedMap);
+    }}
+  </script>
+</body>
+</html>
+"""
+
+
+def write_map_html(html: str, path: str | Path) -> Path:
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(html, encoding="utf-8")
+    return out.resolve()
+
+
+def export_leaflet_map(
+    center: GeoTag,
+    markers: list[dict[str, Any]],
+    out_path: str | Path,
+    *,
+    heat_points: list[list[float]] | None = None,
+    manual_tags: list[dict[str, Any]] | None = None,
+    field_bounds: FieldBounds | None = None,
+) -> Path:
+    html = build_map_html(
+        center_lat=center.latitude,
+        center_lon=center.longitude,
+        heat_points=heat_points,
+        markers=markers,
+        manual_tags=manual_tags,
+        field_bounds=field_bounds,
+        accuracy_m=center.accuracy_m,
+        altitude_m=center.altitude_m,
+        source=center.source,
+        interactive=False,
+    )
+    return write_map_html(html, out_path)

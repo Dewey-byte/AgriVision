@@ -43,10 +43,14 @@ def _detect_on_image(frame: np.ndarray, offset_x: int = 0, offset_y: int = 0) ->
     max_det = int(os.environ.get("AGRIVISION_MAX_DET", "80"))
     sh, sw = small.shape[:2]
     eff_imgsz = min(imgsz, max(sh, sw))
+    conf_thresh = float(os.environ.get("AGRIVISION_DET_CONF", "0.30"))
+    iou_thresh = float(os.environ.get("AGRIVISION_DET_IOU", "0.55"))
 
     results = model.predict(
         small,
         imgsz=eff_imgsz,
+        conf=conf_thresh,
+        iou=iou_thresh,
         verbose=False,
         half=_want_half(),
         max_det=max_det,
@@ -55,7 +59,7 @@ def _detect_on_image(frame: np.ndarray, offset_x: int = 0, offset_y: int = 0) ->
     detections = []
     names = model.names
     conf_min = float(os.environ.get("AGRIVISION_DET_MIN_CONF", "0.35"))
-    min_area = int(os.environ.get("AGRIVISION_DET_MIN_AREA", "400"))
+    min_area = int(os.environ.get("AGRIVISION_DET_MIN_AREA", "300"))
 
     for r in results:
         boxes = r.boxes
@@ -143,8 +147,8 @@ def _tiled_detection(frame: np.ndarray, grid: int) -> list[dict]:
 def run_detection(frame):
     """Run YOLO; uses tiled inference on large aerial frames for multiple boxes per image."""
     h, w = frame.shape[:2]
-    grid = int(os.environ.get("AGRIVISION_DET_TILES", "3"))
-    min_side = int(os.environ.get("AGRIVISION_DET_TILE_MIN_SIDE", "400"))
+    grid = int(os.environ.get("AGRIVISION_DET_TILES", "4"))
+    min_side = int(os.environ.get("AGRIVISION_DET_TILE_MIN_SIDE", "360"))
 
     if grid > 1 and max(h, w) >= min_side:
         return _tiled_detection(frame, grid)
