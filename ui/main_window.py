@@ -273,6 +273,11 @@ class MainWindow(QWidget):
         self._capture.reset()
         self._preprocessor.reset()
         self._session.reset()
+        override = self.sidebar.video_id_override()
+        if override:
+            self._session.set_video_id(override)
+        self.sidebar.set_video_id(self._session.video_id)
+        self.sidebar.add_log(log(f"Flight video ID: {self._session.video_id}"))
         self._infer.set_active(True)
         self._capture_thread.set_title(self._capture_window_title)
         self._capture_thread.start_capture()

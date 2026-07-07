@@ -70,6 +70,25 @@ class Sidebar(QWidget):
         src_heading.setObjectName("cardTitle")
         source_lay.addWidget(src_heading)
 
+        self._auto_video_id = ""
+        vid_row = QHBoxLayout()
+        vid_row.setSpacing(8)
+        vid_label = QLabel("Flight Video ID")
+        vid_label.setObjectName("mutedLabel")
+        vid_row.addWidget(vid_label)
+        vid_row.addStretch(1)
+        self.btn_new_video_id = QPushButton("New ID")
+        self.btn_new_video_id.setObjectName("btnSecondary")
+        self.btn_new_video_id.setCursor(Qt.PointingHandCursor)
+        self.btn_new_video_id.clicked.connect(self._on_new_video_id)
+        vid_row.addWidget(self.btn_new_video_id)
+        source_lay.addLayout(vid_row)
+
+        self.video_id_edit = QLineEdit()
+        self.video_id_edit.setObjectName("videoIdEdit")
+        self.video_id_edit.setPlaceholderText("Assigned before take-off (auto if blank)")
+        source_lay.addWidget(self.video_id_edit)
+
         self.grp_mirror = QWidget()
         mirror_lay = QVBoxLayout(self.grp_mirror)
         mirror_lay.setContentsMargins(0, 0, 0, 0)
@@ -512,3 +531,20 @@ class Sidebar(QWidget):
 
     def video_source(self) -> str:
         return "scrcpy"
+
+    def _on_new_video_id(self) -> None:
+        from backend.session import generate_video_id
+
+        self.video_id_edit.setText(generate_video_id())
+
+    def set_video_id(self, video_id: str) -> None:
+        """Show the active session's video ID and remember it as the auto value."""
+        self._auto_video_id = (video_id or "").strip()
+        self.video_id_edit.setText(self._auto_video_id)
+
+    def video_id_override(self) -> str:
+        """Operator-entered video ID, or empty when the auto ID should be used."""
+        text = self.video_id_edit.text().strip()
+        if text and text != self._auto_video_id:
+            return text
+        return ""

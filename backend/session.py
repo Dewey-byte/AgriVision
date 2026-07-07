@@ -7,6 +7,7 @@ from __future__ import annotations
 
 
 import os
+import secrets
 from dataclasses import dataclass, field
 
 from datetime import datetime, timezone
@@ -31,6 +32,8 @@ class SessionRecorder:
 
 
     started_at: str = field(default_factory=lambda: _utc_now())
+
+    video_id: str = field(default_factory=lambda: generate_video_id())
 
     frames_processed: int = 0
 
@@ -66,6 +69,8 @@ class SessionRecorder:
 
         self.started_at = _utc_now()
 
+        self.video_id = generate_video_id()
+
         self.frames_processed = 0
 
         self.frames_analyzed = 0
@@ -87,6 +92,12 @@ class SessionRecorder:
         self.last_geo = {}
 
 
+
+    def set_video_id(self, video_id: str) -> None:
+        """Assign the pre-flight video ID for this session (set before take-off)."""
+        vid = (video_id or "").strip()
+        if vid:
+            self.video_id = vid
 
     def record_frame(self) -> None:
 
@@ -204,6 +215,8 @@ class SessionRecorder:
 
             "started_at": self.started_at,
 
+            "video_id": self.video_id,
+
             "frames_processed": self.frames_processed,
 
             "frames_analyzed": self.frames_analyzed,
@@ -235,4 +248,10 @@ class SessionRecorder:
 def _utc_now() -> str:
 
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def generate_video_id() -> str:
+    """Unique flight/video ID assigned before take-off, e.g. AGV-20260708-A3F19C."""
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    return f"AGV-{stamp}-{secrets.token_hex(3).upper()}"
 

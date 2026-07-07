@@ -102,11 +102,15 @@ def export_field_report(
 
 
 
+    video_id = str((session or {}).get("video_id") or "").strip()
+
     payload: dict[str, Any] = {
 
         "system": "AgriVision",
 
         "exported_at": datetime.now().isoformat(timespec="seconds"),
+
+        "video_id": video_id,
 
         "video_source": video_source,
 
@@ -206,7 +210,7 @@ def export_field_report(
 
     csv_path = base.with_name(base.name + "_report.csv")
 
-    _write_csv(csv_path, summary, detections, geo_block, vegetation or {})
+    _write_csv(csv_path, summary, detections, geo_block, vegetation or {}, video_id=video_id)
 
     paths["csv"] = str(csv_path)
 
@@ -248,6 +252,10 @@ def _write_csv(
 
     vegetation: dict[str, float | str],
 
+    *,
+
+    video_id: str = "",
+
 ) -> None:
 
     with path.open("w", newline="", encoding="utf-8") as f:
@@ -255,6 +263,10 @@ def _write_csv(
         writer = csv.writer(f)
 
         writer.writerow(["section", "field", "value"])
+
+        if video_id:
+
+            writer.writerow(["flight", "video_id", video_id])
 
         writer.writerow(["summary", "total", summary["total"]])
 
