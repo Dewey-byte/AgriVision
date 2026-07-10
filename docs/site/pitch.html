@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriVision OS — Pitch Deck</title>
+<meta name="description" content="AgriVision pitch deck: 12 presentation slides, exportable to PDF by screenshot.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M24 4C13 8 7 17 7 27c0 8 5 15 13 17 0-14 4-24 15-31C29 6 26 5 24 4Z' fill='%2322c55e'/></svg>">
+<link rel="stylesheet" href="assets/css/os.css">
+</head>
+<body data-app="pitch" data-crumb="Pitch Deck">
+<main class="os-main">
+<div class="page wide">
+
+  <section class="hero" style="padding-bottom:6px" data-reveal>
+    <span class="eyebrow">Investor / defense deck · 12 slides</span>
+    <h1 class="h-xl">The pitch</h1>
+    <p class="lead">A presentation-ready deck. Present it fullscreen, or export every slide to a PDF — each slide is screenshotted to a canvas and assembled into a landscape PDF entirely in your browser, offline.</p>
+  </section>
+
+  <div class="deck-toolbar" data-reveal>
+    <button class="btn btn-primary" id="pdfBtn"><span id="dlIc"></span> Download PDF</button>
+    <button class="btn btn-ghost" id="presentBtn">▶ Present fullscreen</button>
+    <button class="btn btn-ghost" id="printBtn">🖨 Print</button>
+    <div style="flex:1"></div>
+    <span class="pill" id="progress" style="display:none"><span class="d" style="background:var(--gold)"></span><span id="progressTxt">Rendering…</span></span>
+  </div>
+
+  <div class="deck" id="deck">
+
+    <!-- 1 COVER -->
+    <div class="slide cover">
+      <span class="snum">01 / 12</span>
+      <div class="brandmark"><svg viewBox="0 0 48 48" width="44" height="44"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c55e"/><stop offset="1" stop-color="#0e7a38"/></linearGradient></defs><path d="M24 4C13 8 7 17 7 27c0 8 5 15 13 17 0-14 4-24 15-31C29 6 26 5 24 4Z" fill="url(#g)"/><path d="M20 44c-1-13 3-23 15-31" stroke="#f5c518" stroke-width="2.4" stroke-linecap="round"/></svg><b style="font-size:1.4rem">Agri<span style="color:#f5c518">Vision</span></b></div>
+      <span class="skicker">Legacy College of Compostela · IIT</span>
+      <h2 style="font-size:clamp(1.6rem,4vw,3.1rem)">A drone-based system for detecting banana diseases &amp; mapping disease distribution</h2>
+      <p style="max-width:52ch">Using <b style="color:#eaf5ec">YOLOv8</b>, heatmaps, and geotagging — Compostela, Davao de Oro.</p>
+      <div class="metrics-row">
+        <div class="m"><b>4</b><span>proponents</span></div>
+        <div class="m"><b>3+1</b><span>disease classes</span></div>
+        <div class="m"><b>18 m</b><span>flight altitude</span></div>
+        <div class="m"><b>2026</b><span>capstone</span></div>
+      </div>
+    </div>
+
+    <!-- 2 PROBLEM -->
+    <div class="slide">
+      <span class="snum">02 / 12</span>
+      <span class="skicker">The problem</span>
+      <h2>Banana disease spreads faster than farmers can inspect</h2>
+      <div class="slide-cols">
+        <ul>
+          <li>Panama disease, Black Sigatoka &amp; BBTV cause severe, spreading yield loss</li>
+          <li>Manual inspection is slow, labor-intensive, and error-prone at plantation scale</li>
+          <li>Delayed, inconsistent diagnosis lets hotspots grow unchecked</li>
+        </ul>
+        <div class="visual">
+          <div style="display:grid;gap:12px;width:100%">
+            <div style="background:rgba(214,69,69,.14);border:1px solid rgba(214,69,69,.4);border-radius:14px;padding:16px"><b style="color:#e8615f;font-size:1.6rem">up to 100%</b><div style="color:#b7d4c1;font-size:.85rem">BBTV yield loss in infected plants</div></div>
+            <div style="background:rgba(224,161,0,.14);border:1px solid rgba(224,161,0,.4);border-radius:14px;padding:16px"><b style="color:#f5c518;font-size:1.6rem">&gt; 50%</b><div style="color:#b7d4c1;font-size:.85rem">Black Sigatoka losses by cultivar &amp; environment</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 GAP -->
+    <div class="slide">
+      <span class="snum">03 / 12</span>
+      <span class="skicker">The gap</span>
+      <h2>Existing AI systems stay on the ground</h2>
+      <ul>
+        <li>Most banana AI works on <b style="color:#eaf5ec">close-range</b> leaf/fruit images, not aerial plantation views</li>
+        <li>Few systems offer <b style="color:#eaf5ec">heatmaps</b> or <b style="color:#eaf5ec">geotagged</b> disease mapping for targeted intervention</li>
+        <li>BBTV is underrepresented — most detect only one or two diseases</li>
+        <li>No integrated Philippine, aerial, three-disease monitoring tool exists</li>
+      </ul>
+    </div>
+
+    <!-- 4 SOLUTION -->
+    <div class="slide">
+      <span class="snum">04 / 12</span>
+      <span class="skicker">Our solution</span>
+      <h2>Drone eyes + YOLOv8 + a map that shows where disease is</h2>
+      <div class="slide-cols">
+        <ul>
+          <li><b style="color:#eaf5ec">Capture</b> aerial RGB frames from a drone/phone mirror</li>
+          <li><b style="color:#eaf5ec">Detect</b> Panama, Black Sigatoka &amp; BBTV with YOLOv8</li>
+          <li><b style="color:#eaf5ec">Map</b> detections into heatmaps &amp; geotagged pins</li>
+          <li><b style="color:#eaf5ec">Report</b> health summaries as JSON, CSV &amp; interactive maps</li>
+        </ul>
+        <div class="visual">
+          <div style="display:flex;flex-direction:column;gap:8px;width:100%;font-size:.82rem">
+            <div style="background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.4);border-radius:12px;padding:12px;color:#d3ead9"><b>Input</b> · drone imagery, GPS</div>
+            <div style="text-align:center;color:#22c55e">↓</div>
+            <div style="background:rgba(34,197,94,.16);border:1px solid rgba(34,197,94,.4);border-radius:12px;padding:12px;color:#d3ead9"><b>Process</b> · preprocess → YOLOv8 → geotag + heatmap</div>
+            <div style="text-align:center;color:#22c55e">↓</div>
+            <div style="background:rgba(245,197,24,.14);border:1px solid rgba(245,197,24,.4);border-radius:12px;padding:12px;color:#d3ead9"><b>Output</b> · detections, map, field report</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 DISEASES -->
+    <div class="slide">
+      <span class="snum">05 / 12</span>
+      <span class="skicker">Detection targets</span>
+      <h2>Three diseases, one healthy baseline</h2>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:10px" id="deckDiseases"></div>
+    </div>
+
+    <!-- 6 PIPELINE -->
+    <div class="slide">
+      <span class="snum">06 / 12</span>
+      <span class="skicker">How it works</span>
+      <h2>From aerial frame to field report in six stages</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px" id="deckPipe"></div>
+    </div>
+
+    <!-- 7 SYSTEM -->
+    <div class="slide">
+      <span class="snum">07 / 12</span>
+      <span class="skicker">The system</span>
+      <h2>One offline desktop dashboard</h2>
+      <div class="slide-cols">
+        <ul>
+          <li>Single PyQt5 console — no CLI for the operator</li>
+          <li>Runs <b style="color:#eaf5ec">offline</b>; only map tiles need internet</li>
+          <li>Windows desktop + Android mirror via scrcpy</li>
+          <li>Live boxes, health summary, stress map, geo-tags &amp; one-click report</li>
+        </ul>
+        <div class="visual"><div style="border-radius:12px;overflow:hidden;border:1px solid rgba(120,200,150,.35);width:100%"><img src="assets/figures/sys_capture_frame.jpg" alt="live detection" style="width:100%;display:block"></div></div>
+      </div>
+    </div>
+
+    <!-- 8 OBJECTIVES -->
+    <div class="slide">
+      <span class="snum">08 / 12</span>
+      <span class="skicker">Objectives</span>
+      <h2>Five specific objectives</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px" id="deckObj"></div>
+    </div>
+
+    <!-- 9 RESULTS -->
+    <div class="slide">
+      <span class="snum">09 / 12</span>
+      <span class="skicker">Results</span>
+      <h2>Strong on healthy, honest about the rest</h2>
+      <div class="metrics-row" style="margin-bottom:14px">
+        <div class="m"><b>0.501</b><span>healthy mAP@0.5</span></div>
+        <div class="m"><b>0.177</b><span>overall mAP@0.5</span></div>
+        <div class="m"><b>100</b><span>epochs · RTX 4050</span></div>
+        <div class="m"><b>7/7</b><span>smoke tests pass</span></div>
+      </div>
+      <ul>
+        <li>Healthy class learned well; rare classes limited by <b style="color:#eaf5ec">severe class imbalance</b> (~92% healthy labels)</li>
+        <li>Clear next step: collect balanced BBTV &amp; Panama samples to lift recall</li>
+      </ul>
+    </div>
+
+    <!-- 10 STATUS -->
+    <div class="slide">
+      <span class="snum">10 / 12</span>
+      <span class="skicker">Build status</span>
+      <h2>Frontend complete, backend foundation in place</h2>
+      <div class="slide-cols">
+        <div>
+          <div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;color:#d3ead9;font-size:.85rem"><span>Frontend (UI)</span><b>100%</b></div><div style="height:12px;border-radius:8px;background:rgba(255,255,255,.08);margin-top:6px"><i style="display:block;height:100%;width:100%;border-radius:8px;background:linear-gradient(90deg,#22c55e,#14b8a6)"></i></div></div>
+          <div><div style="display:flex;justify-content:space-between;color:#d3ead9;font-size:.85rem"><span>Backend (services)</span><b>50%</b></div><div style="height:12px;border-radius:8px;background:rgba(255,255,255,.08);margin-top:6px"><i style="display:block;height:100%;width:50%;border-radius:8px;background:linear-gradient(90deg,#f5c518,#d9a406)"></i></div></div>
+        </div>
+        <ul style="font-size:.86rem">
+          <li>Done: capture, preprocess, YOLO inference, reports, geo maps</li>
+          <li>Next: session archival, EXIF GPS, GeoTIFF, PDF farmer reports</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 11 COMPARISON -->
+    <div class="slide">
+      <span class="snum">11 / 12</span>
+      <span class="skicker">Why AgriVision</span>
+      <h2>What sets it apart</h2>
+      <div style="overflow:auto;margin-top:8px" id="deckCompare"></div>
+    </div>
+
+    <!-- 12 CLOSING -->
+    <div class="slide cover">
+      <span class="snum">12 / 12</span>
+      <span class="skicker">Impact</span>
+      <h2>Earlier detection. Less loss. Smarter fields.</h2>
+      <p style="max-width:54ch">AgriVision gives farmers, the banana industry, and future developers a spatially-aware early-warning tool for banana disease in Compostela and beyond.</p>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:18px;font-size:.82rem;color:#b7d4c1" id="deckTeam"></div>
+      <p style="margin-top:16px;color:#7fb495;font-size:.8rem">Cleentson Dewey A. Lenterna · Frincis Jane P. Omadley · Jenny Rose R. Zabala · Jase Karl M. Zerrudo — Adviser: Kyle Pacatang</p>
+    </div>
+
+  </div>
+</div>
+</main>
+
+<!-- Present overlay -->
+<div id="present" style="position:fixed;inset:0;z-index:9998;background:#04100a;display:none;flex-direction:column">
+  <div id="presentStage" style="flex:1;display:grid;place-items:center;padding:2vw"></div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:18px;padding:14px;color:#7fb495;font-family:var(--mono);font-size:.8rem">
+    <button class="btn btn-ghost" id="pPrev" style="padding:8px 14px">←</button>
+    <span id="pCount"></span>
+    <button class="btn btn-ghost" id="pNext" style="padding:8px 14px">→</button>
+    <button class="btn btn-ghost" id="pExit" style="padding:8px 14px">Esc ✕</button>
+  </div>
+</div>
+
+<script src="assets/vendor/html2canvas.min.js"></script>
+<script src="assets/vendor/jspdf.umd.min.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/os.js"></script>
+<script>
+OS.ready(function () {
+  var h = OS.h, esc = OS.esc, D = window.AGV;
+  document.getElementById("dlIc").innerHTML = OS.icon("download", 18);
+
+  // deck diseases
+  var dd = document.getElementById("deckDiseases");
+  var dcolor = { panama: "#e8615f", black_sigatoka: "#f5c518", bbtv: "#9b87e8", healthy: "#34c77b" };
+  D.paper.diseases.forEach(function (x) {
+    var c = dcolor[x.id] || "#34c77b";
+    dd.appendChild(h("div", { style: "background:rgba(255,255,255,.04);border:1px solid rgba(120,200,150,.25);border-top:3px solid " + c + ";border-radius:12px;padding:14px",
+      html: '<b style="color:' + c + ';font-size:1rem">' + esc(x.name) + '</b><div style="color:#7fb495;font-size:.72rem;font-style:italic;margin:4px 0 8px">' + esc(x.pathogen) + '</div><div style="color:#c9e2d1;font-size:.78rem">' + esc(x.symptoms) + '</div>' }));
+  });
+
+  // deck pipeline
+  var dp = document.getElementById("deckPipe");
+  D.system.pipeline.forEach(function (s, i) {
+    if (i) dp.appendChild(h("div", { style: "display:grid;place-items:center;color:#22c55e;font-size:1.1rem", text: "→" }));
+    dp.appendChild(h("div", { style: "flex:1;min-width:110px;background:rgba(255,255,255,.04);border:1px solid rgba(120,200,150,.25);border-radius:12px;padding:12px;text-align:center",
+      html: '<div style="font-size:1.3rem">' + s.icon + '</div><b style="color:#eaf5ec;font-size:.82rem;display:block;margin-top:4px">' + esc(s.name) + '</b><span style="color:#7fb495;font-size:.68rem">' + esc(s.fr) + '</span>' }));
+  });
+
+  // deck objectives
+  var doj = document.getElementById("deckObj");
+  var objs = D.paper.chapters[0].sections[1].blocks.filter(function (b) { return b.type === "list"; })[0].items;
+  objs.forEach(function (t, i) {
+    doj.appendChild(h("div", { style: "display:flex;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(120,200,150,.22);border-radius:10px;padding:10px",
+      html: '<span style="flex:none;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-weight:800;font-size:.8rem;color:#04100a;background:#22c55e">' + (i + 1) + '</span><span style="color:#c9e2d1;font-size:.76rem">' + esc(t) + '</span>' }));
+  });
+
+  // deck comparison
+  document.getElementById("deckCompare").innerHTML = OS.tableHTML(D.tables.table2).replace(/<p class="tbl-cap.*/, "");
+  var dcTable = document.querySelector("#deckCompare table");
+  if (dcTable) { dcTable.style.fontSize = ".72rem"; dcTable.style.minWidth = "0"; }
+
+  // deck team
+  var dt = document.getElementById("deckTeam");
+  [["🎓", "Legacy College of Compostela"], ["📍", "Compostela, Davao de Oro"], ["📅", "March 2026"], ["🍌", "Musa spp. plantations"]].forEach(function (x) {
+    dt.appendChild(h("span", { html: x[0] + " " + esc(x[1]) }));
+  });
+
+  /* ---- PDF export ---- */
+  var pdfBtn = document.getElementById("pdfBtn"), prog = document.getElementById("progress"), ptxt = document.getElementById("progressTxt");
+  pdfBtn.addEventListener("click", function () {
+    if (!window.jspdf || !window.html2canvas) { alert("PDF libraries not loaded."); return; }
+    exportPDF();
+  });
+
+  function exportPDF() {
+    var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+    var jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [1280, 720] });
+    pdfBtn.disabled = true; prog.style.display = "inline-flex";
+    var i = 0;
+    function next() {
+      if (i >= slides.length) {
+        pdf.save("AgriVision-Pitch-Deck.pdf");
+        prog.style.display = "none"; pdfBtn.disabled = false;
+        return;
+      }
+      ptxt.textContent = "Rendering slide " + (i + 1) + " / " + slides.length;
+      window.html2canvas(slides[i], { scale: 2, backgroundColor: "#06120c", useCORS: true, logging: false }).then(function (canvas) {
+        var img = canvas.toDataURL("image/jpeg", 0.92);
+        if (i > 0) pdf.addPage([1280, 720], "landscape");
+        pdf.addImage(img, "JPEG", 0, 0, 1280, 720);
+        i++; setTimeout(next, 30);
+      }).catch(function (e) { console.error(e); ptxt.textContent = "Error on slide " + (i + 1); pdfBtn.disabled = false; });
+    }
+    next();
+  }
+
+  document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+
+  /* ---- Present mode ---- */
+  var present = document.getElementById("present"), stage = document.getElementById("presentStage");
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide")), idx = 0;
+  function showSlide() {
+    stage.innerHTML = "";
+    var clone = slides[idx].cloneNode(true);
+    clone.style.width = "min(92vw, 164vh)"; clone.style.maxWidth = "1400px";
+    stage.appendChild(clone);
+    document.getElementById("pCount").textContent = (idx + 1) + " / " + slides.length;
+  }
+  function openPresent() { present.style.display = "flex"; idx = 0; showSlide(); if (present.requestFullscreen) present.requestFullscreen().catch(function(){}); }
+  function closePresent() { present.style.display = "none"; if (document.fullscreenElement) document.exitFullscreen().catch(function(){}); }
+  document.getElementById("presentBtn").addEventListener("click", openPresent);
+  document.getElementById("pExit").addEventListener("click", closePresent);
+  document.getElementById("pNext").addEventListener("click", function () { idx = Math.min(idx + 1, slides.length - 1); showSlide(); });
+  document.getElementById("pPrev").addEventListener("click", function () { idx = Math.max(idx - 1, 0); showSlide(); });
+  document.addEventListener("keydown", function (e) {
+    if (present.style.display === "none") return;
+    if (e.key === "ArrowRight" || e.key === " ") { idx = Math.min(idx + 1, slides.length - 1); showSlide(); }
+    else if (e.key === "ArrowLeft") { idx = Math.max(idx - 1, 0); showSlide(); }
+    else if (e.key === "Escape") closePresent();
+  });
+
+  OS.scanReveal();
+});
+</script>
+</body>
+</html>

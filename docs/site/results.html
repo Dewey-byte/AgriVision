@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriVision OS — Results Explorer</title>
+<meta name="description" content="Interactive AgriVision model results: training curves, per-class mAP, dataset balance, and system testing from real YOLOv8n runs.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M24 4C13 8 7 17 7 27c0 8 5 15 13 17 0-14 4-24 15-31C29 6 26 5 24 4Z' fill='%2322c55e'/></svg>">
+<link rel="stylesheet" href="assets/css/os.css">
+</head>
+<body data-app="results" data-crumb="Results Explorer">
+<main class="os-main">
+<div class="page wide">
+
+  <section class="hero" style="padding-bottom:8px" data-reveal>
+    <span class="eyebrow">System testing · YOLOv8n · AdamW</span>
+    <h1 class="h-xl">Results, measured honestly</h1>
+    <p class="lead">Every number here is pulled from the real 100-epoch training run on an NVIDIA RTX 4050. The model works well on the dominant <b>healthy</b> class and shows a textbook overfitting gap driven by severe class imbalance.</p>
+  </section>
+
+  <section class="grid g3" id="head" data-reveal style="margin-top:20px"></section>
+
+  <div class="section-head" data-reveal><span class="eyebrow">Training dynamics</span><h2>Detection metrics across 100 epochs</h2>
+    <p class="lead">Validation mAP rises early then plateaus while precision swings as augmentation schedules change — the model learns the majority class quickly.</p></div>
+  <section class="chart-card" data-reveal>
+    <div class="chart-head"><h3>Validation metrics (0–1)</h3><span class="sub">real results.csv · sampled</span></div>
+    <div id="metricLine"></div><div id="metricLegend"></div>
+  </section>
+  <section class="chart-card" data-reveal style="margin-top:18px">
+    <div class="chart-head"><h3>Training vs validation loss</h3><span class="sub">box + cls + dfl loss</span></div>
+    <div id="lossLine"></div><div id="lossLegend"></div>
+    <div class="callout info" style="margin-top:14px"><b>Reading the gap</b><span>Training loss keeps falling to ~4.4 while validation loss plateaus near 6.0 — the signature of overfitting on an imbalanced dataset.</span></div>
+  </section>
+
+  <div class="section-head" data-reveal><span class="eyebrow">Per-class performance</span><h2>Where the model is strong — and where it isn't</h2></div>
+  <section class="grid g2" data-reveal>
+    <div class="chart-card">
+      <div class="chart-head"><h3>Best-checkpoint score by class</h3>
+        <div class="metric-toggle" id="pcToggle"></div></div>
+      <div id="perClassBar"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Validation metrics by class</h3>
+      <div id="perClassTable"></div>
+    </div>
+  </section>
+
+  <div class="section-head" data-reveal><span class="eyebrow">The dataset</span><h2>315 unique aerial images · 80 : 10 : 10</h2>
+    <p class="lead">Roughly 92% of all bounding-box labels are <span class="pill healthy" style="padding:2px 9px"><span class="d"></span>healthy</span> — the root cause of the results above. <code>bunchy_top</code> has only three training boxes.</p></div>
+  <section class="grid g2" data-reveal>
+    <div class="chart-card">
+      <div class="chart-head"><h3>Train / validation / test split</h3><span class="sub">images per label</span></div>
+      <div id="dataBar"></div><div id="dataBarLegend"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Dataset summary</h3>
+      <div id="datasetTable"></div>
+    </div>
+  </section>
+
+  <div class="section-head" data-reveal><span class="eyebrow">Checkpoints</span><h2>Table 13 — metrics by epoch checkpoint</h2></div>
+  <section class="chart-card" data-reveal>
+    <div class="chart-head"><h3>Accuracy · Recall · Precision · F1</h3><span class="sub">AdamW optimizer</span></div>
+    <div id="ckptBar"></div><div id="ckptLegend"></div>
+  </section>
+
+  <div class="section-head" data-reveal><span class="eyebrow">Reference figure</span><h2>Original training curves (Figure 12)</h2></div>
+  <section class="card" data-reveal style="text-align:center">
+    <div class="frame" style="background:#fff;border-radius:14px;padding:12px;display:inline-block"><img src="assets/figures/sys_training_curves_all.png" alt="Keras-style accuracy and loss curves" style="max-height:420px"></div>
+    <p class="fig-cap"><b>Figure 12.</b> YOLOv8n AdamW accuracy and loss across all epoch checkpoints.</p>
+  </section>
+
+  <section class="grid g2" style="margin-top:40px" data-reveal>
+    <div class="card">
+      <h3 style="margin-top:0">Hyperparameters</h3>
+      <div id="hpTable"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">System smoke test <span class="pill healthy" style="margin-left:8px;padding:2px 9px"><span class="d"></span>7 / 7 pass</span></h3>
+      <div id="smoke" style="display:grid;gap:8px;margin-top:12px"></div>
+    </div>
+  </section>
+
+  <section class="card pad-lg" style="margin-top:30px" data-reveal>
+    <h3 style="margin-top:0">Narrative interpretation</h3>
+    <div id="narr" style="display:grid;gap:10px"></div>
+  </section>
+
+</div>
+</main>
+
+<style>
+.metric-toggle { display:flex; gap:6px; }
+.metric-toggle button { font-size:.72rem; font-weight:700; padding:5px 11px; border-radius:8px; border:1px solid var(--line-strong); background:var(--bg-2); color:var(--ink-2); cursor:pointer; transition:.18s; }
+.metric-toggle button.on { background:linear-gradient(150deg,var(--brand),var(--brand-deep)); color:#fff; border-color:transparent; }
+</style>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/os.js"></script>
+<script>
+OS.ready(function () {
+  var h = OS.h, esc = OS.esc, D = window.AGV, M = D.metrics;
+  function col(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+  // headline tiles
+  var tiles = [
+    { v: M.headline.valMap50, l: "Val mAP@0.5", n: "all classes" },
+    { v: M.headline.healthyMap50, l: "Healthy mAP@0.5", n: "best class" },
+    { v: M.headline.epochs, l: "Epochs", n: M.headline.trainHours + " h on RTX 4050" },
+    { v: M.headline.uniqueImages, l: "Unique images", n: "80 : 10 : 10 split" },
+    { v: M.headline.valMap50_95, l: "Val mAP@0.5:0.95", n: "stricter IoU" },
+    { v: M.headline.smokePass, l: "Smoke tests", n: "all passing" }
+  ];
+  var head = document.getElementById("head");
+  tiles.forEach(function (t) { head.appendChild(h("div", { class: "stat", html: '<div class="v">' + esc(t.v) + '</div><div class="l">' + esc(t.l) + '</div><div class="n">' + esc(t.n) + '</div>' })); });
+
+  var CLR = { all: "--brand", healthy: "--healthy", black_sigatoka: "--stressed", panama: "--diseased", bunchy_top: "--viral" };
+
+  // metric line (0-1)
+  OS.lineChart("#metricLine", {
+    points: M.curve, xKey: "epoch", xLabel: "epoch", yMin: 0, yMax: 1, yTicks: 5, yDp: 2, xEvery: 1, height: 300,
+    series: [
+      { key: "map50", label: "mAP@0.5", color: col("--s1") },
+      { key: "map5095", label: "mAP@0.5:0.95", color: col("--s5") },
+      { key: "precision", label: "Precision", color: col("--s2") },
+      { key: "recall", label: "Recall", color: col("--s4") }
+    ]
+  });
+  document.getElementById("metricLegend").innerHTML = OS.legend([
+    { label: "mAP@0.5", color: col("--s1") }, { label: "mAP@0.5:0.95", color: col("--s5") },
+    { label: "Precision", color: col("--s2") }, { label: "Recall", color: col("--s4") }
+  ]);
+
+  // loss line
+  OS.lineChart("#lossLine", {
+    points: M.curve, xKey: "epoch", yMin: 3.5, yMax: 11, yTicks: 5, yDp: 1, height: 280,
+    series: [
+      { key: "train_loss", label: "Train loss", color: col("--s1") },
+      { key: "val_loss", label: "Val loss", color: col("--s3") }
+    ]
+  });
+  document.getElementById("lossLegend").innerHTML = OS.legend([
+    { label: "Train loss", color: col("--s1") }, { label: "Val loss", color: col("--s3") }
+  ]);
+
+  // per-class bar (toggle metric)
+  var metricKey = "map50";
+  function drawPC() {
+    OS.hbarChart("#perClassBar", {
+      max: 1, height: 240, labelW: 130, valFmt: function (v) { return Number(v).toFixed(3); },
+      items: M.perClass.map(function (c) { return { label: c.class, value: c[metricKey], color: col(CLR[c.id]) }; })
+    });
+  }
+  var tog = document.getElementById("pcToggle");
+  [["map50", "mAP@.5"], ["precision", "Precision"], ["recall", "Recall"]].forEach(function (m, i) {
+    var b = h("button", { class: i === 0 ? "on" : "", text: m[1] });
+    b.addEventListener("click", function () { metricKey = m[0]; tog.querySelectorAll("button").forEach(function (x) { x.classList.remove("on"); }); b.classList.add("on"); drawPC(); });
+    tog.appendChild(b);
+  });
+  drawPC();
+
+  // per-class table
+  document.getElementById("perClassTable").innerHTML = OS.tableHTML({
+    number: "", caption: "", headers: ["Class", "Precision", "Recall", "mAP@.5", "mAP@.5:.95"],
+    rows: M.perClass.map(function (c) { return [c.class, c.precision.toFixed(3), c.recall.toFixed(3), c.map50.toFixed(3), c.map5095.toFixed(3)]; })
+  }).replace(/<p class="tbl-cap.*/, "");
+
+  // dataset grouped bars
+  OS.barChart("#dataBar", {
+    height: 280, yMax: 260,
+    groups: M.dataset.composition.map(function (c) {
+      return { label: c.label.split(" ")[0], bars: [
+        { label: "Train", value: c.train, color: col("--s1") },
+        { label: "Val", value: c.val, color: col("--s2") },
+        { label: "Test", value: c.test, color: col("--s4") }
+      ] };
+    })
+  });
+  document.getElementById("dataBarLegend").innerHTML = OS.legend([
+    { label: "Train", color: col("--s1") }, { label: "Validation", color: col("--s2") }, { label: "Test", color: col("--s4") }
+  ]);
+
+  document.getElementById("datasetTable").innerHTML = OS.tableHTML({
+    number: "", caption: "", headers: ["Label", "Images", "Train", "Val", "Test"],
+    rows: M.dataset.composition.map(function (c) { return [c.label, c.images, c.train, c.val, c.test]; })
+  }).replace(/<p class="tbl-cap.*/, "");
+
+  // checkpoint bar
+  OS.barChart("#ckptBar", {
+    height: 300, yMax: 100,
+    groups: M.checkpoints.map(function (c) {
+      return { label: c.epoch + " ep", bars: [
+        { label: "Accuracy", value: c.accuracy, color: col("--s1") },
+        { label: "Recall", value: c.recall, color: col("--s5") },
+        { label: "Precision", value: c.precision, color: col("--s2") },
+        { label: "F1", value: c.f1, color: col("--s4") }
+      ] };
+    }),
+    valFmt: function (v) { return v + "%"; }
+  });
+  document.getElementById("ckptLegend").innerHTML = OS.legend([
+    { label: "Accuracy (mAP@.5)", color: col("--s1") }, { label: "Recall", color: col("--s5") },
+    { label: "Precision", color: col("--s2") }, { label: "F1-Score", color: col("--s4") }
+  ]);
+
+  // hyperparameters
+  document.getElementById("hpTable").innerHTML = OS.tableHTML({
+    number: "", caption: "", headers: ["Parameter", "Value"], rows: M.hyperparameters.map(function (p) { return [p.param, p.value]; })
+  }).replace(/<p class="tbl-cap.*/, "");
+
+  // smoke tests
+  var sm = document.getElementById("smoke");
+  M.smokeTests.forEach(function (s) {
+    sm.appendChild(h("div", { style: "display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg-2)",
+      html: '<span style="font-size:.86rem">' + esc(s.area) + '</span><span class="pill healthy" style="padding:2px 10px"><span class="d"></span>' + esc(s.result) + '</span>' }));
+  });
+
+  // narrative
+  var narr = document.getElementById("narr");
+  M.narrative.forEach(function (n, i) {
+    narr.appendChild(h("div", { class: "callout " + (i % 2 ? "warning" : "info"), html: "<span>" + esc(n) + "</span>" }));
+  });
+
+  OS.scanReveal();
+});
+</script>
+</body>
+</html>

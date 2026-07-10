@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriVision OS — Field Console</title>
+<meta name="description" content="Interactive recreation of the AgriVision operator dashboard: live feed with YOLOv8 detections, health summary, vegetation stress, geo-tags, and field map.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M24 4C13 8 7 17 7 27c0 8 5 15 13 17 0-14 4-24 15-31C29 6 26 5 24 4Z' fill='%2322c55e'/></svg>">
+<link rel="stylesheet" href="assets/css/os.css">
+</head>
+<body data-app="dashboard" data-crumb="Field Console">
+<main class="os-main">
+<div class="page wide">
+
+  <section class="hero" style="padding-bottom:6px" data-reveal>
+    <span class="eyebrow">Live operator dashboard · recreation</span>
+    <h1 class="h-xl">The field console</h1>
+    <p class="lead">A browser recreation of the PyQt5 dashboard the operator uses in the field. Press <b>Start</b> to run detection over a real captured frame, then <b>Capture</b> to export a field report bundle.</p>
+    <div class="hero-cta" style="margin-top:16px">
+      <div class="metric-toggle" id="scenario">
+        <button class="on" data-s="real">Real capture</button>
+        <button data-s="demo">Mixed field (demo)</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="dash" data-reveal style="margin-top:14px">
+    <!-- FEED -->
+    <div class="feed">
+      <div class="canvas" id="canvas">
+        <img src="assets/figures/sys_capture_frame.jpg" alt="captured aerial frame">
+        <div class="scan"></div>
+        <div class="hud">
+          <span class="badge" id="fpsBadge">● IDLE</span>
+          <span class="badge" id="resBadge">scrcpy · 640×480</span>
+        </div>
+        <div id="boxes"></div>
+      </div>
+      <div class="foot">
+        <button class="btn btn-primary" id="startBtn" style="padding:10px 18px"><span id="startIc"></span> Start</button>
+        <button class="btn btn-gold" id="capBtn" style="padding:10px 18px" disabled>Capture Frame</button>
+        <div style="flex:1"></div>
+        <span class="pill" id="statePill"><span class="d" style="background:var(--ink-3)"></span>Stopped</span>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="dash-side">
+      <div class="sidecard">
+        <h4>Detection Summary</h4>
+        <div class="count-row"><span>Total detections</span><span class="n" id="cTotal" style="color:var(--brand-bright)">0</span></div>
+        <div class="count-row"><span><span class="pill healthy" style="padding:1px 8px"><span class="d"></span>Healthy</span></span><span class="n" id="cHealthy">0</span></div>
+        <div class="count-row"><span><span class="pill stressed" style="padding:1px 8px"><span class="d"></span>Stressed</span></span><span class="n" id="cStressed">0</span></div>
+        <div class="count-row"><span><span class="pill diseased" style="padding:1px 8px"><span class="d"></span>Diseased</span></span><span class="n" id="cDiseased">0</span></div>
+      </div>
+
+      <div class="sidecard">
+        <h4>Vegetation Health</h4>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+          <span class="pill healthy" id="vegLabel" style="padding:2px 10px"><span class="d"></span>good</span>
+          <span class="muted" style="font-size:.78rem">ExG proxy</span>
+        </div>
+        <div class="meter" id="vegMeter"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:.76rem;color:var(--ink-2)">
+          <span>mean stress <b id="vegMean">0.29</b></span><span>high-stress <b id="vegHigh">26%</b></span>
+        </div>
+      </div>
+
+      <div class="sidecard">
+        <h4>Geo Tag (GPS)</h4>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem;padding:4px 0"><span class="muted">Latitude</span><b id="gLat">7.45</b></div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem;padding:4px 0"><span class="muted">Longitude</span><b id="gLon">125.78</b></div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem;padding:4px 0"><span class="muted">Source</span><span class="tag" id="gSrc">windows_gps</span></div>
+      </div>
+
+      <div class="sidecard">
+        <h4>Field Map (Leaflet)</h4>
+        <div class="minimap" id="minimap"></div>
+        <p class="muted" style="font-size:.74rem;margin:8px 0 0">Markers colored by health category · Compostela, Davao de Oro</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid g2" data-reveal style="margin-top:18px;align-items:start">
+    <div class="sidecard">
+      <h4>Activity Log</h4>
+      <div class="log" id="log"></div>
+    </div>
+    <div class="sidecard" id="reportCard">
+      <h4>Last Field Report</h4>
+      <p class="muted" style="font-size:.86rem">Press <b>Capture Frame</b> during a live session to generate a report bundle (JPG + JSON + CSV + Leaflet map).</p>
+      <pre class="code" id="reportJson" style="display:none;font-size:.72rem;max-height:220px"></pre>
+    </div>
+  </section>
+
+  <div class="section-head" data-reveal><span class="eyebrow">Session telemetry</span><h2>What the recorder tracks</h2></div>
+  <section class="grid g4" id="telemetry" data-reveal></section>
+
+</div>
+</main>
+
+<style>
+.metric-toggle { display:inline-flex; gap:6px; }
+.metric-toggle button { font-size:.78rem; font-weight:700; padding:8px 16px; border-radius:10px; border:1px solid var(--line-strong); background:var(--bg-2); color:var(--ink-2); cursor:pointer; }
+.metric-toggle button.on { background:linear-gradient(150deg,var(--brand),var(--brand-deep)); color:#fff; border-color:transparent; }
+.feed .bbox { transition: opacity .25s, transform .25s; }
+</style>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/os.js"></script>
+<script>
+OS.ready(function () {
+  var h = OS.h, esc = OS.esc, D = window.AGV, R = D.metrics.sampleReport;
+  function col(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+  var CATCOLOR = { healthy: "--healthy", stressed: "--stressed", diseased: "--diseased", viral: "--viral" };
+  var FW = R.frameWidth, FH = R.frameHeight;
+
+  // scenarios
+  var scenarios = {
+    real: { source: "scrcpy · 640×480", geo: R.geo, veg: R.vegetation, dets: R.detections.map(function (d) { return { bbox: d.bbox, cat: "healthy", label: d.label }; }) },
+    demo: {
+      source: "demo scenario · 640×480",
+      geo: { latitude: 7.3669, longitude: 125.91, source: "manual" },
+      veg: { health_label: "moderate", mean_stress: 0.48, high_stress_pct: 41.0 },
+      dets: [
+        { bbox: [40, 60, 150, 170], cat: "healthy", label: "healthy (0.61)" },
+        { bbox: [190, 44, 300, 150], cat: "healthy", label: "healthy (0.58)" },
+        { bbox: [330, 70, 440, 180], cat: "stressed", label: "black_sigatoka (0.44)" },
+        { bbox: [470, 50, 580, 160], cat: "healthy", label: "healthy (0.55)" },
+        { bbox: [70, 220, 190, 340], cat: "diseased", label: "panama (0.47)" },
+        { bbox: [230, 240, 340, 350], cat: "stressed", label: "black_sigatoka (0.39)" },
+        { bbox: [380, 230, 500, 360], cat: "diseased", label: "panama (0.52)" },
+        { bbox: [520, 250, 615, 360], cat: "viral", label: "bunchy_top (0.35)" },
+        { bbox: [150, 370, 280, 460], cat: "healthy", label: "healthy (0.49)" },
+        { bbox: [330, 380, 460, 470], cat: "diseased", label: "panama (0.41)" }
+      ]
+    }
+  };
+
+  var cur = "real", running = false, timer = null, shown = 0;
+  var boxesEl = document.getElementById("boxes");
+
+  function catCount(dets) {
+    var c = { total: dets.length, healthy: 0, stressed: 0, diseased: 0 };
+    dets.forEach(function (d) { if (d.cat === "healthy") c.healthy++; else if (d.cat === "stressed") c.stressed++; else c.diseased++; });
+    return c;
+  }
+
+  function renderBoxes(n) {
+    var dets = scenarios[cur].dets;
+    boxesEl.innerHTML = "";
+    for (var i = 0; i < n && i < dets.length; i++) {
+      var d = dets[i], c = col(CATCOLOR[d.cat]);
+      var x = d.bbox[0] / FW * 100, y = d.bbox[1] / FH * 100, w = (d.bbox[2] - d.bbox[0]) / FW * 100, hh = (d.bbox[3] - d.bbox[1]) / FH * 100;
+      var b = h("div", { class: "bbox", style: "left:" + x + "%;top:" + y + "%;width:" + w + "%;height:" + hh + "%;border-color:" + c });
+      b.innerHTML = '<span style="background:' + c + ';color:#04100a">' + esc(d.label) + '</span>';
+      boxesEl.appendChild(b);
+    }
+  }
+
+  function updateCounts(n) {
+    var c = catCount(scenarios[cur].dets.slice(0, n));
+    document.getElementById("cTotal").textContent = c.total;
+    document.getElementById("cHealthy").textContent = c.healthy;
+    document.getElementById("cStressed").textContent = c.stressed;
+    document.getElementById("cDiseased").textContent = c.diseased;
+  }
+
+  function renderVeg() {
+    var v = scenarios[cur].veg, high = v.high_stress_pct, mod = Math.max(0, Math.min(100 - high, 30));
+    var healthyPct = Math.max(0, 100 - high - mod);
+    document.getElementById("vegMeter").innerHTML =
+      '<i style="width:' + healthyPct + '%;background:var(--healthy)"></i>' +
+      '<i style="width:' + mod + '%;background:var(--stressed)"></i>' +
+      '<i style="width:' + high + '%;background:var(--diseased)"></i>';
+    document.getElementById("vegMean").textContent = v.mean_stress.toFixed(2);
+    document.getElementById("vegHigh").textContent = Math.round(v.high_stress_pct) + "%";
+    var lbl = document.getElementById("vegLabel");
+    lbl.className = "pill " + (v.health_label === "good" ? "healthy" : "stressed");
+    lbl.innerHTML = '<span class="d"></span>' + esc(v.health_label);
+  }
+
+  function renderGeo() {
+    var g = scenarios[cur].geo;
+    document.getElementById("gLat").textContent = g.latitude;
+    document.getElementById("gLon").textContent = g.longitude;
+    document.getElementById("gSrc").textContent = g.source;
+    document.getElementById("resBadge").textContent = scenarios[cur].source;
+  }
+
+  function renderMap(n) {
+    var dets = scenarios[cur].dets.slice(0, n), W = 300, H = 200, inner = "";
+    // field rows
+    inner += '<rect width="' + W + '" height="' + H + '" fill="#0a1f14"/>';
+    for (var r = 0; r < 6; r++) for (var c2 = 0; c2 < 12; c2++) {
+      inner += '<circle cx="' + (18 + c2 * 24) + '" cy="' + (22 + r * 30) + '" r="2.2" fill="rgba(120,200,150,.18)"/>';
+    }
+    dets.forEach(function (d, i) {
+      var cx = 24 + ((i * 53) % (W - 40)), cy = 26 + ((i * 71) % (H - 44)), c = col(CATCOLOR[d.cat]);
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="9" fill="' + c + '" opacity="0.18"/>';
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="4" fill="' + c + '" stroke="#04100a" stroke-width="1.2"/>';
+    });
+    document.getElementById("minimap").innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="100%">' + inner + '</svg>';
+  }
+
+  var logEl = document.getElementById("log");
+  function logMsg(m) {
+    var t = new Date().toLocaleTimeString([], { hour12: false });
+    var row = h("div", { html: '<span class="t">[' + t + ']</span> ' + esc(m) });
+    logEl.insertBefore(row, logEl.firstChild);
+  }
+
+  function setScenario(s) {
+    cur = s; stop(); shown = 0;
+    var n = scenarios[s].dets.length;
+    renderBoxes(n); updateCounts(n); renderVeg(); renderGeo(); renderMap(n);
+    logMsg("Scenario loaded: " + s + " (" + n + " detections on last frame)");
+  }
+
+  function tick() {
+    var dets = scenarios[cur].dets;
+    shown = Math.min(shown + 1, dets.length);
+    renderBoxes(shown); updateCounts(shown); renderMap(shown);
+    var fps = (10 + Math.random() * 6).toFixed(1);
+    document.getElementById("fpsBadge").textContent = "● LIVE · " + fps + " FPS";
+    if (shown >= dets.length) { logMsg("Frame analyzed · " + shown + " detections"); shown = 0; setTimeout(function () { if (running) renderBoxes(0); }, 350); }
+  }
+
+  var startBtn = document.getElementById("startBtn"), capBtn = document.getElementById("capBtn");
+  function start() {
+    if (running) return; running = true;
+    startBtn.innerHTML = '❚❚ Stop'; startBtn.classList.remove("btn-primary"); startBtn.classList.add("btn-ghost");
+    document.getElementById("statePill").innerHTML = '<span class="d" style="background:var(--brand-bright)"></span>Processing';
+    capBtn.disabled = false;
+    logMsg("Live processing started · YOLOv8n · models/best.pt");
+    timer = setInterval(tick, 520);
+  }
+  function stop() {
+    running = false; if (timer) clearInterval(timer);
+    startBtn.innerHTML = '<span>' + OS.icon("dashboard", 16) + '</span> Start'; startBtn.classList.add("btn-primary"); startBtn.classList.remove("btn-ghost");
+    startBtn.querySelector("span").innerHTML = "▶";
+    document.getElementById("statePill").innerHTML = '<span class="d" style="background:var(--ink-3)"></span>Stopped';
+    document.getElementById("fpsBadge").textContent = "● IDLE";
+    capBtn.disabled = true;
+  }
+  startBtn.addEventListener("click", function () { running ? stop() : start(); });
+  startBtn.querySelector("span") && (document.getElementById("startIc").textContent = "▶");
+
+  capBtn.addEventListener("click", function () {
+    var dets = scenarios[cur].dets, c = catCount(dets), v = scenarios[cur].veg, g = scenarios[cur].geo;
+    var ts = new Date();
+    var stamp = ts.getFullYear() + pad(ts.getMonth() + 1) + pad(ts.getDate()) + "_" + pad(ts.getHours()) + pad(ts.getMinutes()) + pad(ts.getSeconds());
+    var report = {
+      system: "AgriVision", exported_at: ts.toISOString().slice(0, 19), video_source: cur === "real" ? "scrcpy" : "demo",
+      geo: g, detection_summary: c, vegetation: v,
+      artifacts: {
+        frame: "output/reports/agrivision_" + stamp + "_frame.jpg",
+        leaflet_map: "output/reports/agrivision_" + stamp + "_map.html",
+        report_json: "output/reports/agrivision_" + stamp + "_report.json"
+      }
+    };
+    var pre = document.getElementById("reportJson");
+    pre.style.display = "block"; pre.textContent = JSON.stringify(report, null, 2);
+    logMsg("Captured field report → agrivision_" + stamp + "_report.json (+ CSV, map, JPG)");
+  });
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  // scenario toggle
+  document.querySelectorAll("#scenario button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll("#scenario button").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on"); setScenario(b.getAttribute("data-s"));
+    });
+  });
+
+  // telemetry cards
+  var tele = [
+    { v: R.session.frames_processed, l: "Frames processed" },
+    { v: R.session.frames_analyzed, l: "Frames analyzed" },
+    { v: R.session.total_detections, l: "Total detections" },
+    { v: R.session.peak_detections, l: "Peak in one frame" }
+  ];
+  var tg = document.getElementById("telemetry");
+  tele.forEach(function (t) { tg.appendChild(h("div", { class: "stat", html: '<div class="v">' + esc(t.v) + '</div><div class="l">' + esc(t.l) + '</div>' })); });
+
+  document.getElementById("startIc").textContent = "▶";
+  setScenario("real");
+  logMsg("AgriVision console ready · offline mode");
+  OS.scanReveal();
+});
+</script>
+</body>
+</html>

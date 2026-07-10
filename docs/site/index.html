@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriVision OS — Overview</title>
+<meta name="description" content="AgriVision: a drone-based system for detecting banana diseases and mapping disease distribution using YOLOv8, heatmaps, and geotagging.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M24 4C13 8 7 17 7 27c0 8 5 15 13 17 0-14 4-24 15-31C29 6 26 5 24 4Z' fill='%2322c55e'/></svg>">
+<link rel="stylesheet" href="assets/css/os.css">
+</head>
+<body data-app="overview" data-crumb="Overview" data-boot="always">
+<main class="os-main">
+<div class="page">
+
+  <!-- HERO -->
+  <section class="hero" data-reveal>
+    <span class="eyebrow">Legacy College of Compostela · IIT · March 2026</span>
+    <h1 class="h-xxl">A drone that <span class="accent">sees banana disease</span><br>before the field does.</h1>
+    <p class="lead">AgriVision is a drone-based crop monitoring system that pairs <b>YOLOv8</b> aerial detection with <b>heatmaps</b> and <b>geotagging</b> to find Panama disease, Black Sigatoka, and BBTV — then maps exactly where they are across a plantation.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="documentation.html">Read the documentation <span id="a1"></span></a>
+      <a class="btn btn-ghost" href="dashboard.html">Launch the console</a>
+      <a class="btn btn-gold" href="pitch.html">View pitch deck</a>
+    </div>
+  </section>
+
+  <!-- KEY FACTS -->
+  <section class="grid g3" style="margin-top:34px" id="facts" data-reveal></section>
+
+  <!-- APP LAUNCHER -->
+  <div class="section-head" data-reveal><span class="eyebrow">The OS</span><h2>Six workspaces, one platform</h2>
+    <p class="lead">Everything about AgriVision — the research paper and the running system — organized into interactive apps.</p></div>
+  <section class="grid g3" id="apps" data-reveal></section>
+
+  <!-- SYSTEM AT A GLANCE -->
+  <div class="section-head" data-reveal><span class="eyebrow">Pipeline</span><h2>From aerial frame to field report</h2></div>
+  <section class="card pad-lg" data-reveal>
+    <div class="flow" id="flow"></div>
+  </section>
+
+  <!-- DISEASES -->
+  <div class="section-head" data-reveal><span class="eyebrow">Detection targets</span><h2>Three diseases + a healthy baseline</h2></div>
+  <section class="grid g4" id="diseases" data-reveal></section>
+
+  <!-- METRICS SNAPSHOT -->
+  <div class="section-head" data-reveal><span class="eyebrow">At a glance</span><h2>Model & dataset snapshot</h2></div>
+  <section class="grid g2" data-reveal>
+    <div class="chart-card">
+      <div class="chart-head"><h3>Objective completion</h3><span class="sub">frontend vs backend</span></div>
+      <div id="objChart"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head"><h3>Dataset composition</h3><span class="sub">images per label · 80:10:10</span></div>
+      <div id="dataDonut"></div>
+      <div id="dataLegend"></div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <div class="section-head" data-reveal><span class="eyebrow">The proponents</span><h2>Built by four, advised by one</h2></div>
+  <section class="grid g4" id="team" data-reveal></section>
+
+  <section class="card pad-lg" style="margin-top:40px;text-align:center" data-reveal>
+    <h2 class="h-xl">Explore the full capstone</h2>
+    <p class="lead" style="margin:10px auto 22px">Every chapter, table, figure, and metric — structured and interactive.</p>
+    <div class="hero-cta" style="justify-content:center">
+      <a class="btn btn-primary" href="documentation.html">Open documentation</a>
+      <a class="btn btn-ghost" href="architecture.html">Inspect the system</a>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/os.js"></script>
+<script>
+OS.ready(function () {
+  var h = OS.h, esc = OS.esc, D = window.AGV;
+  document.getElementById("a1").innerHTML = OS.icon("arrow", 18);
+
+  // Key facts
+  var facts = document.getElementById("facts");
+  D.paper.keyFacts.forEach(function (f) {
+    facts.appendChild(h("div", { class: "stat", html: '<div class="v">' + esc(f.value) + '</div><div class="l">' + esc(f.label) + '</div><div class="n">' + esc(f.note) + '</div>' }));
+  });
+
+  // Apps
+  var apps = [
+    { id: "docs", t: "Documentation", d: "All chapters, tables, figures and references from the paper — structured and searchable.", href: "documentation.html" },
+    { id: "results", t: "Results Explorer", d: "Interactive training curves, per-class mAP, and dataset balance from real runs.", href: "results.html" },
+    { id: "architecture", t: "System & Diagrams", d: "IPO, DFDs, ERD, use cases, pipeline modules, and the data model.", href: "architecture.html" },
+    { id: "dashboard", t: "Field Console", d: "A live recreation of the PyQt operator dashboard with real detections.", href: "dashboard.html" },
+    { id: "pitch", t: "Pitch Deck", d: "A 12-slide presentation you can export to PDF by screenshot.", href: "pitch.html" },
+    { id: "overview", t: "Overview", d: "The one-page tour you're reading now — start here.", href: "index.html" }
+  ];
+  var ag = document.getElementById("apps");
+  apps.forEach(function (a) {
+    var c = h("a", { class: "card hover", href: a.href, style: "text-decoration:none;color:inherit;display:block" });
+    c.innerHTML = '<div class="card-ic">' + OS.icon(a.id, 24) + '</div><div class="kicker">app</div><h3>' + esc(a.t) + '</h3><p>' + esc(a.d) + '</p>';
+    ag.appendChild(c);
+  });
+
+  // Flow
+  var flowEl = document.getElementById("flow");
+  D.system.pipeline.forEach(function (s, i) {
+    if (i) flowEl.appendChild(h("div", { class: "arrow", html: "→" }));
+    flowEl.appendChild(h("div", { class: "node", html: '<div class="ic">' + s.icon + '</div><b>' + esc(s.name) + '</b><small>' + esc(s.fr) + '</small>' }));
+  });
+
+  // Diseases
+  var dg = document.getElementById("diseases");
+  D.paper.diseases.forEach(function (dd) {
+    var cat = dd.uiCategory;
+    dg.appendChild(h("div", { class: "card hover", html:
+      '<span class="pill ' + (cat === "diseased" && dd.id === "bbtv" ? "viral" : cat) + '"><span class="d"></span>' + esc(cat) + '</span>' +
+      '<h3 style="margin-top:12px">' + esc(dd.name) + '</h3>' +
+      '<p style="color:var(--ink-3);font-size:.8rem;margin-bottom:8px"><i>' + esc(dd.pathogen) + '</i></p>' +
+      '<p>' + esc(dd.symptoms) + '</p>' }));
+  });
+
+  // Objective completion chart (grouped bars)
+  OS.barChart("#objChart", {
+    height: 260, yMax: 100,
+    groups: D.system.completion.objectives.map(function (o) {
+      return { label: "Obj " + o.n, bars: [
+        { label: "Frontend", value: o.frontend, color: getComputedStyle(document.documentElement).getPropertyValue("--s1").trim() },
+        { label: "Backend", value: o.backend, color: getComputedStyle(document.documentElement).getPropertyValue("--s5").trim() }
+      ] };
+    }),
+    valFmt: function (v) { return v + "%"; }
+  });
+  document.getElementById("objChart").insertAdjacentHTML("afterend", OS.legend([
+    { label: "Frontend (UI)", color: getComputedStyle(document.documentElement).getPropertyValue("--s1").trim() },
+    { label: "Backend (services)", color: getComputedStyle(document.documentElement).getPropertyValue("--s5").trim() }
+  ]));
+
+  // Dataset donut
+  var C = { healthy: "--healthy", black_sigatoka: "--stressed", panama: "--diseased", bunchy_top: "--viral" };
+  function col(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  var segs = D.metrics.dataset.composition.map(function (c) { return { label: c.label, value: c.images, color: col(C[c.id]) }; });
+  OS.donut("#dataDonut", { segments: segs, center: D.metrics.dataset.totalUnique, centerLabel: "unique imgs" });
+  document.getElementById("dataLegend").innerHTML = OS.legend(segs);
+
+  // Team
+  var tg = document.getElementById("team");
+  D.paper.meta.authors.forEach(function (a) {
+    var initials = a.name.split(" ").filter(function (w) { return w.length > 1 && w[0] === w[0].toUpperCase(); }).slice(0, 2).map(function (w) { return w[0]; }).join("");
+    tg.appendChild(h("div", { class: "card hover", style: "text-align:center", html:
+      '<div style="width:56px;height:56px;border-radius:16px;margin:0 auto 12px;display:grid;place-items:center;font-weight:800;font-size:1.1rem;color:#fff;background:linear-gradient(150deg,var(--brand),var(--brand-deep))">' + esc(initials) + '</div>' +
+      '<h3 style="font-size:.98rem">' + esc(a.name) + '</h3><p style="color:var(--brand-bright);font-size:.8rem;font-weight:700">' + esc(a.role) + '</p>' }));
+  });
+  tg.appendChild(h("div", { class: "card hover", style: "text-align:center", html:
+    '<div style="width:56px;height:56px;border-radius:16px;margin:0 auto 12px;display:grid;place-items:center;font-weight:800;color:#3a2c00;background:linear-gradient(150deg,var(--gold),var(--gold-deep))">KP</div>' +
+    '<h3 style="font-size:.98rem">' + esc(D.paper.meta.adviser.name) + '</h3><p style="color:var(--gold);font-size:.8rem;font-weight:700">' + esc(D.paper.meta.adviser.role) + '</p>' }));
+
+  OS.scanReveal();
+});
+</script>
+</body>
+</html>

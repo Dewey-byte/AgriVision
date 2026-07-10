@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriVision OS — System & Architecture</title>
+<meta name="description" content="AgriVision system architecture: IPO model, data-flow diagrams, ERD, use cases, pipeline modules, requirements, and storage design.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M24 4C13 8 7 17 7 27c0 8 5 15 13 17 0-14 4-24 15-31C29 6 26 5 24 4Z' fill='%2322c55e'/></svg>">
+<link rel="stylesheet" href="assets/css/os.css">
+</head>
+<body data-app="architecture" data-crumb="System & Architecture">
+<main class="os-main">
+<div class="page wide">
+
+  <section class="hero" style="padding-bottom:8px" data-reveal>
+    <span class="eyebrow">System design · Chapter 2</span>
+    <h1 class="h-xl">How AgriVision is built</h1>
+    <p class="lead">A modular, offline-first desktop application — no web server, no database. Live stats live in memory; field reports are traceable file bundles. Below: the data model, the diagrams, and the module map.</p>
+  </section>
+
+  <section class="grid g4" id="sysfacts" data-reveal style="margin-top:18px"></section>
+
+  <!-- IPO -->
+  <div class="section-head" data-reveal><span class="eyebrow">Conceptual framework</span><h2>Input → Process → Output</h2></div>
+  <section class="grid g3" data-reveal>
+    <div class="ipo-col in"><h4>📥 Input</h4><ul id="ipoIn"></ul></div>
+    <div class="ipo-col proc"><h4>⚙️ Process</h4><ul id="ipoProc"></ul></div>
+    <div class="ipo-col out"><h4>📤 Output</h4><ul id="ipoOut"></ul></div>
+  </section>
+
+  <!-- PIPELINE -->
+  <div class="section-head" data-reveal><span class="eyebrow">Runtime pipeline</span><h2>Six stages, one background worker</h2></div>
+  <section class="card pad-lg" data-reveal>
+    <div class="pipe" id="pipe"></div>
+  </section>
+
+  <!-- DIAGRAMS -->
+  <div class="section-head" data-reveal><span class="eyebrow">Analysis diagrams</span><h2>Data flow, use cases & context</h2>
+    <p class="lead">The formal diagrams from the capstone — click any to view full size in a new tab.</p></div>
+  <section class="grid g2" id="diagrams" data-reveal></section>
+
+  <!-- ERD -->
+  <div class="section-head" data-reveal><span class="eyebrow">Data model</span><h2>Entity relationships (JSON schema)</h2></div>
+  <section class="grid g2" data-reveal style="align-items:start">
+    <figure class="fig" style="margin:0" id="erdFig"></figure>
+    <div>
+      <div class="grid" id="entities" style="gap:10px"></div>
+    </div>
+  </section>
+  <section class="card" data-reveal style="margin-top:16px">
+    <h3 style="margin-top:0">Key relationships</h3>
+    <div id="rels" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+  </section>
+
+  <!-- CLASSES -->
+  <div class="section-head" data-reveal><span class="eyebrow">Taxonomy</span><h2>Disease classes (data.yaml)</h2></div>
+  <section data-reveal id="classTbl"></section>
+
+  <!-- MODULES -->
+  <div class="section-head" data-reveal><span class="eyebrow">Codebase</span><h2>Module map</h2></div>
+  <section class="grid g2" id="modules" data-reveal></section>
+
+  <!-- REQUIREMENTS -->
+  <div class="section-head" data-reveal><span class="eyebrow">Traceability</span><h2>Requirements → modules</h2></div>
+  <section class="grid g2" data-reveal>
+    <div><h4 class="sub" style="color:var(--brand-bright)">Functional</h4><div id="fr"></div></div>
+    <div><h4 class="sub" style="color:var(--teal)">Non-functional</h4><div id="nfr"></div></div>
+  </section>
+
+  <!-- STORAGE -->
+  <div class="section-head" data-reveal><span class="eyebrow">Persistence</span><h2>Local filesystem storage</h2>
+    <p class="lead" id="storageNote"></p></div>
+  <section class="grid g2" data-reveal style="align-items:start">
+    <div id="storageTbl"></div>
+    <pre class="code" aria-label="storage tree">AgriVision/
+├── <span class="k">models/best.pt</span>        <span class="c"># deployed YOLO weights</span>
+├── datasets/            <span class="c"># offline training data</span>
+├── runs/detect/         <span class="c"># Ultralytics training runs</span>
+└── output/              <span class="c"># primary storage root</span>
+    ├── reports/         <span class="c"># JPG + JSON + CSV + map bundle</span>
+    ├── maps/            <span class="c"># rolling live Leaflet map</span>
+    ├── sessions/        <span class="c"># planned: per-run folders</span>
+    └── batch/           <span class="c"># planned: flight folders</span></pre>
+  </section>
+
+</div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/os.js"></script>
+<script>
+OS.ready(function () {
+  var h = OS.h, esc = OS.esc, D = window.AGV, S = D.system;
+
+  // sys facts
+  var facts = [
+    { v: "Desktop", l: "Application type", n: "Python · PyQt5" },
+    { v: "Offline", l: "Operation mode", n: "no server, no DB" },
+    { v: "main.py", l: "Entry point", n: "single dashboard" },
+    { v: "best.pt", l: "Model weights", n: "YOLOv8n" }
+  ];
+  var sf = document.getElementById("sysfacts");
+  facts.forEach(function (f) { sf.appendChild(h("div", { class: "stat", html: '<div class="v" style="font-size:1.5rem">' + esc(f.v) + '</div><div class="l">' + esc(f.l) + '</div><div class="n">' + esc(f.n) + '</div>' })); });
+
+  // IPO
+  function fill(id, arr) { var el = document.getElementById(id); arr.forEach(function (x) { el.appendChild(h("li", { text: x })); }); }
+  fill("ipoIn", S.ipo.input); fill("ipoProc", S.ipo.process); fill("ipoOut", S.ipo.output);
+
+  // Pipeline
+  var pipe = document.getElementById("pipe");
+  S.pipeline.forEach(function (s) {
+    pipe.appendChild(h("div", { class: "step", html:
+      '<div class="num"><div class="dot">' + s.icon + '</div></div>' +
+      '<div class="body"><b>' + esc(s.n) + ' · ' + esc(s.name) + '</b> <span class="tag" style="color:var(--gold);border-color:var(--line)">' + esc(s.fr) + '</span>' +
+      '<p>' + esc(s.desc) + '</p>' + s.modules.map(function (m) { return '<span class="tag">' + esc(m) + '</span>'; }).join(" ") + '</div>' }));
+  });
+
+  // Diagrams (figures)
+  var diagIds = ["fig07a", "fig08", "fig09", "fig10"];
+  var dg = document.getElementById("diagrams");
+  diagIds.forEach(function (id) {
+    var f = D.figures[id];
+    var a = h("a", { href: f.file, target: "_blank", rel: "noopener", style: "text-decoration:none;color:inherit" });
+    a.innerHTML = '<figure class="fig" style="margin:0"><div class="frame"><img loading="lazy" src="' + esc(f.file) + '" alt="' + esc(f.title) + '"></div>' +
+      '<p class="fig-cap"><b>' + esc(f.number) + '.</b> ' + esc(f.title) + '</p><p class="desc">' + esc(f.desc) + '</p></figure>';
+    dg.appendChild(a);
+  });
+
+  // ERD figure + entities
+  document.getElementById("erdFig").innerHTML =
+    '<a href="' + D.figures.fig11.file + '" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="frame"><img src="' + D.figures.fig11.file + '" alt="ERD"></div></a>' +
+    '<p class="fig-cap"><b>Figure 11.</b> ' + esc(D.figures.fig11.title) + '</p>';
+  var ent = document.getElementById("entities");
+  S.erd.entities.forEach(function (e) {
+    ent.appendChild(h("div", { class: "entity", html: '<b>' + esc(e.name) + '</b><p>' + esc(e.role) + '</p><span class="tag">' + esc(e.persistence) + '</span>' }));
+  });
+  var rels = document.getElementById("rels");
+  S.erd.relationships.forEach(function (r) {
+    rels.appendChild(h("span", { class: "tag", style: "padding:6px 10px", html: '<b style="color:var(--brand-bright)">' + esc(r[0]) + '</b> <span style="color:var(--ink-3)">' + esc(r[1]) + '</span> <b style="color:var(--gold)">' + esc(r[2]) + '</b>' }));
+  });
+
+  // classes table
+  document.getElementById("classTbl").innerHTML = OS.tableHTML({
+    number: "data.yaml", caption: "YOLO class taxonomy and UI health mapping",
+    headers: ["class_id", "name", "UI category"],
+    rows: S.classes.map(function (c) { return [c.id, c.name, c.category]; })
+  });
+
+  // modules
+  var mg = document.getElementById("modules");
+  S.modules.forEach(function (grp) {
+    var c = h("div", { class: "card" });
+    c.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span class="tag" style="color:var(--brand-bright);border-color:var(--line-strong)">' + esc(grp.group) + '/</span><b>' + esc(grp.role) + '</b></div>';
+    grp.files.forEach(function (f) {
+      c.appendChild(h("div", { style: "padding:8px 0;border-bottom:1px dashed var(--line)", html: '<code style="color:var(--gold)">' + esc(f.name) + '</code><p style="margin:3px 0 0;font-size:.84rem;color:var(--ink-2)">' + esc(f.desc) + '</p>' }));
+    });
+    mg.appendChild(c);
+  });
+
+  // requirements
+  var frEl = document.getElementById("fr"), nfrEl = document.getElementById("nfr");
+  S.requirements.functional.forEach(function (r) {
+    frEl.appendChild(h("div", { class: "req", html: '<span class="rid">' + esc(r.id) + '</span><div><b>' + esc(r.title) + '</b><p>' + esc(r.text) + '</p><span class="tag" style="margin-top:6px;display:inline-block">' + esc(r.modules) + '</span></div>' }));
+  });
+  S.requirements.nonfunctional.forEach(function (r) {
+    nfrEl.appendChild(h("div", { class: "req nf", html: '<span class="rid">' + esc(r.id) + '</span><div><b>' + esc(r.title) + '</b><p>' + esc(r.text) + '</p></div>' }));
+  });
+
+  // storage
+  document.getElementById("storageNote").textContent = S.storage.note;
+  document.getElementById("storageTbl").innerHTML = OS.tableHTML({
+    number: "", caption: "", headers: ["Path", "Role", "Status"],
+    rows: S.storage.paths.map(function (p) { return [p.path, p.role, p.status]; })
+  }).replace(/<p class="tbl-cap.*/, "");
+
+  OS.scanReveal();
+});
+</script>
+</body>
+</html>

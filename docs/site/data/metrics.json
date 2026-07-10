@@ -1,0 +1,104 @@
+{
+  "headline": {
+    "valMap50": 0.177,
+    "valMap50_95": 0.046,
+    "healthyMap50": 0.501,
+    "trainHours": 1.46,
+    "epochs": 100,
+    "uniqueImages": 315,
+    "smokePass": "7 / 7"
+  },
+  "hyperparameters": [
+    { "param": "Base Model", "value": "YOLOv8n (yolov8n.pt)" },
+    { "param": "Optimizer", "value": "AdamW (auto-selected)" },
+    { "param": "Learning Rate", "value": "0.00125" },
+    { "param": "LR Scheduler", "value": "Linear decay (lrf = 0.01)" },
+    { "param": "Epochs", "value": "100" },
+    { "param": "Batch Size", "value": "16" },
+    { "param": "Image Size", "value": "640" },
+    { "param": "Weight Decay", "value": "0.0005" },
+    { "param": "Momentum", "value": "0.937" },
+    { "param": "Warm-up Epochs", "value": "3" },
+    { "param": "Device", "value": "NVIDIA GeForce RTX 4050 (CUDA)" }
+  ],
+  "curve": [
+    { "epoch": 1, "map50": 0.0, "map5095": 0.0, "precision": 0.0006, "recall": 0.0102, "train_loss": 10.221, "val_loss": 9.97 },
+    { "epoch": 5, "map50": 0.0756, "map5095": 0.0233, "precision": 0.8336, "recall": 0.123, "train_loss": 6.475, "val_loss": 6.83 },
+    { "epoch": 10, "map50": 0.0843, "map5095": 0.0247, "precision": 0.845, "recall": 0.117, "train_loss": 6.177, "val_loss": 6.078 },
+    { "epoch": 20, "map50": 0.1119, "map5095": 0.0322, "precision": 0.872, "recall": 0.1216, "train_loss": 5.813, "val_loss": 6.235 },
+    { "epoch": 30, "map50": 0.1115, "map5095": 0.035, "precision": 0.8658, "recall": 0.1139, "train_loss": 5.633, "val_loss": 6.167 },
+    { "epoch": 40, "map50": 0.1025, "map5095": 0.0303, "precision": 0.3646, "recall": 0.0958, "train_loss": 5.478, "val_loss": 6.189 },
+    { "epoch": 50, "map50": 0.111, "map5095": 0.0295, "precision": 0.3376, "recall": 0.1413, "train_loss": 5.203, "val_loss": 6.291 },
+    { "epoch": 60, "map50": 0.1424, "map5095": 0.0413, "precision": 0.4415, "recall": 0.1575, "train_loss": 5.024, "val_loss": 6.056 },
+    { "epoch": 70, "map50": 0.1469, "map5095": 0.0418, "precision": 0.2049, "recall": 0.1893, "train_loss": 4.863, "val_loss": 6.168 },
+    { "epoch": 80, "map50": 0.146, "map5095": 0.0389, "precision": 0.1989, "recall": 0.1961, "train_loss": 4.658, "val_loss": 6.218 },
+    { "epoch": 90, "map50": 0.1621, "map5095": 0.0415, "precision": 0.24, "recall": 0.1978, "train_loss": 4.511, "val_loss": 6.275 },
+    { "epoch": 100, "map50": 0.1475, "map5095": 0.0396, "precision": 0.1759, "recall": 0.2256, "train_loss": 4.387, "val_loss": 6.236 }
+  ],
+  "checkpoints": [
+    { "epoch": 20, "accuracy": 8.89, "recall": 11.29, "precision": 59.56, "f1": 18.99 },
+    { "epoch": 40, "accuracy": 13.25, "recall": 16.20, "precision": 45.79, "f1": 23.93 },
+    { "epoch": 60, "accuracy": 12.93, "recall": 17.46, "precision": 15.56, "f1": 16.46 },
+    { "epoch": 80, "accuracy": 16.34, "recall": 21.10, "precision": 29.03, "f1": 24.44 }
+  ],
+  "perClass": [
+    { "class": "All classes", "id": "all", "precision": 0.454, "recall": 0.173, "map50": 0.177, "map5095": 0.046 },
+    { "class": "healthy", "id": "healthy", "precision": 0.521, "recall": 0.540, "map50": 0.501, "map5095": 0.143 },
+    { "class": "black_sigatoka", "id": "black_sigatoka", "precision": 0.294, "recall": 0.154, "map50": 0.182, "map5095": 0.035 },
+    { "class": "panama", "id": "panama", "precision": 1.000, "recall": 0.000, "map50": 0.026, "map5095": 0.007 },
+    { "class": "bunchy_top", "id": "bunchy_top", "precision": 0.000, "recall": 0.000, "map50": 0.000, "map5095": 0.000 }
+  ],
+  "dataset": {
+    "split": "80 : 10 : 10",
+    "totalUnique": 315,
+    "train": 252,
+    "val": 32,
+    "test": 31,
+    "note": "No. Images counts aerial images containing at least one bounding box of that label (one image may appear in multiple rows). Severe class imbalance: ~92% of labels are healthy.",
+    "composition": [
+      { "label": "Healthy", "id": "healthy", "images": 315, "train": 252, "val": 32, "test": 31 },
+      { "label": "Black Sigatoka", "id": "black_sigatoka", "images": 108, "train": 84, "val": 12, "test": 12 },
+      { "label": "Panama Disease", "id": "panama", "images": 98, "train": 78, "val": 7, "test": 13 },
+      { "label": "Bunchy Top", "id": "bunchy_top", "images": 4, "train": 3, "val": 1, "test": 0 }
+    ]
+  },
+  "smokeTests": [
+    { "area": "Backend module imports (14 modules)", "result": "Pass" },
+    { "area": "Detection category mapping", "result": "Pass" },
+    { "area": "Preprocessing (resize, denoise, CLAHE)", "result": "Pass" },
+    { "area": "Live detection pipeline", "result": "Pass" },
+    { "area": "Geo-tagged Leaflet map export", "result": "Pass" },
+    { "area": "Field report export (JSON, CSV, HTML)", "result": "Pass" },
+    { "area": "UI boot and live frame loop", "result": "Pass" }
+  ],
+  "narrative": [
+    "Training accuracy rose steadily to ~0.54 by epoch 80 while validation mAP@0.5 plateaued between 0.05 and 0.16 — a classic overfitting gap.",
+    "Validation loss dropped from ~10 to ~6 by epoch 10 then plateaued near 6.0 while training loss kept decreasing to ~4.4.",
+    "The healthy class dominates (~92% of labels) and reaches mAP50 0.501; rare classes such as bunchy_top (only 3 training boxes) cannot be learned meaningfully.",
+    "The precision drop after epoch ~40 and recovery reflect Ultralytics disabling mosaic augmentation in the final epochs."
+  ],
+  "sampleReport": {
+    "exported_at": "2026-07-04T04:06:26",
+    "video_source": "scrcpy",
+    "geo": { "latitude": 7.45, "longitude": 125.78, "source": "windows_gps", "accuracy_m": 50000.0 },
+    "detection_summary": { "total": 11, "healthy": 11, "stressed": 0, "diseased": 0 },
+    "vegetation": { "health_label": "good", "mean_stress": 0.2917, "high_stress_pct": 26.09, "index_type": "exg_proxy" },
+    "session": { "frames_processed": 1052, "frames_analyzed": 35, "total_detections": 261, "peak_detections": 13 },
+    "detections": [
+      { "bbox": [240, 202, 335, 317], "class": 2, "confidence": 0.55, "label": "healthy (0.55)" },
+      { "bbox": [484, 20, 551, 96], "class": 2, "confidence": 0.49, "label": "healthy (0.49)" },
+      { "bbox": [362, 201, 439, 275], "class": 2, "confidence": 0.48, "label": "healthy (0.48)" },
+      { "bbox": [499, 112, 558, 168], "class": 2, "confidence": 0.47, "label": "healthy (0.47)" },
+      { "bbox": [479, 209, 552, 292], "class": 2, "confidence": 0.47, "label": "healthy (0.47)" },
+      { "bbox": [63, 201, 165, 254], "class": 2, "confidence": 0.45, "label": "healthy (0.45)" },
+      { "bbox": [176, 277, 252, 367], "class": 2, "confidence": 0.44, "label": "healthy (0.44)" },
+      { "bbox": [557, 212, 635, 281], "class": 2, "confidence": 0.44, "label": "healthy (0.44)" },
+      { "bbox": [19, 199, 150, 306], "class": 2, "confidence": 0.40, "label": "healthy (0.40)" },
+      { "bbox": [231, 202, 345, 254], "class": 2, "confidence": 0.39, "label": "healthy (0.39)" },
+      { "bbox": [96, 323, 212, 448], "class": 2, "confidence": 0.37, "label": "healthy (0.37)" }
+    ],
+    "frameImage": "assets/figures/sys_capture_frame.jpg",
+    "frameWidth": 640,
+    "frameHeight": 480
+  }
+}
