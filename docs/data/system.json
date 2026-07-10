@@ -1,0 +1,155 @@
+{
+  "summary": {
+    "type": "Desktop application (Python, PyQt5) with real-time computer vision",
+    "note": "No web server, relational database, or authentication layer. Runs offline for capture, inference, and export; only map basemap tiles and GPS auto-detect need connectivity.",
+    "entryPoint": "main.py",
+    "weights": "models/best.pt",
+    "classesFile": "datasets/yolo_banana/data.yaml"
+  },
+  "ipo": {
+    "input": ["Drone aerial images", "GPS / location data", "Banana plantation images"],
+    "process": ["Image preprocessing", "YOLOv8 disease detection", "Disease classification (Panama, Black Sigatoka, BBTV, Healthy)", "Geotagging and heatmap generation"],
+    "output": ["Disease detection results", "Geotagged disease locations", "Heatmap visualization", "Field reports (JSON / CSV)", "Plantation health summary"]
+  },
+  "pipeline": [
+    { "n": "1.0", "name": "Capture", "icon": "📱", "desc": "Pull frames from the Android phone/drone mirror in real time.", "modules": ["utils/cast_manager.py", "utils/screen_capture.py"], "fr": "FR-1" },
+    { "n": "2.0", "name": "Preprocess", "icon": "🧪", "desc": "Resize, bilateral denoise, CLAHE contrast, and ECC temporal alignment for a stable feed.", "modules": ["core/preprocess.py"], "fr": "FR-4" },
+    { "n": "3.0", "name": "Detect", "icon": "🎯", "desc": "Run YOLOv8 inference to produce bounding boxes, confidence, and class labels.", "modules": ["core/detection.py", "ui/inference_worker.py"], "fr": "FR-2" },
+    { "n": "4.0", "name": "Stress map", "icon": "🌿", "desc": "Compute an ExG-derived vegetation stress index as a health proxy.", "modules": ["core/ndvi.py", "core/processor.py"], "fr": "FR-4" },
+    { "n": "5.0", "name": "Visualize & aggregate", "icon": "📊", "desc": "Overlay detections, roll up Healthy/Stressed/Diseased counts, update map + activity log.", "modules": ["utils/drawing.py", "ui/main_window.py", "ui/components/sidebar.py"], "fr": "FR-2" },
+    { "n": "6.0", "name": "Report & export", "icon": "📦", "desc": "On Capture Frame, write a report bundle: annotated JPG, JSON, CSV, and interactive Leaflet map.", "modules": ["backend/report.py", "backend/map_export.py", "backend/geo.py"], "fr": "FR-3" }
+  ],
+  "modules": [
+    { "group": "backend", "role": "Services & orchestration", "files": [
+      { "name": "pipeline.py", "desc": "Pipeline orchestrator that chains capture → preprocess → detect → report." },
+      { "name": "session.py", "desc": "In-memory SessionRecorder tracking rolling live-run statistics." },
+      { "name": "report.py", "desc": "Builds the JSON/CSV field report bundle on Capture Frame." },
+      { "name": "map_export.py", "desc": "Writes geo-tagged Leaflet HTML maps with detection markers." },
+      { "name": "geo.py", "desc": "Local tangent-plane offset mapping detection centers to lat/lon." },
+      { "name": "status.py", "desc": "Objective/completion reporting (python -m backend)." }
+    ]},
+    { "group": "core", "role": "Computer vision", "files": [
+      { "name": "detection.py", "desc": "YOLOv8 inference wrapper and category mapping." },
+      { "name": "preprocess.py", "desc": "Resize, denoise, CLAHE, and temporal alignment." },
+      { "name": "ndvi.py", "desc": "ExG / green-band vegetation stress proxy." },
+      { "name": "processor.py", "desc": "Per-frame processing that ties preprocess + detect + stress." },
+      { "name": "classification.py", "desc": "Label-to-health-category logic." }
+    ]},
+    { "group": "ui", "role": "PyQt5 dashboard", "files": [
+      { "name": "main_window.py", "desc": "Main orchestration window and live timer loop." },
+      { "name": "inference_worker.py", "desc": "Background worker thread running YOLO off the UI thread." },
+      { "name": "components/", "desc": "card, feed_panel, map_panel, sidebar, video_feed widgets." },
+      { "name": "capture_worker.py / geo_worker.py", "desc": "Async capture and GPS acquisition workers." }
+    ]},
+    { "group": "utils", "role": "Infrastructure", "files": [
+      { "name": "cast_manager.py", "desc": "Launches and manages the scrcpy Android mirror." },
+      { "name": "screen_capture.py", "desc": "Grabs frames from the mirror window." },
+      { "name": "drawing.py", "desc": "Draws overlays and maps labels to health categories." },
+      { "name": "frame_quality.py", "desc": "ExG/HSV frame quality gate." }
+    ]},
+    { "group": "tools", "role": "Offline training pipeline", "files": [
+      { "name": "label_studio/", "desc": "Annotation server + YOLO export config." },
+      { "name": "split_yolo_dataset.py", "desc": "Applies the 80:10:10 train/val/test split." },
+      { "name": "merge_yolo_export.py", "desc": "Merges new labeled export zips into the dataset." },
+      { "name": "generate_epoch_reports.py", "desc": "Produces Keras-style accuracy/loss graphs per checkpoint." }
+    ]}
+  ],
+  "classes": [
+    { "id": 0, "name": "black_sigatoka", "category": "stressed" },
+    { "id": 1, "name": "bunchy_top", "category": "diseased" },
+    { "id": 2, "name": "healthy", "category": "healthy" },
+    { "id": 3, "name": "panama", "category": "diseased" }
+  ],
+  "requirements": {
+    "functional": [
+      { "id": "FR-1", "title": "Aerial capture via mirror", "text": "Identify diseases from aerial input captured through a wireless drone or phone mirror feed.", "demo": "Start Mirror → Live Feed", "modules": "utils/cast_manager.py, utils/screen_capture.py" },
+      { "id": "FR-2", "title": "Disease detect & classify", "text": "Classify healthy and diseased plants (Black Sigatoka, Bunchy Top, Panama, healthy) and evaluate with precision, recall, and mAP.", "demo": "Bounding boxes + Detection Summary", "modules": "core/detection.py, ui/inference_worker.py" },
+      { "id": "FR-3", "title": "Geo reports & summaries", "text": "Provide geo-tagged disease info, health summaries, and exported reports (JSON, CSV, interactive map).", "demo": "GPS + Leaflet map + Capture Frame", "modules": "backend/geo.py, backend/report.py, backend/map_export.py" },
+      { "id": "FR-4", "title": "Preprocess, stress & retrain", "text": "Preprocess images, generate vegetation stress indicators, and support model retraining from newly labeled datasets.", "demo": "Stable feed + Vegetation Health; train.py", "modules": "core/preprocess.py, core/ndvi.py, train.py" }
+    ],
+    "nonfunctional": [
+      { "id": "NFR-1", "title": "Easy to use", "text": "Single desktop dashboard with live feed, overlays, and one-click export for non-technical users." },
+      { "id": "NFR-2", "title": "Offline capable", "text": "Capture, inference, and export work offline; maps need internet only for basemap tiles." },
+      { "id": "NFR-3", "title": "Windows + Android", "text": "PyQt5 on Windows desktop; Android as a wireless mirror source via scrcpy." },
+      { "id": "NFR-4", "title": "Reliable & maintainable", "text": "Automated smoke testing, modular pipeline architecture, low downtime during field sessions." }
+    ]
+  },
+  "useCases": [
+    { "id": "UC01", "name": "Select Mirror Source", "actor": "Farm Operator", "desc": "Choose iOS (AirPlay) or Android (scrcpy); set device IP and quality." },
+    { "id": "UC02", "name": "Start Live Processing", "actor": "Farm Operator", "desc": "Enable capture timer and background inference worker." },
+    { "id": "UC03", "name": "Stop Live Processing", "actor": "Farm Operator", "desc": "Stop timer and release capture handles." },
+    { "id": "UC04", "name": "View Live Feed with Detections", "actor": "Farm Operator", "desc": "See video with bounding boxes colored by health category." },
+    { "id": "UC05", "name": "View Detection Summary", "actor": "Farm Operator", "desc": "Sidebar total detections and Healthy/Stressed/Diseased breakdown." },
+    { "id": "UC06", "name": "View Stress Heatmap", "actor": "Farm Operator", "desc": "ExG stress index rendered as a colormap preview." },
+    { "id": "UC07", "name": "Capture Frame to Disk", "actor": "Farm Operator", "desc": "Export the current frame + report bundle." },
+    { "id": "UC08", "name": "Monitor Activity Log", "actor": "Farm Operator", "desc": "Read timestamped operational messages." },
+    { "id": "UC09", "name": "Train YOLO Model Offline", "actor": "Technician", "desc": "Run train.py to prepare data and fine-tune YOLOv8." },
+    { "id": "UC10", "name": "Mirror Android via scrcpy", "actor": "Drone Pilot", "desc": "Connect the phone over USB/Wi-Fi to launch the mirror." }
+  ],
+  "erd": {
+    "entities": [
+      { "name": "VIDEO_SOURCE", "role": "Built-in mirror config (Android scrcpy / iOS AirPlay)", "persistence": "UI state" },
+      { "name": "LIVE_SESSION", "role": "Rolling stats for one Start→Stop run", "persistence": "Memory" },
+      { "name": "VIDEO_FRAME", "role": "Raw BGR frame from capture", "persistence": "Memory (per tick)" },
+      { "name": "PREPROCESSED_FRAME", "role": "Denoised, CLAHE, aligned frame", "persistence": "Memory" },
+      { "name": "YOLO_MODEL", "role": "Trained weights for inference", "persistence": "models/best.pt" },
+      { "name": "DISEASE_CLASS", "role": "Banana disease taxonomy", "persistence": "data.yaml" },
+      { "name": "DETECTION", "role": "One YOLO bounding box result", "persistence": "Memory cache" },
+      { "name": "STRESS_MAP", "role": "ExG vegetation stress grid", "persistence": "Memory" },
+      { "name": "HEALTH_SUMMARY", "role": "Healthy / Stressed / Diseased counts", "persistence": "Memory" },
+      { "name": "FIELD_REPORT", "role": "Export bundle on Capture Frame", "persistence": "output/reports/" },
+      { "name": "REPORT_ARTIFACT", "role": "JPG, JSON, CSV, HTML map files", "persistence": "Filesystem" },
+      { "name": "TRAINING_RUN", "role": "Ultralytics training job", "persistence": "runs/detect/" }
+    ],
+    "relationships": [
+      ["VIDEO_SOURCE", "configures", "LIVE_SESSION"],
+      ["LIVE_SESSION", "captures", "VIDEO_FRAME"],
+      ["VIDEO_FRAME", "preprocesses to", "PREPROCESSED_FRAME"],
+      ["PREPROCESSED_FRAME", "yields", "DETECTION"],
+      ["PREPROCESSED_FRAME", "yields", "STRESS_MAP"],
+      ["YOLO_MODEL", "powers", "DETECTION"],
+      ["DISEASE_CLASS", "classifies", "DETECTION"],
+      ["DETECTION", "aggregates into", "HEALTH_SUMMARY"],
+      ["PREPROCESSED_FRAME", "exports as", "FIELD_REPORT"],
+      ["FIELD_REPORT", "contains", "REPORT_ARTIFACT"],
+      ["TRAINING_RUN", "produces", "YOLO_MODEL"]
+    ]
+  },
+  "storage": {
+    "note": "No SQL database. Live stats live in memory (SessionRecorder); field reports are written as traceable file bundles sharing one timestamp prefix.",
+    "paths": [
+      { "path": "output/reports/agrivision_*", "role": "Capture Frame bundle (JPG + JSON + CSV + HTML map)", "status": "Implemented" },
+      { "path": "output/maps/live_map.html", "role": "Rolling Leaflet map during live session", "status": "Implemented" },
+      { "path": "captured_frame.jpg", "role": "Quick preview (overwritten each capture)", "status": "Implemented" },
+      { "path": "models/best.pt", "role": "Deployed YOLO weights", "status": "Implemented" },
+      { "path": "output/sessions/", "role": "One folder per Start→Stop run", "status": "Planned" },
+      { "path": "output/batch/", "role": "Offline DJI / flight-folder processing", "status": "Planned" }
+    ]
+  },
+  "completion": {
+    "frontend": 100,
+    "backend": 50,
+    "objectives": [
+      { "n": 1, "title": "Capture aerial images", "frontend": 100, "backend": 50 },
+      { "n": 2, "title": "Preprocess & enhance", "frontend": 100, "backend": 50 },
+      { "n": 3, "title": "YOLOv8 disease detection", "frontend": 100, "backend": 50 },
+      { "n": 4, "title": "Geo maps & reports", "frontend": 100, "backend": 50 }
+    ],
+    "implemented": [
+      "Built-in wireless mirror capture (Android scrcpy)",
+      "Preprocessing pipeline (resize, denoise, CLAHE, alignment)",
+      "YOLOv8 inference + training script (train.py)",
+      "Detection summary stats (healthy / stressed / diseased)",
+      "Session tracking in memory (backend/session.py)",
+      "Field report export: JSON, CSV, Leaflet HTML map + frame JPEG",
+      "Geo-tagged detection markers (backend/map_export.py)"
+    ],
+    "planned": [
+      "Session-scoped folders under output/sessions/",
+      "Drone EXIF GPS auto-import",
+      "GeoTIFF export",
+      "PDF farmer reports",
+      "Batch flight processing & validation metrics"
+    ]
+  }
+}

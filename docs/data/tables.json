@@ -1,0 +1,203 @@
+{
+  "table1": {
+    "number": "Table 1",
+    "caption": "Summary of Reviewed Literature",
+    "headers": ["Article", "Functionalities", "Algorithm", "Parameters", "Performance"],
+    "rows": [
+      ["Raja and Rajendran [3]", "Comparative evaluation of banana leaf disease detection and classification methods", "CNN, SVM, KNN, Random Forest", "Banana leaf image dataset; ML vs. DL benchmark", ">90% accuracy (CNN-based methods)"],
+      ["Ibarra et al. [9]", "Object detection of Panama disease symptoms on banana leaves", "YOLOv4", "Custom annotated Panama disease leaf images; Philippine dataset", "Competitive mAP and recall for Fusarium wilt detection"],
+      ["Yumang et al. [10]", "Black Sigatoka disease detection on Philippine banana leaves", "ShuffleNet V2, SVM, KNN", "Philippine Black Sigatoka leaf images; classifier comparison", "ShuffleNet V2 significantly outperformed SVM and KNN"],
+      ["Nabil et al. [22]", "Banana leaf spot disease detection including Sigatoka-related symptoms", "YOLOv8s", "BananaLSD dataset subset; bounding-box annotations", "88.9% precision, 92.0% recall"],
+      ["Morocho et al. [19]", "UAV-based instance segmentation of Moko and Black Sigatoka in banana plantations", "YOLOv8m-seg", "UAV imagery from Ecuadorian banana farms; seven model configurations", "84.9% mAP@0.5, 80.3% recall"],
+      ["Khamis et al. [23]", "Georeferenced multiplatform surveillance of banana wilt diseases", "YOLOv8, YOLOv9, YOLO-NAS, Faster R-CNN", "Aerial and ground georeferenced banana images; human-in-the-loop AI", "55–99% mAP depending on platform and region"],
+      ["Lusiba et al. [26]", "UAV-based detection of banana Xanthomonas wilt in complex landscapes", "YOLOv8, Faster R-CNN", "High-resolution UAV RGB imagery; annotated banana stems", "75–99% F1-score"],
+      ["De Souza et al. [25] (GeoDLS)", "Geolocated corn disease tracking and hotspot notification from UAS imagery", "VGG16, ResNet50, InceptionV3, DenseNet169, Xception", "RTK geolocated UAS imagery; tile-segmented and SLIC superpixel inputs", "Successful GPS-referenced disease region identification"],
+      ["Sangaiah et al. [27] (UAV T-YOLO-Rice)", "UAV-based rice leaf disease detection in paddy fields", "UAV T-YOLO-Rice (enhanced Tiny YOLO)", "UAV-captured paddy field imagery; field-deployed agronomy dataset", "High detection performance in IEEE-validated field trials"],
+      ["Masykur et al. [28]", "Rice disease detection at varying drone capture distances", "YOLOv4", "Drone image acquisition at 2 m, 5 m, 10 m, and 20 m altitudes", "Up to 77.3% precision at 20 m distance"],
+      ["Gerance et al. [5] (SaBaTech)", "Web-based banana pest and disease detection with alerts and reporting", "TensorFlow/Keras CNN with ESP32-CAM", "Ground-level banana pest and disease images; Philippine user evaluation", "3.72/4.0 functional suitability score"]
+    ]
+  },
+  "table2": {
+    "number": "Table 2",
+    "caption": "Comparison of Related Systems",
+    "highlightCol": 3,
+    "headers": ["List of Function", "SaBaTech", "GeoDLS", "AgriVision"],
+    "rows": [
+      ["Target crop", "Banana", "Corn", "Banana"],
+      ["Primary purpose", "Ground-based pest and disease identification", "Geolocated corn disease tracking", "Aerial banana disease detection and mapping"],
+      ["Image source", "ESP32-CAM (ground-level)", "RTK geolocated UAS imagery", "Drone aerial images (18 m altitude, 2–3 km/h)"],
+      ["Detection algorithm", "TensorFlow/Keras CNN", "VGG16, ResNet50, DenseNet169, etc.", "YOLOv8"],
+      ["Disease classes covered", "General banana pests and diseases", "Corn leaf diseases (NLB, GLS, rust)", "Panama disease, Black Sigatoka, BBTV"],
+      ["Aerial/drone monitoring", "No", "Yes", "Yes"],
+      ["Geotagged disease locations", "No", "Yes", "Yes"],
+      ["Heatmap visualization", "No", "No", "Yes"],
+      ["Leaf map interface", "No", "No", "Yes"],
+      ["Web-based system", "Yes", "Yes (notification system)", "Yes"],
+      ["Confusion matrix evaluation", "Not reported", "Not reported", "Yes (accuracy, precision, recall, F1-score)"],
+      ["Philippine deployment context", "Yes", "No", "Yes (Compostela, Davao de Oro)"]
+    ]
+  },
+  "definitions": {
+    "number": "Definition of Terms",
+    "caption": "Definition of Terms",
+    "headers": ["Term", "Definition"],
+    "rows": [
+      ["Aerial Image", "A photograph captured from an elevated position using an unmanned aerial vehicle (drone), used as the primary input for disease detection and spatial mapping in this study."],
+      ["Banana Bunchy Top Virus (BBTV)", "A viral disease of banana plants transmitted by aphids, characterized by stunted growth, narrow upright leaves, and dark green streaks on leaf margins, capable of causing severe yield loss."],
+      ["Black Sigatoka", "A foliar fungal disease caused by Pseudocercospora fijiensis, producing dark leaf streaks and necrotic lesions that reduce photosynthetic capacity and fruit quality."],
+      ["Confusion Matrix", "A tabular evaluation metric that compares predicted disease classifications against actual labels, from which accuracy, precision, recall, and F1-score are derived."],
+      ["Drone (UAV)", "An unmanned aerial vehicle equipped with a camera used to capture georeferenced images of banana plantations from a predefined flight altitude and speed."],
+      ["F1-Score", "The harmonic mean of precision and recall, providing a single metric that balances false positives and false negatives in model evaluation."],
+      ["Geotagging", "The process of attaching geographic coordinates (latitude and longitude) to detected disease locations, enabling spatial mapping of infection points on a plantation map."],
+      ["Heatmap", "A spatial visualization that uses color intensity to represent the concentration or severity of detected disease occurrences across a mapped plantation area."],
+      ["Leaf Map Interface", "A graphical user interface that displays banana plantation areas with overlaid disease heatmaps and geotagged detection points for farmer decision support."],
+      ["Object Detection", "A computer vision task that identifies and localizes objects of interest, such as disease symptoms, within an image by drawing bounding boxes around detected instances."],
+      ["Panama Disease (Fusarium Wilt)", "A soil-borne fungal disease caused by Fusarium oxysporum f.sp. cubense that blocks vascular tissue, causing leaf yellowing, wilting, and plant death."],
+      ["Precision", "The proportion of true positive detections among all positive predictions made by the model, indicating the reliability of disease identifications."],
+      ["Recall", "The proportion of actual disease instances correctly detected by the model, indicating the completeness of disease identification."],
+      ["YOLOv8 (You Only Look Once version 8)", "A single-stage deep learning object detection algorithm selected for real-time identification of Panama disease, Black Sigatoka, and BBTV from aerial banana plantation images."]
+    ]
+  },
+  "table3": {
+    "number": "Table 3",
+    "caption": "LiveSession (in-memory)",
+    "headers": ["Field", "Type", "Description"],
+    "rows": [
+      ["started_at", "string (ISO-8601 UTC)", "Session start timestamp"],
+      ["frames_processed", "integer", "Total frames pulled from mirror"],
+      ["frames_analyzed", "integer", "Frames that completed inference"],
+      ["total_detections", "integer", "Cumulative detection count"],
+      ["peak_detections", "integer", "Max detections in a single analyzed frame"],
+      ["last_detection_summary", "object", "{total, healthy, stressed, diseased}"],
+      ["geo_marker_count", "integer", "Count of markers on current map"],
+      ["last_geo", "object", "Last GeoTag used for mapping"]
+    ]
+  },
+  "table4": {
+    "number": "Table 4",
+    "caption": "Detection (per bounding box)",
+    "headers": ["Field", "Type", "Description"],
+    "rows": [
+      ["bbox", "array[4] integer", "[x1, y1, x2, y2] pixels, top-left origin"],
+      ["label", "string", "Display label, e.g. Healthy (0.92)"],
+      ["confidence", "float", "Model confidence 0.0–1.0"],
+      ["class", "integer", "YOLO class id (see data.yaml)"]
+    ]
+  },
+  "table5": {
+    "number": "Table 5",
+    "caption": "HealthSummary (aggregated per frame)",
+    "headers": ["Field", "Type", "Description"],
+    "rows": [
+      ["total", "integer", "Count of valid detections"],
+      ["healthy", "integer", "Healthy category count"],
+      ["stressed", "integer", "Stressed / moderate count"],
+      ["diseased", "integer", "Diseased count"]
+    ]
+  },
+  "table6": {
+    "number": "Table 6",
+    "caption": "GeoTag (plantation anchor)",
+    "headers": ["Field", "Type", "Description"],
+    "rows": [
+      ["latitude", "float", "Decimal degrees (WGS84)"],
+      ["longitude", "float", "Decimal degrees (WGS84)"],
+      ["altitude_m", "float | null", "Altitude in meters (optional)"],
+      ["source", "string", "manual, browser_gps, windows_gps, default, env"]
+    ]
+  },
+  "table7": {
+    "number": "Table 7",
+    "caption": "GeoMarker (map pin per detection)",
+    "headers": ["Field", "Type", "Description"],
+    "rows": [
+      ["lat", "float", "Marker latitude"],
+      ["lon", "float", "Marker longitude"],
+      ["label", "string", "Detection label"],
+      ["category", "string", "healthy | stressed | diseased"],
+      ["confidence", "float", "Detection confidence"]
+    ]
+  },
+  "table8": {
+    "number": "Table 8",
+    "caption": "FieldReport (export root JSON)",
+    "headers": ["Field", "Type", "Description"],
+    "rows": [
+      ["system", "string", "Always \"AgriVision\""],
+      ["exported_at", "string (datetime)", "Capture timestamp (local ISO)"],
+      ["video_source", "string", "e.g. scrcpy, android"],
+      ["geo", "object", "GeoTag fields"],
+      ["detection_summary", "object", "HealthSummary"],
+      ["detections", "array", "List of Detection"],
+      ["session", "object", "LiveSession snapshot"],
+      ["artifacts", "object", "Paths to frame, JSON, map files"]
+    ]
+  },
+  "table9": {
+    "number": "Table 9",
+    "caption": "FieldReport CSV columns (summary and geo rows)",
+    "headers": ["section", "field", "value (example)"],
+    "rows": [
+      ["summary", "total", "12"],
+      ["summary", "healthy", "8"],
+      ["summary", "stressed", "2"],
+      ["summary", "diseased", "2"],
+      ["geo", "latitude", "7.3669"],
+      ["geo", "longitude", "125.91"],
+      ["geo", "altitude_m", "(empty)"],
+      ["geo", "source", "manual"]
+    ]
+  },
+  "table10": {
+    "number": "Table 10",
+    "caption": "FieldReport CSV detection rows",
+    "headers": ["label", "confidence", "class", "bbox"],
+    "rows": [
+      ["Healthy (0.92)", "0.92", "2", "10 10 50 50"]
+    ]
+  },
+  "table11": {
+    "number": "Table 11",
+    "caption": "YOLO training label (offline)",
+    "headers": ["Field", "Format", "Description"],
+    "rows": [
+      ["class_id", "integer 0–3", "Disease class index"],
+      ["x_center", "float 0–1", "Normalized bbox center x"],
+      ["y_center", "float 0–1", "Normalized bbox center y"],
+      ["width", "float 0–1", "Normalized bbox width"],
+      ["height", "float 0–1", "Normalized bbox height"]
+    ]
+  },
+  "table12": {
+    "number": "Table 12",
+    "caption": "Technologies Used in AgriVision",
+    "headers": ["Area", "Technology / theory", "Role in AgriVision"],
+    "rows": [
+      ["Object detection", "YOLOv8 (Ultralytics)", "Bounding-box disease / plant detection on aerial frames"],
+      ["Deep learning runtime", "PyTorch", "Model inference and fine-tuning (models/best.pt)"],
+      ["Computer vision", "OpenCV", "Preprocess, draw overlays, image I/O"],
+      ["Preprocessing", "Bilateral denoise, CLAHE (LAB), ECC temporal alignment", "Improve contrast and stability before inference"],
+      ["Vegetation index (proxy)", "ExG / HSV green-band ratio", "Frame quality gate (utils/frame_quality.py)"],
+      ["Geo mapping", "Local tangent-plane offset (meters → lat/lon)", "Map detection centers to field coordinates"],
+      ["Map visualization", "Leaflet + OpenStreetMap tiles", "Interactive field map in UI and HTML export"],
+      ["Desktop UI", "PyQt5", "Operator dashboard (feed, sidebar, controls)"],
+      ["Video capture", "scrcpy (Android mirror)", "Primary aerial video source from phone/drone app"],
+      ["Annotation pipeline", "Label Studio → YOLO export", "Offline training dataset preparation"],
+      ["Software architecture", "Pipeline pattern, background worker thread", "backend/pipeline.py, ui/inference_worker.py"]
+    ]
+  },
+  "table13": {
+    "number": "Table 13",
+    "caption": "YOLOv8n Results using AdamW Optimizer",
+    "note": "Accuracy = validation mAP@0.5. Recall, Precision, and F1-Score reported as percentages across epoch checkpoints.",
+    "headers": ["YOLOv8n", "Epochs", "Accuracy", "Recall", "Precision", "F1-Score"],
+    "rows": [
+      ["", "20", "8.89%", "11.29", "59.56", "18.99"],
+      ["", "40", "13.25%", "16.20", "45.79", "23.93"],
+      ["", "60", "12.93%", "17.46", "15.56", "16.46"],
+      ["", "80", "16.34%", "21.10", "29.03", "24.44"],
+      ["Average", "", "12.86%", "16.51", "37.49", "20.95"],
+      ["Total Average", "", "", "", "", "21.95%"]
+    ]
+  }
+}
