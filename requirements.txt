@@ -1,5 +1,7 @@
 ultralytics
 opencv-python
 pyqt5
+PyQtWebEngine
 numpy
-pyautogui
+mss
+pygetwindow

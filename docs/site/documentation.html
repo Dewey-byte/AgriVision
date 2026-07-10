@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriVision OS — Documentation</title>
+<meta name="description" content="The complete AgriVision capstone: introduction, related literature, and methodology with all tables, figures, and references.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M24 4C13 8 7 17 7 27c0 8 5 15 13 17 0-14 4-24 15-31C29 6 26 5 24 4Z' fill='%2322c55e'/></svg>">
+<link rel="stylesheet" href="assets/css/os.css">
+</head>
+<body data-app="docs" data-crumb="Documentation">
+<main class="os-main">
+<div class="page wide">
+
+  <section class="hero" style="padding-bottom:8px" data-reveal>
+    <span class="eyebrow">Capstone paper · full text</span>
+    <h1 class="h-xl" id="doc-title"></h1>
+    <p class="lead" id="doc-abstract"></p>
+    <div class="hero-cta">
+      <span class="pill"><span class="d" style="background:var(--brand-bright)"></span><span id="pcount"></span> figures</span>
+      <span class="pill"><span class="d" style="background:var(--gold)"></span><span id="tcount"></span> tables</span>
+      <span class="pill"><span class="d" style="background:var(--teal)"></span>29 references</span>
+    </div>
+  </section>
+
+  <div class="doc-layout">
+    <aside class="toc" id="toc"></aside>
+    <div class="prose" id="doc-body"></div>
+  </div>
+
+</div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/os.js"></script>
+<script>
+OS.ready(function () {
+  var h = OS.h, esc = OS.esc, D = window.AGV, P = D.paper;
+
+  document.getElementById("doc-title").textContent = P.meta.fullTitle;
+  document.getElementById("doc-abstract").textContent = P.meta.abstract;
+  document.getElementById("pcount").textContent = Object.keys(D.figures).length;
+  document.getElementById("tcount").textContent = 13;
+
+  var body = document.getElementById("doc-body");
+  var toc = document.getElementById("toc");
+
+  P.chapters.forEach(function (ch) {
+    toc.appendChild(h("div", { class: "grp", text: ch.number }));
+    // chapter header
+    var head = h("section", { class: "card pad-lg", id: ch.id, style: "margin:26px 0 8px;background:var(--card-grad)" });
+    head.setAttribute("data-reveal", "");
+    head.innerHTML = '<div class="chapter-band">' + esc(ch.number) + '</div><h2 class="h-xl" style="margin:0">' + esc(ch.title) + '</h2>';
+    body.appendChild(head);
+
+    ch.sections.forEach(function (sec) {
+      toc.appendChild(h("a", { href: "#" + sec.id, text: sec.title }));
+      var s = h("section", { id: sec.id, style: "scroll-margin-top:80px;margin-top:30px" });
+      s.setAttribute("data-reveal", "");
+      s.appendChild(h("h2", { style: "font-size:1.5rem;border-left:3px solid var(--brand);padding-left:12px", text: sec.title }));
+      body.appendChild(s);
+      OS.renderBlocks(s, sec.blocks);
+    });
+  });
+
+  // References section
+  toc.appendChild(h("div", { class: "grp", text: "References" }));
+  toc.appendChild(h("a", { href: "#references", text: "IEEE References (29)" }));
+  var refSec = h("section", { id: "references", style: "scroll-margin-top:80px;margin-top:40px" });
+  refSec.setAttribute("data-reveal", "");
+  refSec.innerHTML = '<h2 style="font-size:1.5rem;border-left:3px solid var(--brand);padding-left:12px">References</h2>';
+  var list = h("div", { class: "grid", style: "gap:8px" });
+  D.references.forEach(function (r) {
+    list.appendChild(h("div", { class: "req", style: "grid-template-columns:auto 1fr", html:
+      '<span class="rid" style="background:linear-gradient(150deg,var(--teal),#0e7f74)">[' + r.n + ']</span>' +
+      '<div><p style="font-size:.86rem;color:var(--ink-2)">' + esc(r.citation) + '</p>' +
+      (r.doi ? '<a class="tag" style="margin-top:6px;display:inline-block" href="https://doi.org/' + esc(r.doi) + '" target="_blank" rel="noopener">doi:' + esc(r.doi) + '</a>' : '') +
+      ' <span class="tag" style="background:transparent;border-color:var(--line);color:var(--ink-3)">' + esc(r.topic) + '</span></div>' }));
+  });
+  refSec.appendChild(list);
+  body.appendChild(refSec);
+
+  // mount any charts declared inside blocks
+  OS.mountEpochChart();
+  OS.scanReveal();
+
+  // TOC scroll spy
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var targets = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
+  var spy = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        links.forEach(function (l) { l.classList.remove("active"); });
+        var i = targets.indexOf(e.target);
+        if (i >= 0) links[i].classList.add("active");
+      }
+    });
+  }, { rootMargin: "-70px 0px -70% 0px" });
+  targets.forEach(function (t) { if (t) spy.observe(t); });
+});
+</script>
+</body>
+</html>

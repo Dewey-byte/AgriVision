@@ -1,0 +1,27 @@
+{
+  "system": "AgriVision",
+  "exported_at": "2026-07-04T04:04:06",
+  "video_source": "unknown",
+  "geo": {
+    "latitude": 7.3669,
+    "longitude": 125.91,
+    "altitude_m": null,
+    "accuracy_m": null,
+    "source": "manual",
+    "note": "Set GPS in sidebar or AGRIVISION_LAT / AGRIVISION_LON"
+  },
+  "detection_summary": {
+    "total": 0,
+    "healthy": 0,
+    "stressed": 0,
+    "diseased": 0
+  },
+  "detections": [],
+  "vegetation": {},
+  "session": {},
+  "artifacts": {
+    "frame": "output\\reports\\agrivision_20260704_040406_frame.jpg",
+    "leaflet_map": "output\\reports\\agrivision_20260704_040406_map.html",
+    "report_json": "output\\reports\\agrivision_20260704_040406_report.json"
+  }
+}

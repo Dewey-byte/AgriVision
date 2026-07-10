@@ -1,0 +1,154 @@
+<mxfile host="app.diagrams.net" agent="AgriVision">
+  <diagram id="workflow-erd" name="Workflow ERD">
+    <mxGraphModel dx="1414" dy="823" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="720" background="light-dark(#FFFFFF,#FFFFFF)" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lane-mem" parent="1" style="swimlane;startSize=24;fontFamily=Helvetica;fontStyle=1;fontSize=11;rounded=1;arcSize=4;fontColor=#000000;" value="  IN MEMORY (live session)" vertex="1">
+          <mxGeometry height="200" width="1120" x="40" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vs" parent="lane-mem" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=22;fontSize=11;rounded=1;arcSize=6;verticalAlign=top;fontColor=#000000;" value="VideoSource" vertex="1">
+          <mxGeometry height="148" width="130" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vs-t" parent="e-vs" style="text;html=1;align=left;spacingLeft=6;verticalAlign=top;fontFamily=Helvetica;fontSize=9;fontColor=#000000;" value="platform&lt;br&gt;device_ip&lt;br&gt;quality&lt;br&gt;window_title&lt;br&gt;&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="130" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ls" parent="lane-mem" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=22;fontSize=11;rounded=1;arcSize=6;verticalAlign=top;fontColor=#000000;" value="LiveSession" vertex="1">
+          <mxGeometry height="148" width="130" x="170" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ls-t" parent="e-ls" style="text;html=1;align=left;spacingLeft=6;verticalAlign=top;fontFamily=Helvetica;fontSize=9;fontColor=#000000;" value="started_at&lt;br&gt;frames_processed&lt;br&gt;frames_analyzed&lt;br&gt;peak_detections&lt;br&gt;&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="130" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="e-fr" parent="lane-mem" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=22;fontSize=11;rounded=1;arcSize=6;verticalAlign=top;fontColor=#000000;" value="Frame" vertex="1">
+          <mxGeometry height="148" width="120" x="340" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-fr-t" parent="e-fr" style="text;html=1;align=left;spacingLeft=6;verticalAlign=top;fontFamily=Helvetica;fontSize=9;fontColor=#000000;" value="BGR image&lt;br&gt;from mirror&lt;br&gt;&lt;br&gt;→ preprocess&lt;br&gt;(denoise, CLAHE)&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="120" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ar" parent="lane-mem" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=22;fontSize=11;rounded=1;arcSize=6;verticalAlign=top;fontColor=#000000;" value="AnalysisResult" vertex="1">
+          <mxGeometry height="148" width="130" x="500" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ar-t" parent="e-ar" style="text;html=1;align=left;spacingLeft=6;verticalAlign=top;fontFamily=Helvetica;fontSize=9;fontColor=#000000;" value="frame_shape[]&lt;br&gt;detections[]&lt;br&gt;  bbox, label, conf&lt;br&gt;detection_summary&lt;br&gt;  total, healthy…&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="130" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gt" parent="lane-mem" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=22;fontSize=11;rounded=1;arcSize=6;verticalAlign=top;fontColor=#000000;" value="GeoTag" vertex="1">
+          <mxGeometry height="148" width="115" x="655" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gt-t" parent="e-gt" style="text;html=1;align=left;spacingLeft=6;verticalAlign=top;fontFamily=Helvetica;fontSize=9;fontColor=#000000;" value="latitude&lt;br&gt;longitude&lt;br&gt;altitude_m&lt;br&gt;source&lt;br&gt;&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="115" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gm" parent="lane-mem" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=22;fontSize=11;rounded=1;arcSize=6;verticalAlign=top;fontColor=#000000;" value="GeoMarker[]" vertex="1">
+          <mxGeometry height="148" width="125" x="795" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gm-t" parent="e-gm" style="text;html=1;align=left;spacingLeft=6;verticalAlign=top;fontFamily=Helvetica;fontSize=9;fontColor=#000000;" value="lat, lon&lt;br&gt;label&lt;br&gt;category&lt;br&gt;confidence&lt;br&gt;&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="125" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="e-map" parent="lane-mem" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=22;fontSize=11;rounded=1;arcSize=6;verticalAlign=top;fontColor=#000000;" value="LiveMap" vertex="1">
+          <mxGeometry height="148" width="125" x="945" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-map-t" parent="e-map" style="text;html=1;align=left;spacingLeft=6;verticalAlign=top;fontFamily=Helvetica;fontSize=9;fontColor=#000000;" value="Leaflet HTML&lt;br&gt;output/maps/&lt;br&gt;live_map.html&lt;br&gt;&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="125" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="a5" edge="1" parent="lane-mem" style="endArrow=block;endFill=1;strokeWidth=1.5;rounded=1;fontColor=#000000;entryX=-0.002;entryY=0.382;entryDx=0;entryDy=0;entryPerimeter=0;" target="e-gt-t">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="630" y="110" as="sourcePoint" />
+            <mxPoint x="650" y="109" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lane-disk" parent="1" style="swimlane;startSize=24;fontFamily=Helvetica;fontStyle=1;fontSize=11;rounded=1;arcSize=4;fontColor=#000000;" value="  ON DISK (Capture Frame)" vertex="1">
+          <mxGeometry height="200" width="1120" x="40" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="e-frep" parent="lane-disk" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=22;fontSize=11;rounded=1;arcSize=6;verticalAlign=top;fontColor=#000000;" value="FieldReport" vertex="1">
+          <mxGeometry height="148" width="200" x="280" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-frep-t" parent="e-frep" style="text;html=1;align=left;spacingLeft=6;verticalAlign=top;fontFamily=Helvetica;fontSize=9;fontColor=#000000;" value="system, exported_at&#xa;video_source&#xa;geo { }&#xa;detection_summary { }&#xa;detections [ ]&#xa;session { }&#xa;artifacts { paths }&#xa;&lt;i&gt;report.py → *_report.json&lt;/i&gt;" vertex="1">
+          <mxGeometry height="120" width="200" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="e-art" parent="lane-disk" style="swimlane;fontFamily=Helvetica;fontStyle=1;startSize=22;fontSize=11;rounded=1;arcSize=6;verticalAlign=top;fontColor=#000000;" value="Artifacts" vertex="1">
+          <mxGeometry height="148" width="220" x="570" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-art-t" parent="e-art" style="text;html=1;align=left;spacingLeft=6;verticalAlign=top;fontFamily=Helvetica;fontSize=9;fontColor=#000000;" value="*_frame.jpg&#xa;*_report.json&#xa;*_report.csv&#xa;*_map.html&#xa;&#xa;output/reports/&#xa;captured_frame.jpg" vertex="1">
+          <mxGeometry height="120" width="220" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cap-btn" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=10;fontStyle=1;fontColor=#000000;" value="Capture Frame&#xa;(operator)" vertex="1">
+          <mxGeometry height="44" width="110" x="130" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" edge="1" parent="1" source="e-vs" style="endArrow=block;endFill=1;strokeWidth=1.5;rounded=1;fontColor=#000000;" target="e-ls">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a1l" connectable="0" parent="a1" style="edgeLabel;html=1;fontSize=8;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="starts" vertex="1">
+          <mxGeometry relative="1" x="-0.1" as="geometry">
+            <mxPoint x="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a2" edge="1" parent="1" source="e-ls" style="endArrow=block;endFill=1;strokeWidth=1.5;rounded=1;fontColor=#000000;" target="e-fr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2l" connectable="0" parent="a2" style="edgeLabel;html=1;fontSize=8;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="1:N frames" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a3" edge="1" parent="1" source="e-fr" style="endArrow=block;endFill=1;strokeWidth=1.5;rounded=1;fontColor=#000000;" target="e-ar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a3l" connectable="0" parent="a3" style="edgeLabel;html=1;fontSize=8;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="analyze" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a6" edge="1" parent="1" source="e-gt" style="endArrow=block;endFill=1;strokeWidth=1.5;rounded=1;fontColor=#000000;" target="e-gm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a7" edge="1" parent="1" source="e-gm" style="endArrow=block;endFill=1;strokeWidth=1.5;rounded=1;fontColor=#000000;" target="e-map">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a8" edge="1" parent="1" source="e-ar" style="endArrow=block;endFill=1;strokeWidth=2;rounded=1;fontColor=#000000;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="552" y="310" />
+              <mxPoint x="430" y="310" />
+            </Array>
+            <mxPoint x="430" y="368" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a8l" connectable="0" parent="a8" style="edgeLabel;html=1;fontSize=9;fontColor=#000000;fontStyle=1;labelBackgroundColor=#FFFFFF;" value="capture" vertex="1">
+          <mxGeometry relative="1" x="-0.2" as="geometry">
+            <mxPoint x="8" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a9" edge="1" parent="1" source="e-ls" style="endArrow=block;endFill=1;strokeWidth=1.5;rounded=1;dashed=1;dashPattern=4 4;entryX=0.3;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;fontColor=#000000;" target="e-frep">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="270" y="310" />
+              <mxPoint x="380" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a9l" connectable="0" parent="a9" style="edgeLabel;html=1;fontSize=8;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="session { }" vertex="1">
+          <mxGeometry relative="1" x="0.3" as="geometry">
+            <mxPoint x="-53" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a10" edge="1" parent="1" source="e-frep" style="endArrow=block;endFill=1;strokeWidth=1.5;rounded=1;fontColor=#000000;" target="e-art">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a10l" connectable="0" parent="a10" style="edgeLabel;html=1;fontSize=8;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="artifacts { }" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-25" y="-4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a11" edge="1" parent="1" source="cap-btn" style="endArrow=block;endFill=1;strokeWidth=1.5;rounded=1;dashed=1;entryX=0;entryY=0.467;entryDx=0;entryDy=0;entryPerimeter=0;fontColor=#000000;" target="e-frep-t">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="185" y="450" />
+              <mxPoint x="280" y="450" />
+            </Array>
+            <mxPoint x="310" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

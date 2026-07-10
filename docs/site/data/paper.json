@@ -1,0 +1,367 @@
+{
+  "meta": {
+    "title": "AGRIVISION",
+    "fullTitle": "AgriVision: A Drone-Based System for Detecting Banana Diseases and Mapping Disease Distribution Using YOLOv8, Heatmaps, and Geotagging",
+    "shortTitle": "A Drone-Based System for Detecting Banana Diseases and Mapping Disease Distribution",
+    "institution": "Legacy College of Compostela",
+    "department": "Institute of Information Technology",
+    "address": "Dagohoy Street, Poblacion, Compostela, Davao de Oro",
+    "documentType": "Capstone Project (Proposed Project Title)",
+    "date": "March 2026",
+    "capstoneWindow": "March 2026 – July 2026",
+    "location": "Compostela, Davao de Oro, Philippines",
+    "adviser": { "name": "Kyle Pacatang", "role": "Project Adviser" },
+    "authors": [
+      { "name": "Cleentson Dewey A. Lenterna", "role": "System Developer" },
+      { "name": "Frincis Jane P. Omadley", "role": "System Designer" },
+      { "name": "Jenny Rose R. Zabala", "role": "System Architect" },
+      { "name": "Jase Karl M. Zerrudo", "role": "Project Manager" }
+    ],
+    "abstract": "AgriVision is a drone-based crop monitoring system that integrates aerial imaging, deep learning, and spatial disease visualization to detect banana diseases and map their distribution across plantations. It employs YOLOv8 to detect Panama disease (Fusarium wilt), Black Sigatoka, and Banana Bunchy Top Virus (BBTV) from aerial images captured at 18 m altitude and 2–3 km/h, and generates heatmaps and geo-tagged disease locations on a leaf map interface. Targeted at banana farms in Compostela, Davao de Oro, the system aims to enable early, spatially accurate disease detection to reduce yield losses and support plantation management."
+  },
+  "keyFacts": [
+    { "label": "Detector", "value": "YOLOv8n", "note": "single-stage, real-time" },
+    { "label": "Disease classes", "value": "3 + healthy", "note": "Panama · Black Sigatoka · BBTV" },
+    { "label": "Flight altitude", "value": "18 m", "note": "2–3 km/h speed" },
+    { "label": "Dataset split", "value": "80 : 10 : 10", "note": "train / val / test" },
+    { "label": "Best val mAP@0.5", "value": "0.177", "note": "healthy class 0.501" },
+    { "label": "Deployment", "value": "Offline desktop", "note": "PyQt5 on Windows" }
+  ],
+  "diseases": [
+    {
+      "id": "panama",
+      "name": "Panama Disease",
+      "aka": "Fusarium Wilt",
+      "pathogen": "Fusarium oxysporum f.sp. cubense (TR4)",
+      "type": "Soil-borne fungal",
+      "uiCategory": "diseased",
+      "symptoms": "Vascular blockage, leaf yellowing, wilting, and eventual plant death.",
+      "impact": "Catastrophic threat to Cavendish cultivars; clonal, highly virulent spread."
+    },
+    {
+      "id": "black_sigatoka",
+      "name": "Black Sigatoka",
+      "aka": "Black Leaf Streak",
+      "pathogen": "Pseudocercospora fijiensis",
+      "type": "Foliar fungal",
+      "uiCategory": "stressed",
+      "symptoms": "Dark leaf streaks and necrotic lesions that reduce photosynthetic capacity.",
+      "impact": "Most economically damaging banana foliar pathogen; yield losses can exceed 50%."
+    },
+    {
+      "id": "bbtv",
+      "name": "Banana Bunchy Top Virus",
+      "aka": "BBTV",
+      "pathogen": "Bunchy top virus (aphid-transmitted)",
+      "type": "Viral",
+      "uiCategory": "diseased",
+      "symptoms": "Stunted growth, chlorotic leaf margins, and bunchy top symptoms.",
+      "impact": "Can cause up to 100% yield loss in infected plants; underrepresented in AI detection literature."
+    },
+    {
+      "id": "healthy",
+      "name": "Healthy",
+      "aka": "Baseline",
+      "pathogen": "—",
+      "type": "Reference class",
+      "uiCategory": "healthy",
+      "symptoms": "Full canopy, uniform green coloration, no visible lesions.",
+      "impact": "Dominant class (~92% of labels); baseline for the health summary."
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ch1",
+      "number": "Chapter 1",
+      "title": "Introduction",
+      "sections": [
+        {
+          "id": "background",
+          "title": "Background of the Study",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "Banana is one of the most widely cultivated crops globally and plays a vital role in food security and agricultural economies [1]. Despite its importance, banana production is highly susceptible to various diseases, particularly Panama disease (Fusarium wilt), Black Sigatoka, and Banana Bunchy Top Virus (BBTV). These diseases significantly reduce crop yield and quality, and if not detected early, can spread rapidly across plantations, resulting in substantial economic losses [11], [12], [15]." },
+            { "type": "paragraph", "text": "Traditional disease detection methods rely heavily on manual inspection by farmers and agricultural experts. While effective on a small scale, this approach is time-consuming, labor-intensive, and prone to human error, especially in large plantation areas. Studies have shown that manual inspection often leads to delayed diagnosis and inconsistent detection results, highlighting the need for automated and scalable solutions [11], [12]." },
+            { "type": "paragraph", "text": "To address these challenges, researchers have explored computer vision and machine learning techniques for plant disease detection. Image processing combined with machine learning has demonstrated improved accuracy in classifying banana leaf diseases [2]. Furthermore, comparative studies indicate that machine learning-based approaches outperform traditional image processing techniques in terms of detection performance and reliability [3]." },
+            { "type": "paragraph", "text": "Recent advancements in deep learning have further enhanced detection capabilities. YOLO-based models, known for real-time object detection, have shown high effectiveness in identifying banana diseases from images [4], [9]. In addition, the integration of unmanned aerial vehicles (UAVs) with aerial imaging has enabled efficient large-scale monitoring of banana plantations, allowing disease symptoms to be captured across extensive farm areas [19], [24]." },
+            { "type": "paragraph", "text": "Several systems have also been developed to apply artificial intelligence in agricultural disease detection. For instance, SaBaTech demonstrated how web-based AI applications can assist in identifying banana pests and diseases efficiently [5]. A systematic review further emphasized the growing role of artificial intelligence in improving detection accuracy and supporting decision-making in agriculture [6]. Moreover, accessible tools such as Google Teachable Machine have shown that even simplified machine learning models can effectively classify banana leaf diseases [7]." },
+            { "type": "paragraph", "text": "Local studies reinforce these findings. The use of CNN architectures such as MobileNetV2 has achieved high accuracy in classifying banana diseases [8], while YOLOv4 has been successfully applied for detecting Panama disease [9]. Additionally, deep learning models such as ShuffleNet V2 have demonstrated superior performance compared to traditional methods like SVM and KNN in detecting diseases such as Black Sigatoka [10]." },
+            { "type": "paragraph", "text": "Despite these advancements, many existing systems are limited to close-range image analysis and do not fully utilize aerial monitoring technologies. Furthermore, several approaches lack spatial visualization tools such as heatmaps and geotagged disease mapping, which are essential for identifying disease hotspots and supporting targeted plantation management [23], [25]." },
+            { "type": "paragraph", "text": "To address these gaps, this study proposes AgriVision, a drone-based crop monitoring system that integrates aerial imaging, deep learning, and spatial disease visualization. The system employs YOLOv8 for accurate detection of Panama disease, Black Sigatoka, and BBTV from aerial images captured at a flight altitude of 18 meters, and generates heatmaps and geotagged disease locations integrated into a leaf map interface. By combining these technologies, the proposed system aims to enhance monitoring efficiency and provide a comprehensive tool for detecting plant diseases and visualizing their distribution in large-scale banana plantations in Compostela, Davao de Oro." }
+          ]
+        },
+        {
+          "id": "objectives",
+          "title": "Objectives of the Study",
+          "level": 1,
+          "blocks": [
+            { "type": "heading", "level": 2, "text": "General Objective" },
+            { "type": "callout", "variant": "goal", "title": "General Objective", "text": "Develop a drone-based crop monitoring system capable of detecting banana diseases and visualizing disease distribution using YOLOv8, heatmaps, and geotagging." },
+            { "type": "heading", "level": 2, "text": "Specific Objectives" },
+            { "type": "list", "ordered": true, "items": [
+              "Acquire aerial images of selected banana plantations in Compostela using a drone at a predefined flight altitude of 18 meters and a speed of 2 to 3 km/h to provide the raw image dataset required for disease detection.",
+              "Preprocess and enhance captured aerial images through normalization and denoising, then partition the dataset into an 80:10:10 ratio for training, validation, and testing to ensure image quality sufficient for YOLOv8 model training.",
+              "Train a YOLOv8 model for the detection of the three primary banana diseases: Panama disease, Black Sigatoka, and Banana Bunchy Top Virus (BBTV).",
+              "Generate heatmaps and geo-tagged disease locations integrated into a leaf map interface to visualize disease distribution across monitored plantation areas.",
+              "Evaluate the model's performance using a confusion matrix based on accuracy, precision, recall, and F1-score, aiming for an optimal evaluation score."
+            ]}
+          ]
+        },
+        {
+          "id": "significance",
+          "title": "Significance of the Study",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "This study introduces an intelligent drone-based monitoring system that combines aerial imaging, YOLOv8 object detection, heatmap visualization, and geotagging to improve the detection and monitoring of banana diseases. By providing timely and spatially accurate information, the proposed system benefits various stakeholders involved in agriculture, research, and technology development." },
+            { "type": "definitionList", "items": [
+              { "term": "Farmers", "def": "Enables farmers to detect banana diseases at an early stage through drone-based monitoring and artificial intelligence. Early disease detection and heatmap visualization help farmers identify infected areas promptly, allowing timely intervention to reduce disease spread and minimize crop yield losses." },
+              { "term": "Banana Industry", "def": "Benefits banana plantation owners and other stakeholders in the banana industry by improving disease monitoring and plantation management. Through early detection and geotagged disease mapping, the system helps reduce production losses, improve operational efficiency, and support sustainable banana production." },
+              { "term": "Future Developers", "def": "Future developers who intend to enhance or develop similar agricultural monitoring systems may build upon the proposed system by incorporating additional disease classes, improving the detection model, integrating advanced imaging technologies, and expanding the system's capabilities for broader agricultural applications." }
+            ]}
+          ]
+        },
+        {
+          "id": "scope",
+          "title": "Scope and Limitation",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "This study focuses on the development of an AI-assisted drone-based system for monitoring banana plantations using aerial RGB imagery. The system integrates YOLOv8 for disease detection and heatmap-based geotagged visualization for mapping disease distribution across plantation areas." },
+            { "type": "paragraph", "text": "The detection component of the system is specifically limited to the following banana diseases:" },
+            { "type": "list", "ordered": false, "items": [
+              "Panama Disease (Fusarium Wilt)",
+              "Black Sigatoka",
+              "Banana Bunchy Top Virus (BBTV)"
+            ]},
+            { "type": "paragraph", "text": "The study will be conducted in selected banana farms in Compostela, Davao de Oro, Philippines. Aerial images will be captured using a drone flown at an altitude of 18 meters and a speed of 2 to 3 km/h. The collected images will be used to train and evaluate the YOLOv8 detection model and to generate heatmaps and geotagged disease locations on a leaf map interface." },
+            { "type": "callout", "variant": "warning", "title": "Limitations", "text": "Performance depends on captured-image quality, which may be affected by lighting variations, wind disturbances, and weather during flight. Detection accuracy is constrained by the training dataset, so diseases outside Panama disease, Black Sigatoka, and BBTV may not be identified. The system is designed solely for monitoring and analysis — it does not provide automated intervention, treatment recommendations, or disease management solutions." }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rrl",
+      "number": "Related Literature",
+      "title": "Review of Related Literature",
+      "sections": [
+        {
+          "id": "rrl-intro",
+          "title": "Overview",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "Banana (Musa spp.) is among the most economically significant fruit crops worldwide. In the Philippines, particularly in Compostela, Davao de Oro, banana production supports local livelihoods and regional agriculture. However, productivity is persistently threatened by Panama disease (Fusarium wilt), Black Sigatoka, and Banana Bunchy Top Virus (BBTV). These three diseases represent distinct pathological mechanisms yet impose a shared requirement for timely, spatially explicit monitoring across large plantations. AgriVision directly targets all three diseases through YOLOv8-based aerial detection and heatmap-geotagged visualization." }
+          ]
+        },
+        {
+          "id": "rrl-diseases",
+          "title": "Banana Diseases and Their Impact on Crop Productivity",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "Panama disease, caused by Fusarium oxysporum f.sp. cubense, particularly Tropical Race 4 (TR4), poses a catastrophic threat to Cavendish cultivars. Van Westerhoven et al. [11] demonstrated through epidemiological modeling that TR4 exhibits clonal, highly virulent spread that surpasses earlier epidemics in geographic reach and host range severity. Infected plants exhibit vascular blockage, wilting, and eventual mortality. Ibarra et al. [9] validated that Panama disease symptoms are detectable through YOLOv4 object detection on banana leaf images in a Philippine context, providing direct methodological precedent for AgriVision's Panama disease detection class." },
+            { "type": "paragraph", "text": "Black Sigatoka, caused by Pseudocercospora fijiensis, produces characteristic necrotic leaf lesions that reduce photosynthetic capacity and marketable yield. Rodríguez-Cabal et al. [13] reported significant reductions in bunch weight, finger size, and fruit quality under black leaf streak pressure. Bwambale et al. [14] found yield losses exceeding 50% depending on cultivar and environmental conditions, with environment contributing 39.1% to disease severity variance. Barbi et al. [15] confirmed that Black Sigatoka is the most economically damaging banana foliar pathogen in many regions. Yumang et al. [10] demonstrated in the Philippines that ShuffleNet V2 CNN significantly outperformed SVM and KNN for Black Sigatoka detection, supporting AgriVision's inclusion of Black Sigatoka as a primary YOLOv8 detection class." },
+            { "type": "paragraph", "text": "Banana Bunchy Top Virus (BBTV) is a viral disease transmitted by aphids that causes stunted growth, chlorotic leaf margins, and bunchy top symptoms, with infected plants capable of near-total yield loss. Perez-Matos et al. [12] documented that BBTV can cause up to 100% yield loss in infected plants and highlighted the multi-pathogen reality of banana epidemiology in the Caribbean, where Fusarium wilt, BBTV, and other pathogens co-occur. The inclusion of BBTV alongside Panama disease and Black Sigatoka in AgriVision addresses a critical gap, as most existing banana AI systems detect only one or two disease classes rather than all three priority pathogens targeted in this study." },
+            { "type": "paragraph", "text": "Comparative methodological analyses reinforce deep learning selection for banana disease identification. Raja and Rajendran [3] found that CNN-based methods consistently outperformed classical machine learning and handcrafted feature approaches. This justifies AgriVision's use of YOLOv8 over traditional image processing pipelines." }
+          ]
+        },
+        {
+          "id": "rrl-ai",
+          "title": "Artificial Intelligence in Plant Disease Detection",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "The transition from manual scouting to AI-assisted diagnosis represents a paradigm shift in agricultural surveillance. Coronel et al. [16] conducted a PRISMA-guided systematic review of 48 studies and found that CNN architectures and transfer learning are predominant, with reported accuracies frequently exceeding 90%, though banana remains underrepresented relative to crops such as tomato and citrus. Ghimire et al. [17] confirmed CNN dominance from 2019 to 2024, emphasizing robustness to environmental variation and field-deployable systems as future priorities. Jibril et al. [18] identified limited annotated datasets for tropical crops as a persistent challenge that AgriVision addresses through Compostela-specific aerial image collection." },
+            { "type": "paragraph", "text": "Nasim et al. [6] reviewed 22 banana-specific AI studies and found that most systems operate on close-range leaf or fruit images rather than aerial plantation imagery, with significant gaps in large-scale datasets and integrated monitoring platforms. Philippine studies including Perito and Erasmo [8], Ancheta et al. [7], and Gerance et al. [5] demonstrate growing local capacity for banana disease AI but remain ground-based. AgriVision extends this paradigm through drone-based aerial capture, YOLOv8 detection, and heatmap-geotagged visualization." }
+          ]
+        },
+        {
+          "id": "rrl-yolo",
+          "title": "YOLO-Based Object Detection for Agricultural Applications",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "The YOLO family of single-stage object detectors is preferred for real-time agricultural monitoring due to its balance of inference speed and detection accuracy. Ajayi et al. [20] reviewed YOLO applications in agriculture and documented high average precision for UAV-based crop and disease detection. Gude and Raghavendra [21] confirmed YOLO variants as preferred for real-time UAV deployment, noting persistent challenges with small object detection at higher altitudes and limited labeled agricultural datasets. AgriVision's flight parameters (18 m altitude, 2–3 km/h speed) are designed to balance coverage efficiency with sufficient ground sampling distance for disease symptom detection." },
+            { "type": "paragraph", "text": "Nabil et al. [22] evaluated YOLOv8 on banana leaf spot diseases including Sigatoka-related symptoms, achieving 88.9% precision and 92.0% recall. Morocho et al. [19] applied YOLOv8 segmentation to UAV imagery from Ecuadorian banana plantations for Moko and Black Sigatoka detection, achieving 84.9% mAP@0.5. Khamis et al. [23] developed a georeferenced multiplatform surveillance framework for banana wilt using multiple YOLO variants with human-in-the-loop refinement. Alanazi [4] demonstrated YOLOv10 effectiveness for banana leaf disease detection. These studies collectively validate YOLO-based architectures for banana disease detection and inform AgriVision's selection of YOLOv8 for multi-class detection of Panama disease, Black Sigatoka, and BBTV from aerial imagery." }
+          ]
+        },
+        {
+          "id": "rrl-drone",
+          "title": "Drone-Based Agricultural Monitoring and Geotagged Disease Mapping",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "UAV platforms enable on-demand, georeferenced aerial imaging across plantation scales. Neupane et al. [24] reviewed deep learning on UAV agricultural imagery and documented altitude-detection trade-offs, with multi-altitude data fusion improving detection performance. Lusiba et al. [26] validated YOLOv8 for banana disease detection from UAV RGB imagery in complex tropical landscapes, achieving F1 scores ranging from 75% to 99%. These findings support AgriVision's use of RGB aerial imagery captured by drone rather than ground-based close-range approaches." },
+            { "type": "paragraph", "text": "Geotagged disease mapping transforms detection outputs into actionable spatial information. De Souza et al. [25] developed GeoDLS, a deep learning-based corn disease tracking system using RTK geolocated UAS imagery that identified and geolocated diseased regions at specific GPS coordinates. Khamis et al. [23] extended this concept to banana wilt surveillance with georeferenced aerial and ground-level imagery. AgriVision adopts this geospatial reporting paradigm by generating geo-tagged disease locations and heatmaps integrated into a leaf map interface, enabling farmers to identify disease hotspots and prioritize intervention areas within Compostela plantations." }
+          ]
+        },
+        {
+          "id": "rrl-heatmap",
+          "title": "Heatmap Visualization for Disease Distribution Analysis",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "Heatmap visualization provides an intuitive spatial representation of disease concentration by mapping detection confidence or frequency across geographic coordinates. In agricultural computer vision, heatmaps derived from object detection outputs enable practitioners to visualize infection clusters that are not apparent from individual image analysis alone. Morocho et al. [19] demonstrated that instance-level YOLOv8 segmentation from UAV imagery enables precise localization of disease symptoms from aerial perspectives, forming the detection layer upon which spatial heatmaps can be constructed. GeoDLS [25] further showed that georeferenced detection outputs can be aggregated into field-level infection maps. AgriVision combines YOLOv8 detections with GPS metadata from drone image capture to generate heatmaps that visualize the spatial distribution of Panama disease, Black Sigatoka, and BBTV across monitored plantation blocks, providing a decision-support layer distinct from tabular or list-based disease reports." }
+          ]
+        },
+        {
+          "id": "rrl-systems",
+          "title": "Review of Related Systems",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "SaBaTech, developed by Gerance et al. [5], is a Philippine web-based banana pest and disease detection application using TensorFlow/Keras deep learning with ESP32-CAM for real-time image capture. The system achieved a functional suitability score of 3.72 out of 4.0 and provides SMS alerts, data visualization, and report generation. However, SaBaTech operates exclusively on close-range, ground-level fruit and leaf images without drone integration, heatmap visualization, or geotagged plantation mapping. AgriVision addresses these limitations by transitioning to aerial drone capture and spatial disease visualization." },
+            { "type": "figure", "ref": "fig01" },
+            { "type": "paragraph", "text": "GeoDLS, developed by De Souza et al. [25], is a deep learning-based corn disease tracking and location system that uses RTK geolocated UAS imagery with 25 trained deep learning models including VGG16, ResNet50, and DenseNet169. The system successfully identifies and geolocates diseased regions within crop fields and notifies users of infection percentages at specific GPS coordinates. While GeoDLS demonstrates effective geotagged disease mapping, it targets corn rather than banana, does not employ YOLOv8, and does not include heatmap visualization on a plantation map interface. AgriVision adapts the geotagging concept for banana disease monitoring with YOLOv8 and heatmap integration." },
+            { "type": "figure", "ref": "fig02" },
+            { "type": "paragraph", "text": "UAV T-YOLO-Rice, developed by Sangaiah et al. [27], is an enhanced Tiny YOLO network for rice leaf disease detection from UAV imagery in paddy agronomy, published in IEEE Transactions on Network Science and Engineering. The system demonstrates that drone-acquired images combined with YOLO-based object detection can effectively identify crop diseases at plantation scale in a staple food crop context. Masykur et al. [28] further evaluated YOLOv4 for rice disease detection at drone capture distances of 2, 5, 10, and 20 meters, reporting precision values up to 77.3% at 20 meters. Pan et al. [29] developed Xoo-YOLO based on YOLOv8 for wild rice bacterial blight detection from UAV field imagery. These rice-focused systems validate the drone-plus-YOLO architecture that AgriVision applies to banana disease detection, while differing in crop target, disease classes, and the absence of heatmap-geotagged leaf map visualization." },
+            { "type": "paragraph", "text": "Morocho et al. [19] developed a YOLOv8 segmentation system for Moko and Black Sigatoka detection from UAV banana imagery in Ecuador, representing the closest existing banana aerial detection system. Khamis et al. [23] provide georeferenced banana wilt surveillance across multiple continents. Compared to these systems, AgriVision uniquely combines detection of all three target diseases (Panama disease, Black Sigatoka, and BBTV), heatmap visualization, geotagged disease locations on a leaf map interface, and deployment in Philippine Compostela plantation conditions." }
+          ]
+        },
+        {
+          "id": "rrl-summary",
+          "title": "Summary of Reviewed Literature",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "Table 1 presents a summary of reviewed literature, including each article's functionalities, algorithm, parameters, and reported performance metrics relevant to AgriVision." },
+            { "type": "table", "ref": "table1" },
+            { "type": "paragraph", "text": "Table 2 compares the functionalities of two related existing systems, SaBaTech and GeoDLS, against the proposed AgriVision system to highlight the features that distinguish this capstone project." },
+            { "type": "table", "ref": "table2" }
+          ]
+        },
+        {
+          "id": "rrl-synthesis",
+          "title": "Synthesis",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "The reviewed literature establishes a coherent technological foundation for AgriVision. Epidemiological studies confirm the severity of Panama disease [11], Black Sigatoka [13]–[15], and BBTV [12] in banana production. Systematic reviews converge on deep learning superiority over classical methods [3], [16]–[18], with YOLO architectures preferred for real-time agricultural object detection [20], [21]. Banana-specific studies validate YOLOv4 and YOLOv8 for Panama disease [9] and Black Sigatoka [10], [19], [22], while BBTV remains underrepresented in computational detection literature, reinforcing AgriVision's contribution. UAV-based monitoring enables plantation-scale surveillance [24], [26], and georeferenced systems such as GeoDLS [25] and Khamis et al. [23] demonstrate the value of spatial disease mapping. Related systems in rice [27]–[29] and Philippine banana AI [5] validate the drone-plus-deep-learning paradigm but lack AgriVision's integrated heatmap-geotagged visualization for three banana diseases." },
+            { "type": "paragraph", "text": "AgriVision synthesizes these research streams into a unified system: drone aerial image capture at 18 meters altitude and 2–3 km/h speed, image preprocessing with 80:10:10 dataset partitioning, YOLOv8 multi-class detection of Panama disease, Black Sigatoka, and BBTV, heatmap and geotagged disease location generation on a leaf map interface, and model evaluation through confusion matrix metrics including accuracy, precision, recall, and F1-score. This integration addresses identified gaps in Philippine aerial banana disease monitoring and provides a novel decision-support tool for farmers in Compostela, Davao de Oro." }
+          ]
+        },
+        {
+          "id": "definitions",
+          "title": "Definition of Terms",
+          "level": 1,
+          "blocks": [
+            { "type": "table", "ref": "definitions" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch2",
+      "number": "Chapter 2",
+      "title": "Methodology",
+      "sections": [
+        {
+          "id": "methodology-intro",
+          "title": "Methodology Overview",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "This chapter presents the methodology employed by the proponents in the development of AgriVision: A Drone-Based System for Detecting Banana Diseases and Mapping Disease Distribution Using YOLOv8, Heatmaps, and Geotagging. The project adopted the Agile Software Development Methodology, an iterative and flexible approach that emphasizes continuous planning, collaboration, frequent testing, and the ability to adapt to changing project requirements throughout the development process." },
+            { "type": "paragraph", "text": "Agile methodology enables the proponents to develop the system incrementally, allowing each feature to be designed, implemented, tested, and improved based on continuous evaluation and feedback. This approach ensures that the system remains aligned with the project's objectives while maintaining high software quality and reliability." },
+            { "type": "paragraph", "text": "In developing AgriVision, the proponents followed the phases of the System Development Life Cycle (SDLC) integrated within the Agile framework. These phases include System Planning, System Analysis, System Design, System Development and Implementation, System Testing, and System Maintenance. Each phase plays a significant role in ensuring the successful development, deployment, and continuous improvement of the system. Figure 3 illustrates the Agile Software Development Methodology adopted by the proponents throughout the development of AgriVision." },
+            { "type": "figure", "ref": "fig03" }
+          ]
+        },
+        {
+          "id": "system-planning",
+          "title": "System Planning",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "System planning established the managerial and technical foundation for AgriVision. During this phase, the proponents defined project scope, timeline, team roles, and resource needs aligned with the capstone calendar from March 2026 to July 2026. Planning activities included stakeholder identification, risk assessment, proposal preparation, and schedule baselining." },
+            { "type": "heading", "level": 2, "text": "Project Team Organization" },
+            { "type": "paragraph", "text": "Each member of the project development team has an individual role and function that contributes to AgriVision. Figure 4 shows the project team organization and the designated responsibilities of each member." },
+            { "type": "figure", "ref": "fig04" },
+            { "type": "paragraph", "text": "The project organization follows a clear accountability structure led by the Project Adviser, Kyle Pacatang, who provides methodological direction, quality oversight, and formal validation of major deliverables. The Project Manager, Jase Karl M. Zerrudo, coordinates schedule execution, risk tracking, stakeholder communication, and milestone acceptance. The System Architect, Jenny Rose R. Zabala, defines the layered architecture, API contracts, and data flow constraints. The System Designer, Frincis Jane P. Omadley, produces interface specifications, dashboard layouts, and visualization standards. The System Developer, Cleentson Dewey A. Lenterna, implements the backend, model integration, preprocessing routines, and map-related features using Python, YOLOv8, and web technologies." },
+            { "type": "heading", "level": 2, "text": "Work Breakdown Structure (WBS)" },
+            { "type": "paragraph", "text": "This section elaborates the work breakdown structure of the development phases followed by the proponents. A work breakdown structure shows the project's deliverables, tasks, and sections in a structured way. Figure 5 illustrates how AgriVision is divided into twelve manageable phases." },
+            { "type": "figure", "ref": "fig05" },
+            { "type": "paragraph", "text": "The WBS decomposes AgriVision into measurable work packages. Critical paths include dataset readiness before full model training, model stabilization before system integration, and integration completion before field testing." },
+            { "type": "heading", "level": 2, "text": "Gantt Chart" },
+            { "type": "paragraph", "text": "This section presents the project schedule for AgriVision, as outlined in the Work Breakdown Structure (WBS). The schedule provides a comprehensive timeline of the project's activities, from the initial planning phase through development, testing, deployment, and maintenance. Figure 6 presents the master Gantt chart, which illustrates the project timeline using phase-based color coding and task bars to clearly represent the sequence, duration, and dependencies of each activity throughout the project lifecycle." },
+            { "type": "figure", "ref": "fig06" },
+            { "type": "paragraph", "text": "Time-critical dependencies include completion of requirements analysis before dataset collection, annotated dataset readiness before YOLOv8 training, heatmap and geotagging module completion before system integration, and field testing before final deployment and defense. Progress monitoring is conducted through weekly standups and variance analysis against baseline dates." }
+          ]
+        },
+        {
+          "id": "system-analysis",
+          "title": "System Analysis",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "After planning, the researchers gathered necessary information to address the aims of the study. System analysis defined what AgriVision must accomplish and how information moves across actors, modules, and data stores. This phase formalized user expectations, operational constraints, and processing requirements for drone imagery, disease detection, and geospatial visualization." },
+            { "type": "heading", "level": 2, "text": "System Architecture" },
+            { "type": "paragraph", "text": "This study employs a developmental and applied research design aimed at designing, developing, and evaluating a drone-based banana disease detection and mapping system called AgriVision. The study integrates computer vision, deep learning, geospatial mapping, and unmanned aerial vehicle (UAV) technology to provide a comprehensive solution for monitoring banana plantation health. The system was designed and evaluated using simulated data and controlled image datasets representative of real-world banana plantation conditions." },
+            { "type": "paragraph", "text": "This study is composed of two interrelated models: (a) the Input-Process-Output (IPO) Model, which provides a high-level abstraction of the system's data flow; and (b) the AgriVision Simulation Framework, which details the step-by-step operational pipeline of the system." },
+            { "type": "figure", "ref": "fig07a" },
+            { "type": "figure", "ref": "fig07b" },
+            { "type": "heading", "level": 2, "text": "Functional and Non-Functional Requirements" },
+            { "type": "paragraph", "text": "The following are the functional and non-functional requirements of the system that are expected to perform and focus on users' expectations." },
+            { "type": "heading", "level": 3, "text": "Functional Requirements" },
+            { "type": "reqList", "kind": "functional", "items": [
+              { "id": "FR-1", "text": "The system must be able to identify common diseases affecting banana crops from aerial input images captured through a wireless drone or phone mirror feed." },
+              { "id": "FR-2", "text": "The system must be able to classify healthy and diseased banana plants (Black Sigatoka, Bunchy Top, Panama disease, and healthy) and evaluate detection performance using validation metrics such as precision, recall, and mAP." },
+              { "id": "FR-3", "text": "The system must provide geo-tagged disease information, field health summaries, and exported reports (JSON, CSV, and interactive map) to farmers and stakeholders for monitoring plantation conditions and supporting harvest planning." },
+              { "id": "FR-4", "text": "The system must be able to preprocess captured images, generate vegetation stress indicators, and support model retraining from newly labeled datasets to improve disease detection over time." }
+            ]},
+            { "type": "heading", "level": 3, "text": "Non-functional Requirements" },
+            { "type": "reqList", "kind": "nonfunctional", "items": [
+              { "id": "NFR-1", "text": "The system must be easy to use and intuitive for farmers and other stakeholders with limited technical expertise through a single desktop dashboard with live feed, detection overlays, and one-click field report export." },
+              { "id": "NFR-2", "text": "The system must be able to operate in offline mode for live capture, inference, and report export, with optional online connectivity for map basemap tiles and GPS auto-detection." },
+              { "id": "NFR-3", "text": "The system must be compatible with Windows desktop computers and support Android devices as a wireless mirror source for aerial video capture via scrcpy." },
+              { "id": "NFR-4", "text": "The system must be reliable and maintainable, with automated smoke testing, modular pipeline architecture, and a low risk of errors and downtime during field sessions." }
+            ]},
+            { "type": "heading", "level": 2, "text": "Use Case Diagram" },
+            { "type": "paragraph", "text": "A use case diagram illustrates the interactions between the user and the system, showing the system's functional requirements. As shown in Figure 8, the Drone Pilot is the primary actor who operates the AgriVision system. The Drone Pilot connects the drone's live video feed through screen mirroring, starts and stops the live detection process, monitors the detection results through the video feed, summary, and map, sets the plantation's GPS location, and captures and exports monitoring reports. These interactions represent the core functionalities of AgriVision in enabling real-time crop monitoring, accurate geospatial mapping, and efficient report generation for agricultural monitoring." },
+            { "type": "figure", "ref": "fig08" },
+            { "type": "heading", "level": 2, "text": "Context Flow Diagram (Level 0)" },
+            { "type": "paragraph", "text": "The Context Flow Diagram (Level 0) presents an overview of the interactions between the external entity and the AgriVision system. As shown in Figure 9, the Pilot serves as the primary external entity who provides the casted drone screen feed to the AgriVision system for real-time processing. The system utilizes the YOLOv8 model and heatmap generation to analyze the incoming video feed and produce visual detection results, which are then displayed to the Pilot for monitoring. Processed detection data are also stored in the Dataset for future reference, analysis, and model improvement. This diagram illustrates the overall flow of data between the Pilot, the AgriVision system, and the Dataset, highlighting the system's role in supporting intelligent and efficient agricultural monitoring." },
+            { "type": "figure", "ref": "fig09" },
+            { "type": "heading", "level": 2, "text": "Level 1 Data Flow Diagram" },
+            { "type": "paragraph", "text": "The Level 1 Data Flow Diagram provides a more detailed representation of the data flow within the AgriVision system by decomposing the processes presented in the Context Flow Diagram. As shown in Figure 10, the Pilot initiates the process by transmitting the casted screen from the drone to the Screen Cast module. The captured video frames are then forwarded to the YOLOv8 Model, where real-time object detection and image analysis are performed. The processed detection data are stored in the Dataset for future reference and model evaluation, while the detected object coordinates are sent to the Generate Heatmap process. This process produces visual heatmaps and detection overlays, which are displayed to the Pilot to support real-time crop monitoring and assessment. The diagram illustrates how data flow through the AgriVision system to provide accurate detection results and meaningful visualizations for agricultural monitoring." },
+            { "type": "figure", "ref": "fig10" }
+          ]
+        },
+        {
+          "id": "system-design",
+          "title": "System Design",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "This section discusses the planned system designs as well as the technologies, concepts, and theories used in this study." },
+            { "type": "heading", "level": 2, "text": "JSON Schema Diagram" },
+            { "type": "paragraph", "text": "The Entity Relationship Diagram illustrates the logical organization of the data objects within the AgriVision system. As shown in Figure 11, the live drone feed from the VideoSource is processed into Frame objects for analysis, producing AnalysisResult data that are linked with GeoTag and GeoMarker information to generate the LiveMap. Captured data are compiled into a FieldReport, while the corresponding images, reports, and map files are stored as Artifacts. This structure ensures the organized management of detection results, geospatial data, and generated reports for real-time monitoring and documentation." },
+            { "type": "figure", "ref": "fig11" },
+            { "type": "heading", "level": 2, "text": "Data Dictionary" },
+            { "type": "paragraph", "text": "The data dictionary provides a comprehensive overview of the data elements used in the system. Tables 3 through 11 present the data dictionary of AgriVision logical entities." },
+            { "type": "table", "ref": "table3" },
+            { "type": "table", "ref": "table4" },
+            { "type": "table", "ref": "table5" },
+            { "type": "table", "ref": "table6" },
+            { "type": "table", "ref": "table7" },
+            { "type": "table", "ref": "table8" },
+            { "type": "table", "ref": "table9" },
+            { "type": "table", "ref": "table10" },
+            { "type": "table", "ref": "table11" },
+            { "type": "heading", "level": 2, "text": "Technologies, Concepts, and Theories" },
+            { "type": "paragraph", "text": "The following technologies, concepts, and theories were applied by the researchers to develop AgriVision. Table 12 summarizes the primary tools and their roles in the system." },
+            { "type": "table", "ref": "table12" }
+          ]
+        },
+        {
+          "id": "system-testing",
+          "title": "System Testing",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "This section presents the phase of system testing and evaluation of AgriVision. The researchers evaluated the developed system to determine whether it satisfies the specified functional and quality requirements. The YOLOv8 architecture was trained and tested using the AdamW optimizer under different epoch settings to generate performance metrics, including accuracy, recall, precision, and F1-score." },
+            { "type": "table", "ref": "table13" },
+            { "type": "chart", "ref": "epochMetrics" },
+            { "type": "figureGroup", "ref": "fig12" },
+            { "type": "paragraph", "text": "Figure 12 illustrates the model accuracy and loss of the YOLOv8n architecture generated during the training process using the AdamW optimizer. The model was trained and evaluated at 20, 40, 60, and 80 epochs to determine the effect of increasing the number of training epochs on its performance. The accuracy and loss curves demonstrate the model's learning behavior throughout the training process, while the corresponding evaluation metrics at each training interval are presented in Table 13." }
+          ]
+        },
+        {
+          "id": "system-maintenance",
+          "title": "System Maintenance",
+          "level": 1,
+          "blocks": [
+            { "type": "paragraph", "text": "This section discusses system maintenance as a critical phase in the lifecycle of the AgriVision system, ensuring that the platform remains reliable, secure, and aligned with the evolving needs of banana plantation disease monitoring after its initial deployment." },
+            { "type": "heading", "level": 2, "text": "Maintenance Plan" },
+            { "type": "paragraph", "text": "The proponents will implement a structured maintenance plan to examine and resolve any bugs encountered during the testing phase of the system and to ensure a consistent and satisfactory user experience throughout its operational lifetime. The AgriVision system is deployed as an executable file, allowing for straightforward installation and update distribution without requiring users to interact with development environments or source code." }
+          ]
+        }
+      ]
+    }
+  ]
+}

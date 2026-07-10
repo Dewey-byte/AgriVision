@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AgriVision — Field Stress Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body, #map { margin: 0; height: 100%; width: 100%; }
+    .leaflet-container { font: 12px/1.4 system-ui, sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  
+  <script>
+    const initialPayload = {"center": [7.45, 125.78], "heatPoints": [], "markers": [], "manualTags": [], "fieldBounds": {"south": 7.449730506647503, "west": 125.77963761642903, "north": 7.450269493352497, "east": 125.78036238357097}, "colors": {"healthy": "#40916c", "stressed": "#d4a373", "diseased": "#bc4749"}, "categoryHeat": {"healthy": 0.15, "stressed": 0.55, "diseased": 0.9}, "heatGradient": {"0.0": "#40916c", "0.15": "#40916c", "0.4": "#74c69d", "0.55": "#d4a373", "0.75": "#e9c46a", "0.9": "#bc4749", "1.0": "#9b2226"}, "manualOnly": false, "meta": {"accuracy_m": 50000.0, "altitude_m": null, "source": "windows_gps"}};
+    const center = initialPayload.center;
+    const colors = initialPayload.colors;
+    const defaultHeatGradient = {"0.0": "#40916c", "0.15": "#40916c", "0.4": "#74c69d", "0.55": "#d4a373", "0.75": "#e9c46a", "0.9": "#bc4749", "1.0": "#9b2226"};
+
+    function heatGradientFrom(payload) {
+      return (payload && payload.heatGradient) || initialPayload.heatGradient || defaultHeatGradient;
+    }
+
+    const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView(center, 17);
+    let heatLayer = null;
+    let anchorMarker = null;
+    let accuracyCircle = null;
+    let hasFitBounds = false;
+    let userMovedMap = false;
+    const markerLayer = L.layerGroup().addTo(map);
+    map.on('dragstart zoomstart', () => { userMovedMap = true; });
+
+    const satellite = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { maxZoom: 18, attribution: 'Tiles &copy; Esri' }
+    );
+    satellite.addTo(map);
+
+    function anchorPopup(center, meta) {
+      const anchorLines = [
+        '<b>Field anchor</b>',
+        'Lat: ' + center[0].toFixed(6),
+        'Lon: ' + center[1].toFixed(6)
+      ];
+      if (meta.altitude_m != null) anchorLines.push('Alt: ' + Number(meta.altitude_m).toFixed(1) + ' m');
+      if (meta.source) anchorLines.push('Source: ' + meta.source);
+      return anchorLines.join('<br>');
+    }
+
+    function extendBounds(bounds, points, markers) {
+      points.forEach(p => bounds.extend([p[0], p[1]]));
+      markers.forEach(m => bounds.extend([m.lat, m.lon]));
+      return bounds;
+    }
+
+    window.agriVisionUpdateMap = function(payload) {
+      const center = payload.center;
+      const heatPoints = payload.heatPoints || [];
+      const markers = payload.markers || [];
+      const meta = payload.meta || {};
+      if (!payload.manualOnly) {
+        window.__agriVisionAutoHeat = heatPoints;
+      }
+
+      if (anchorMarker == null) {
+        anchorMarker = L.circleMarker(center, {
+          radius: 7,
+          color: '#1b4332',
+          fillColor: '#52b788',
+          fillOpacity: 0.95,
+          weight: 2
+        }).addTo(map);
+      }
+      anchorMarker.setLatLng(center).bindPopup(anchorPopup(center, meta));
+
+      if (accuracyCircle != null) {
+        map.removeLayer(accuracyCircle);
+        accuracyCircle = null;
+      }
+      if (meta.accuracy_m != null && meta.accuracy_m > 0) {
+        accuracyCircle = L.circle(center, {
+          radius: meta.accuracy_m,
+          color: '#1b4332',
+          fillColor: '#52b788',
+          fillOpacity: 0.08,
+          weight: 1,
+          dashArray: '4 4'
+        }).addTo(map).bindPopup('GPS accuracy radius');
+      }
+
+      if (payload.fieldBounds) {
+        window.agriVisionSetFieldBounds && window.agriVisionSetFieldBounds(payload.fieldBounds, false);
+      }
+
+      if (heatLayer == null) {
+        heatLayer = L.heatLayer([], {
+        radius: 18,
+        blur: 14,
+        maxZoom: 17,
+        minOpacity: 0.4,
+        gradient: heatGradientFrom(payload)
+      }).addTo(map);
+      }
+      if (typeof renderManualTags === 'function') {
+        renderManualTags(payload.manualTags || [], true);
+      } else if (heatLayer != null) {
+        heatLayer.setLatLngs(heatPoints);
+      }
+      if (typeof syncHeatLayer === 'function') syncHeatLayer();
+      if (typeof raiseManualTagLayers === 'function') raiseManualTagLayers();
+
+      markerLayer.clearLayers();
+      if (!payload.manualOnly && markers.length > 0 && markers.length <= 40) {
+      markers.forEach(m => {
+        const c = colors[m.category] || '#40916c';
+        L.circleMarker([m.lat, m.lon], {
+          radius: 6,
+          color: c,
+          fillColor: c,
+          fillOpacity: 0.85,
+          weight: 2
+        }).addTo(markerLayer).bindPopup('<b>' + m.label + '</b><br>' + (m.category || '') +
+          (m.confidence != null ? '<br>conf: ' + Number(m.confidence).toFixed(2) : ''));
+      });
+      }
+
+      if (!hasFitBounds && !userMovedMap && payload.fieldBounds) {
+        try {
+          const b = payload.fieldBounds;
+          map.fitBounds([[b.south, b.west], [b.north, b.east]], { padding: [20, 20] });
+          hasFitBounds = true;
+        } catch (e) {}
+      } else if (!hasFitBounds && !userMovedMap && (heatPoints.length || markers.length)) {
+        try {
+          const bounds = extendBounds(L.latLngBounds([]), heatPoints, markers);
+          map.fitBounds(bounds.pad(0.15));
+          hasFitBounds = true;
+        } catch (e) {}
+      }
+    };
+
+    
+
+    window.agriVisionUpdateMap(initialPayload);
+    if (initialPayload.fieldBounds) {
+      window.agriVisionSetFieldBounds(initialPayload.fieldBounds, !userMovedMap);
+    }
+  </script>
+</body>
+</html>

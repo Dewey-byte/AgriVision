@@ -1,0 +1,27 @@
+{
+  "fig01": { "number": "Figure 1", "title": "Sample Image for SaBaTech: A Banana Fruit Pest and Disease Detection Web Application", "file": "assets/figures/fig01_sabatech.png", "section": "Review of Related Systems", "desc": "Reference system screenshot — a Philippine web-based, ground-level banana pest and disease detector using a TensorFlow/Keras CNN with ESP32-CAM capture." },
+  "fig02": { "number": "Figure 2", "title": "Sample Image for GeoDLS: A Deep Learning-Based Corn Disease Tracking and Location System Using RTK Geolocated UAS Imagery", "file": "assets/figures/fig02_geodls.png", "section": "Review of Related Systems", "desc": "Reference system — georeferenced corn disease tracking that geolocates diseased regions at GPS coordinates from RTK UAS imagery." },
+  "fig03": { "number": "Figure 3", "title": "Agile Software Development Methodology", "file": "assets/figures/fig03_agile.png", "section": "Methodology Overview", "desc": "The iterative Agile/SDLC cycle adopted for AgriVision: Planning, Analysis, Design, Development, Testing, and Maintenance." },
+  "fig04": { "number": "Figure 4", "title": "Chart of the Project Development Team", "file": "assets/figures/fig04_team.png", "section": "System Planning", "desc": "Team organization and accountability structure, led by the Project Adviser over Project Manager, System Architect, Designer, and Developer." },
+  "fig05": { "number": "Figure 5", "title": "Work Breakdown Structure of AgriVision", "file": "assets/figures/fig05_wbs.jpg", "section": "System Planning", "desc": "AgriVision decomposed into twelve manageable phases and their measurable work packages." },
+  "fig06": { "number": "Figure 6", "title": "Gantt Chart of AgriVision", "file": "assets/figures/fig06_gantt.png", "section": "System Planning", "desc": "Master project schedule (March–July 2026) with phase-based color coding and task dependencies." },
+  "fig07a": { "number": "Figure 7a", "title": "Conceptual Framework — Input · Process · Output (IPO) Model", "file": "assets/figures/fig07a_ipo.jpg", "section": "System Analysis", "desc": "High-level abstraction of the system's data flow from drone/GPS input, through preprocessing, YOLOv8 detection, classification and geotagging, to detection results, geotagged locations, heatmaps and reports." },
+  "fig07b": { "number": "Figure 7b", "title": "Conceptual Framework — AgriVision Simulation Framework", "file": "assets/figures/fig07b_simframework.jpg", "section": "System Analysis", "desc": "Step-by-step operational pipeline of the system, detailing the simulation-based development and evaluation flow." },
+  "fig08": { "number": "Figure 8", "title": "Use Case Diagram of AgriVision", "file": "assets/figures/fig08_usecase.png", "section": "System Analysis", "desc": "Interactions between the Drone Pilot and the system: connect feed, start/stop detection, monitor results, set GPS, and capture/export reports." },
+  "fig09": { "number": "Figure 9", "title": "Context Flow Diagram (Level 0) of AgriVision", "file": "assets/figures/fig09_cfd.png", "section": "System Analysis", "desc": "The Pilot provides the casted drone feed; AgriVision analyzes it with YOLOv8 and heatmap generation, returns visual results, and stores processed data in the Dataset." },
+  "fig10": { "number": "Figure 10", "title": "Level 1 Data Flow Diagram of AgriVision", "file": "assets/figures/fig10_dfd.png", "section": "System Analysis", "desc": "Decomposition of the context process: Screen Cast → YOLOv8 Model → Dataset store + Generate Heatmap → visual overlays back to the Pilot." },
+  "fig11": { "number": "Figure 11", "title": "Entity Relationship Diagram (JSON Schema) of AgriVision", "file": "assets/figures/fig11_erd.png", "section": "System Design", "desc": "Logical data objects: VideoSource → Frame → AnalysisResult, linked with GeoTag/GeoMarker to build the LiveMap, compiled into a FieldReport with stored Artifacts." },
+  "fig12": {
+    "number": "Figure 12",
+    "title": "YOLOv8n AdamW Optimizer — Model Accuracy and Loss",
+    "section": "System Testing",
+    "group": true,
+    "desc": "Training accuracy and loss curves at increasing epoch checkpoints (20, 40, 60, 80). Rising training accuracy against a flatter validation curve indicates overfitting driven by class imbalance.",
+    "items": [
+      { "file": "assets/figures/fig12a_curves_20ep.png", "label": "20 epochs" },
+      { "file": "assets/figures/fig12b_curves_40ep.png", "label": "40 epochs" },
+      { "file": "assets/figures/fig12c_curves_60ep.png", "label": "60 epochs" },
+      { "file": "assets/figures/fig12d_curves_80ep.png", "label": "80 epochs" }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+section,field,value
+summary,total,11
+summary,healthy,11
+summary,stressed,0
+summary,diseased,0
+geo,latitude,7.45
+geo,longitude,125.78
+geo,altitude_m,
+geo,accuracy_m,50000.0
+geo,source,windows_gps
+vegetation,health_label,good
+vegetation,mean_stress,0.2917
+vegetation,high_stress_pct,26.09
+vegetation,index_type,exg_proxy
+
+label,confidence,class,bbox
+healthy (0.55),0.5498046875,2,240 202 335 317
+healthy (0.49),0.4853515625,2,484 20 551 96
+healthy (0.48),0.478515625,2,362 201 439 275
+healthy (0.47),0.466796875,2,499 112 558 168
+healthy (0.47),0.4658203125,2,479 209 552 292
+healthy (0.45),0.450439453125,2,63 201 165 254
+healthy (0.44),0.440673828125,2,176 277 252 367
+healthy (0.44),0.437744140625,2,557 212 635 281
+healthy (0.40),0.39990234375,2,19 199 150 306
+healthy (0.39),0.394287109375,2,231 202 345 254
+healthy (0.37),0.37109375,2,96 323 212 448
