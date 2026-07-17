@@ -78,12 +78,12 @@ export default function Dashboard() {
           <div className="chart-box">
             <ResponsiveContainer>
               <AreaChart data={series}>
-                <CartesianGrid stroke="#2b4234" strokeDasharray="3 3" />
-                <XAxis dataKey="report_id" tick={{ fill: "#93ab99", fontSize: 11 }} />
-                <YAxis tick={{ fill: "#93ab99", fontSize: 11 }} allowDecimals={false} />
+                <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
+                <XAxis dataKey="report_id" tick={{ fill: "#5e7268", fontSize: 11 }} />
+                <YAxis tick={{ fill: "#5e7268", fontSize: 11 }} allowDecimals={false} />
                 <Tooltip
-                  contentStyle={{ background: "#1a2a21", border: "1px solid #2b4234", borderRadius: 10 }}
-                  labelStyle={{ color: "#e8f2ea" }}
+                  contentStyle={{ background: "#ffffff", border: "1px solid #dde5e0", borderRadius: 10 }}
+                  labelStyle={{ color: "#16221b" }}
                 />
                 <Area type="monotone" dataKey="healthy" stackId="1" stroke={CAT_COLORS.healthy} fill={CAT_COLORS.healthy} fillOpacity={0.5} />
                 <Area type="monotone" dataKey="stressed" stackId="1" stroke={CAT_COLORS.stressed} fill={CAT_COLORS.stressed} fillOpacity={0.5} />
@@ -106,8 +106,8 @@ export default function Dashboard() {
                       <Cell key={d.key} fill={CAT_COLORS[d.key]} />
                     ))}
                   </Pie>
-                  <Legend wrapperStyle={{ color: "#93ab99" }} />
-                  <Tooltip contentStyle={{ background: "#1a2a21", border: "1px solid #2b4234", borderRadius: 10 }} />
+                  <Legend wrapperStyle={{ color: "#5e7268" }} />
+                  <Tooltip contentStyle={{ background: "#ffffff", border: "1px solid #dde5e0", borderRadius: 10 }} />
                 </PieChart>
               </ResponsiveContainer>
             )}

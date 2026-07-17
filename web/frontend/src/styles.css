@@ -1,16 +1,16 @@
 :root {
-  --bg: #0f1a14;
-  --bg-soft: #14211a;
-  --panel: #1a2a21;
-  --panel-2: #20332827;
-  --border: #2b4234;
-  --text: #e8f2ea;
-  --muted: #93ab99;
-  --green: #40916c;
-  --green-bright: #52b788;
-  --amber: #d4a373;
+  --bg: #ffffff;
+  --bg-soft: #f4f7f5;
+  --panel: #ffffff;
+  --panel-2: #eef3f0;
+  --border: #dde5e0;
+  --text: #16221b;
+  --muted: #5e7268;
+  --green: #2d6a4f;
+  --green-bright: #2d6a4f;
+  --amber: #b06f37;
   --red: #bc4749;
-  --accent: #74c69d;
+  --accent: #2d6a4f;
   --radius: 14px;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
 }
@@ -72,7 +72,7 @@ a {
   justify-content: center;
   font-weight: 800;
   font-size: 16px;
-  color: #06130c;
+  color: #ffffff;
 }
 
 .brand h1 {
@@ -105,7 +105,7 @@ a {
 
 .navlink.active {
   background: var(--green);
-  color: #06130c;
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -160,6 +160,7 @@ a {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px 20px;
+  box-shadow: 0 1px 2px rgba(16, 40, 28, 0.04), 0 2px 8px rgba(16, 40, 28, 0.04);
 }
 
 .card h3 {
@@ -295,8 +296,8 @@ tr.clickable {
 }
 
 .pill.diseased {
-  background: rgba(188, 71, 73, 0.18);
-  color: #e58a8c;
+  background: rgba(188, 71, 73, 0.14);
+  color: #a13133;
 }
 
 .pill.neutral {
@@ -315,7 +316,7 @@ tr.clickable {
 button,
 .btn {
   background: var(--green);
-  color: #06130c;
+  color: #ffffff;
   border: none;
   border-radius: 10px;
   padding: 9px 16px;
@@ -387,7 +388,7 @@ select:focus {
 }
 
 .error-text {
-  color: #e58a8c;
+  color: #bc4749;
   font-size: 13px;
 }
 

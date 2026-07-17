@@ -14,8 +14,8 @@ import {
 import { api } from "../api.js";
 
 const TOOLTIP_STYLE = {
-  background: "#1a2a21",
-  border: "1px solid #2b4234",
+  background: "#ffffff",
+  border: "1px solid #dde5e0",
   borderRadius: 10,
 };
 
@@ -102,11 +102,11 @@ export default function ModelComparison() {
             <div className="chart-box">
               <ResponsiveContainer>
                 <LineChart data={m.training_curve}>
-                  <CartesianGrid stroke="#2b4234" strokeDasharray="3 3" />
-                  <XAxis dataKey="epoch" tick={{ fill: "#93ab99", fontSize: 11 }} />
-                  <YAxis tick={{ fill: "#93ab99", fontSize: 11 }} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#e8f2ea" }} />
-                  <Legend wrapperStyle={{ color: "#93ab99" }} />
+                  <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
+                  <XAxis dataKey="epoch" tick={{ fill: "#5e7268", fontSize: 11 }} />
+                  <YAxis tick={{ fill: "#5e7268", fontSize: 11 }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#16221b" }} />
+                  <Legend wrapperStyle={{ color: "#5e7268" }} />
                   <Line type="monotone" dataKey="map50" name="mAP@0.5" stroke="#52b788" dot={false} strokeWidth={2} />
                   <Line type="monotone" dataKey="precision" name="Precision" stroke="#74c69d" dot={false} strokeDasharray="4 3" />
                   <Line type="monotone" dataKey="recall" name="Recall" stroke="#d4a373" dot={false} strokeDasharray="4 3" />
@@ -116,11 +116,11 @@ export default function ModelComparison() {
             <div className="chart-box">
               <ResponsiveContainer>
                 <LineChart data={m.training_curve}>
-                  <CartesianGrid stroke="#2b4234" strokeDasharray="3 3" />
-                  <XAxis dataKey="epoch" tick={{ fill: "#93ab99", fontSize: 11 }} />
-                  <YAxis tick={{ fill: "#93ab99", fontSize: 11 }} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#e8f2ea" }} />
-                  <Legend wrapperStyle={{ color: "#93ab99" }} />
+                  <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
+                  <XAxis dataKey="epoch" tick={{ fill: "#5e7268", fontSize: 11 }} />
+                  <YAxis tick={{ fill: "#5e7268", fontSize: 11 }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#16221b" }} />
+                  <Legend wrapperStyle={{ color: "#5e7268" }} />
                   <Line type="monotone" dataKey="train_loss" name="Train loss (box+cls)" stroke="#e9c46a" dot={false} strokeWidth={2} />
                   <Line type="monotone" dataKey="val_loss" name="Val loss (box+cls)" stroke="#bc4749" dot={false} strokeWidth={2} />
                 </LineChart>
@@ -163,11 +163,11 @@ export default function ModelComparison() {
           <div className="chart-box">
             <ResponsiveContainer>
               <BarChart data={classMetrics.filter((c) => c.class !== "all")}>
-                <CartesianGrid stroke="#2b4234" strokeDasharray="3 3" />
-                <XAxis dataKey="class" tick={{ fill: "#93ab99", fontSize: 11 }} />
-                <YAxis tick={{ fill: "#93ab99", fontSize: 11 }} tickFormatter={(v) => `${(v * 100).toFixed(0)}%`} />
-                <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#e8f2ea" }} formatter={(v) => `${(v * 100).toFixed(1)}%`} />
-                <Legend wrapperStyle={{ color: "#93ab99" }} />
+                <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
+                <XAxis dataKey="class" tick={{ fill: "#5e7268", fontSize: 11 }} />
+                <YAxis tick={{ fill: "#5e7268", fontSize: 11 }} tickFormatter={(v) => `${(v * 100).toFixed(0)}%`} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#16221b" }} formatter={(v) => `${(v * 100).toFixed(1)}%`} />
+                <Legend wrapperStyle={{ color: "#5e7268" }} />
                 <Bar dataKey="map50" name="mAP@0.5" fill="#52b788" radius={[6, 6, 0, 0]} />
                 <Bar dataKey="map50_95" name="mAP@0.5:0.95" fill="#2d6a4f" radius={[6, 6, 0, 0]} />
               </BarChart>

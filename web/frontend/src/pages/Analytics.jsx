@@ -16,8 +16,8 @@ import { api } from "../api.js";
 import StatCard from "../components/StatCard.jsx";
 
 const TOOLTIP_STYLE = {
-  background: "#1a2a21",
-  border: "1px solid #2b4234",
+  background: "#ffffff",
+  border: "1px solid #dde5e0",
   borderRadius: 10,
 };
 
@@ -81,10 +81,10 @@ export default function Analytics() {
             ) : (
               <ResponsiveContainer>
                 <BarChart data={classData} layout="vertical" margin={{ left: 30 }}>
-                  <CartesianGrid stroke="#2b4234" strokeDasharray="3 3" />
-                  <XAxis type="number" tick={{ fill: "#93ab99", fontSize: 11 }} allowDecimals={false} />
-                  <YAxis type="category" dataKey="name" width={110} tick={{ fill: "#93ab99", fontSize: 11 }} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#e8f2ea" }} cursor={{ fill: "rgba(82,183,136,0.06)" }} />
+                  <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
+                  <XAxis type="number" tick={{ fill: "#5e7268", fontSize: 11 }} allowDecimals={false} />
+                  <YAxis type="category" dataKey="name" width={110} tick={{ fill: "#5e7268", fontSize: 11 }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#16221b" }} cursor={{ fill: "rgba(82,183,136,0.06)" }} />
                   <Bar dataKey="count" radius={[0, 6, 6, 0]}>
                     {classData.map((d) => (
                       <Cell key={d.name} fill={CLASS_COLORS[d.name] || "#74c69d"} />
@@ -105,11 +105,11 @@ export default function Analytics() {
             ) : (
               <ResponsiveContainer>
                 <LineChart data={stress}>
-                  <CartesianGrid stroke="#2b4234" strokeDasharray="3 3" />
-                  <XAxis dataKey="report_id" tick={{ fill: "#93ab99", fontSize: 11 }} />
-                  <YAxis tick={{ fill: "#93ab99", fontSize: 11 }} unit="%" />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#e8f2ea" }} />
-                  <Legend wrapperStyle={{ color: "#93ab99" }} />
+                  <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
+                  <XAxis dataKey="report_id" tick={{ fill: "#5e7268", fontSize: 11 }} />
+                  <YAxis tick={{ fill: "#5e7268", fontSize: 11 }} unit="%" />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#16221b" }} />
+                  <Legend wrapperStyle={{ color: "#5e7268" }} />
                   <Line type="monotone" dataKey="mean_stress_pct" name="Mean stress %" stroke="#e9c46a" dot strokeWidth={2} />
                   <Line type="monotone" dataKey="high_stress_pct" name="High-stress area %" stroke="#bc4749" dot strokeWidth={2} />
                 </LineChart>
