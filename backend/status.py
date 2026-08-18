@@ -9,19 +9,21 @@ OBJECTIVES: list[dict[str, Any]] = [
     {
         "id": 1,
         "title": "Capture high-resolution aerial images",
-        "backend_pct": 50,
+        "backend_pct": 75,
         "frontend_pct": 100,
         "status": "partial",
         "implemented": [
             "Built-in wireless phone mirror (Android via scrcpy)",
             "scrcpy mirror window capture",
             "Live frame pull in PyQt5 UI",
+            "Session folders under output/sessions/",
+            "Flight / session ID per live run (pre-flight Video ID required)",
         ],
         "pending": [
             "Batch archival of flight imagery",
             "Resolution / metadata validation",
         ],
-        "modules": ["utils/cast_manager.py", "utils/screen_capture.py"],
+        "modules": ["utils/cast_manager.py", "utils/screen_capture.py", "backend/storage.py"],
     },
     {
         "id": 2,
@@ -51,18 +53,18 @@ OBJECTIVES: list[dict[str, Any]] = [
             "Custom banana disease weights (models/best.pt)",
             "Background inference worker",
             "Detection summary in UI",
+            "Held-out test/val metrics pipeline (backend/validation_metrics.py)",
         ],
         "pending": [
-            "Full validation metrics pipeline",
             "Class alignment with thesis disease list",
             "Batch inference on saved flights",
         ],
-        "modules": ["core/detection.py", "train.py", "backend/pipeline.py"],
+        "modules": ["core/detection.py", "train.py", "backend/pipeline.py", "backend/validation_metrics.py"],
     },
     {
         "id": 4,
         "title": "Generate geo-tagged maps and disease reports",
-        "backend_pct": 50,
+        "backend_pct": 75,
         "frontend_pct": 100,
         "status": "partial",
         "implemented": [
@@ -70,13 +72,21 @@ OBJECTIVES: list[dict[str, Any]] = [
             "GPS anchor fields in sidebar",
             "Field report export (JSON + CSV + HTML map)",
             "Embedded map panel in UI",
+            "Session-scoped capture folders",
+            "Drone EXIF GPS auto-import (DJI JPEG)",
         ],
         "pending": [
-            "Drone EXIF / flight-log GPS auto-import",
             "GeoTIFF export",
             "PDF farmer report",
         ],
-        "modules": ["backend/geo.py", "backend/map_export.py", "backend/report.py", "ui/components/map_panel.py"],
+        "modules": [
+            "backend/geo.py",
+            "backend/exif_geo.py",
+            "backend/map_export.py",
+            "backend/report.py",
+            "backend/storage.py",
+            "ui/components/map_panel.py",
+        ],
     },
 ]
 

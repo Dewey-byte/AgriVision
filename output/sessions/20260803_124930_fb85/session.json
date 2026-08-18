@@ -1,0 +1,12 @@
+{
+  "session_id": "fb85",
+  "flight_id": "AGV-20260803-fb85",
+  "folder": "output/sessions/20260803_124930_fb85",
+  "started_at": "2026-08-03T12:49:30+00:00",
+  "ended_at": "2026-08-03T12:49:30+00:00",
+  "field_name": "",
+  "status": "completed",
+  "stats": {
+    "ok": 1
+  }
+}

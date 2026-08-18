@@ -22,7 +22,13 @@
 | **Annotation pipeline** | Label Studio → YOLO export | Offline training dataset preparation |
 | **Software architecture** | Pipeline pattern, background worker thread | `backend/pipeline.py`, `ui/inference_worker.py` |
 
-**Emerging / planned (next phase):** drone EXIF GPS import, GeoTIFF export, PDF farmer reports, full validation metrics (mAP, precision/recall on held-out flights).
+**Emerging / planned (next phase):** drone EXIF GPS import, GeoTIFF export, PDF farmer reports.
+
+**Validation metrics (implemented):** held-out test/val evaluation via `python tools/evaluate_test_set.py` → `output/metrics/test_report_latest.{json,csv,md}`.
+
+**Session storage (implemented):** live runs write to `output/sessions/{YYYYMMDD_HHMMSS_id}/` with `session.json`, `captures/`, and `maps/`.
+
+**Drone EXIF GPS (implemented):** set sidebar **Drone EXIF folder** or `AGRIVISION_DRONE_IMAGE_DIR`; GPS is read from the newest DJI `.JPG` on session start, Detect My Location, and Capture Frame.
 
 ---
 

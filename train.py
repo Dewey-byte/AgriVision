@@ -19,9 +19,14 @@ MODELS_DIR = ROOT / "models"
 BASE_WEIGHTS = ROOT / "yolov8n.pt"
 
 
-def resolve_data_yaml() -> Path:
-    """Use datasets/yolo_banana produced by tools/label_studio/export_yolo.py."""
-    data_yaml = YOLO_ROOT / "data.yaml"
+def resolve_data_yaml(dataset: Path | None = None) -> Path:
+    """Use a YOLO dataset folder (data.yaml + images/labels splits)."""
+    yolo_root = Path(dataset) if dataset else YOLO_ROOT
+    if yolo_root.suffix.lower() in {".yaml", ".yml"}:
+        data_yaml = yolo_root
+        yolo_root = yolo_root.parent
+    else:
+        data_yaml = yolo_root / "data.yaml"
     if not data_yaml.is_file():
         raise FileNotFoundError(
             f"Missing dataset: {data_yaml}\n"
@@ -33,14 +38,14 @@ def resolve_data_yaml() -> Path:
         )
 
     for split in ("train", "val"):
-        images = YOLO_ROOT / "images" / split
-        labels = YOLO_ROOT / "labels" / split
+        images = yolo_root / "images" / split
+        labels = yolo_root / "labels" / split
         if not images.is_dir() or not labels.is_dir():
             raise FileNotFoundError(
-                f"Incomplete dataset under {YOLO_ROOT} (missing images/{split} or labels/{split})"
+                f"Incomplete dataset under {yolo_root} (missing images/{split} or labels/{split})"
             )
 
-    print(f"Using YOLO dataset at {YOLO_ROOT}")
+    print(f"Using YOLO dataset at {yolo_root}")
     return data_yaml
 
 
@@ -114,12 +119,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--resume", default=None, help="Path to last.pt to resume training")
     parser.add_argument("--workers", type=int, default=0)
     parser.add_argument("--model", default="yolov8n.pt", help="Base weights (yolov8n.pt or yolov8s.pt)")
+    parser.add_argument(
+        "--data",
+        type=Path,
+        default=None,
+        help="YOLO dataset folder or data.yaml (default: datasets/yolo_banana)",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    data_yaml = resolve_data_yaml()
+    data_yaml = resolve_data_yaml(args.data)
     train_model(
         data_yaml=data_yaml,
         epochs=args.epochs,

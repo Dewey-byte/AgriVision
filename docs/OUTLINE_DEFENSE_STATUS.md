@@ -7,7 +7,7 @@ Use this document during your **outline defense** to explain system completion.
 | Layer | Progress | Notes |
 |-------|----------|-------|
 | **Frontend (UI)** | **100%** | PyQt5 dashboard, live feed, sidebar stats, Leaflet field map, activity log, built-in wireless mirror controls |
-| **Backend** | **50%** | Core services implemented; session-scoped storage, GeoTIFF, PDF deferred to next phase |
+| **Backend** | **~63%** | Core services + session storage + EXIF GPS; GeoTIFF, PDF deferred |
 
 Run in terminal for a printable summary:
 
@@ -62,7 +62,7 @@ Runtime data is **in-memory** during a live run (`backend/session.py`) and **on 
 | `output/maps/live_map.html` | Rolling Leaflet map during live session | **Implemented** |
 | `captured_frame.jpg` | Quick preview (overwritten each capture) | **Implemented** |
 | `models/best.pt` | Deployed YOLO weights | **Implemented** |
-| `output/sessions/` | One folder per Start→Stop run | Planned |
+| `output/sessions/` | One folder per Start→Stop run | **Implemented** |
 | `output/batch/` | Offline DJI / flight-folder processing | Planned |
 
 Full layout, naming rules, env vars, and rollout phases: **[STORAGE_DESIGN.md](STORAGE_DESIGN.md)**
@@ -88,12 +88,13 @@ Full layout, naming rules, env vars, and rollout phases: **[STORAGE_DESIGN.md](S
 - Session tracking in memory (`backend/session.py`)  
 - Field report export: JSON, CSV, **Leaflet HTML map** + frame JPEG  
 - Geo-tagged detection markers (`backend/map_export.py`)  
+- **Held-out test/val metrics** (`python tools/evaluate_test_set.py` → `output/metrics/`)  
 - **Local filesystem storage design** documented (`docs/STORAGE_DESIGN.md`)  
 
 ## Backend — planned (remaining 50%)
 
-- Session-scoped folders under `output/sessions/`  
-- Drone EXIF GPS auto-import  
+- Session-scoped folders under `output/sessions/` with flight ID  
+- Drone EXIF GPS auto-import from DJI JPEG folder  
 - GeoTIFF export  
 - PDF farmer reports  
 - Batch flight processing & validation metrics  

@@ -183,6 +183,16 @@ Optional: run the project smoke test:
 python smoke_test.py
 ```
 
+### Step 7 — Held-out test metrics
+
+Evaluate `models/best.pt` on the test split (not used during training):
+
+```powershell
+python tools/evaluate_test_set.py
+```
+
+Reports land in `output/metrics/test_report_latest.{json,csv,md}`.
+
 ---
 
 ## Command-line alternative

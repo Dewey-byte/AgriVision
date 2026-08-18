@@ -1,6 +1,9 @@
 import os
 import sys
 
+# Import torch/Ultralytics before PyQt5 — Windows DLL load order (Qt + CUDA conflict).
+import core.detection  # noqa: F401
+
 from PyQt5.QtWidgets import QApplication
 from ui.main_window import MainWindow
 

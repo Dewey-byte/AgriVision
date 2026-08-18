@@ -1,0 +1,7 @@
+path: D:/GitHub/AgriVision/datasets/yolo_healthy_panama
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: healthy
+  1: panama

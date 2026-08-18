@@ -52,6 +52,14 @@ def export_field_report(
 
     session: dict[str, Any] | None = None,
 
+    flight_id: str | None = None,
+
+    video_id: str | None = None,
+
+    session_id: str | None = None,
+
+    capture_id: str | None = None,
+
     vegetation: dict[str, float | str] | None = None,
 
     heat_points: list[list[float]] | None = None,
@@ -80,7 +88,9 @@ def export_field_report(
 
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    base = out / f"agrivision_{stamp}"
+    capture_stamp = capture_id or stamp
+
+    base = out / f"agrivision_{capture_stamp}"
 
 
 
@@ -119,6 +129,14 @@ def export_field_report(
         "vegetation": vegetation or {},
 
         "session": session or {},
+
+        "flight_id": flight_id or (session or {}).get("flight_id", ""),
+
+        "video_id": video_id or (session or {}).get("video_id", "") or flight_id or "",
+
+        "session_id": session_id or (session or {}).get("session_id", ""),
+
+        "capture_id": capture_stamp,
 
         "artifacts": {},
 

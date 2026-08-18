@@ -421,8 +421,21 @@ def _detect_ip_location(timeout: float) -> DetectedLocation | None:
     return None
 
 
+def _detect_drone_exif_folder() -> DetectedLocation | None:
+    """Read GPS from the newest JPEG in AGRIVISION_DRONE_IMAGE_DIR."""
+    try:
+        from backend.exif_geo import import_drone_gps_detailed
+    except ImportError:
+        return None
+
+    found = import_drone_gps_detailed()
+    if found is None:
+        return None
+    return found.to_detected_location()
+
+
 def detect_my_location(timeout: float | None = None) -> DetectedLocation | None:
-    """Phone GPS (ADB) when connected, then Windows GPS, then approximate IP."""
+    """Phone GPS (ADB), Windows GPS, drone EXIF folder, then approximate IP."""
     t = float(timeout or os.environ.get("AGRIVISION_GEO_TIMEOUT", "12"))
 
     phone = _detect_android_gps(min(t, 8.0))
@@ -436,6 +449,10 @@ def detect_my_location(timeout: float | None = None) -> DetectedLocation | None:
     win = _detect_windows_location(min(t, 8.0))
     if win is not None:
         return win
+
+    drone = _detect_drone_exif_folder()
+    if drone is not None:
+        return drone
 
     if os.environ.get("AGRIVISION_ALLOW_IP_GEO", "1").strip().lower() in (
         "0",

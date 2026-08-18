@@ -1,0 +1,111 @@
+{
+  "generated_at": "2026-08-03T12:46:28.832257+00:00",
+  "project": "AgriVision",
+  "split": "test",
+  "weights": "models\\best.pt",
+  "dataset": "datasets\\yolo_banana",
+  "data_yaml": "output\\metrics\\_resolved_data.yaml",
+  "hyperparameters": {
+    "imgsz": 640,
+    "batch": 8,
+    "device": "0",
+    "workers": 0
+  },
+  "dataset_stats": {
+    "split": "test",
+    "images": 31,
+    "instances": 456,
+    "instances_by_class": {
+      "black_sigatoka": 23,
+      "bunchy_top": 0,
+      "healthy": 410,
+      "panama": 23
+    },
+    "images_with_class": {
+      "black_sigatoka": 12,
+      "bunchy_top": 0,
+      "healthy": 31,
+      "panama": 13
+    },
+    "class_names": [
+      "black_sigatoka",
+      "bunchy_top",
+      "healthy",
+      "panama"
+    ]
+  },
+  "overall": {
+    "precision": 0.5193,
+    "recall": 0.2532,
+    "f1": 0.3404,
+    "mAP50": 0.2037,
+    "mAP50_95": 0.0635
+  },
+  "per_class": [
+    {
+      "class_id": 0,
+      "name": "black_sigatoka",
+      "precision": 0.2179,
+      "recall": 0.1304,
+      "f1": 0.1632,
+      "mAP50": 0.0609,
+      "mAP50_95": 0.0233,
+      "instances_in_split": 23,
+      "images_with_class": 12
+    },
+    {
+      "class_id": 1,
+      "name": "bunchy_top",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0635,
+      "instances_in_split": 0,
+      "images_with_class": 0
+    },
+    {
+      "class_id": 2,
+      "name": "healthy",
+      "precision": 0.3399,
+      "recall": 0.6293,
+      "f1": 0.4414,
+      "mAP50": 0.4313,
+      "mAP50_95": 0.1331,
+      "instances_in_split": 410,
+      "images_with_class": 31
+    },
+    {
+      "class_id": 3,
+      "name": "panama",
+      "precision": 1.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "mAP50": 0.119,
+      "mAP50_95": 0.0342,
+      "instances_in_split": 23,
+      "images_with_class": 13
+    }
+  ],
+  "speed_ms_per_image": {
+    "preprocess": 0.278,
+    "inference": 7.754,
+    "loss": 0.001,
+    "postprocess": 1.471
+  },
+  "ultralytics": {
+    "save_dir": "D:\\GitHub\\AgriVision\\output\\metrics\\runs\\test_eval",
+    "results_dict": {
+      "metrics/precision(B)": 0.5192622311262847,
+      "metrics/recall(B)": 0.2532343584305408,
+      "metrics/mAP50(B)": 0.20373392707912583,
+      "metrics/mAP50-95(B)": 0.06351959914022874
+    }
+  },
+  "artifacts": {
+    "json": "output\\metrics\\test_report_latest.json",
+    "csv": "output\\metrics\\test_report_latest.csv",
+    "markdown": "output\\metrics\\test_report_20260803_124628.md",
+    "md": "output\\metrics\\test_report_latest.md"
+  }
+}

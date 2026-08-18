@@ -1,0 +1,25 @@
+{
+  "categories": [
+    {
+      "id": 0,
+      "name": "black_sigatoka"
+    },
+    {
+      "id": 1,
+      "name": "bunchy_top"
+    },
+    {
+      "id": 2,
+      "name": "healthy"
+    },
+    {
+      "id": 3,
+      "name": "panama"
+    }
+  ],
+  "info": {
+    "year": 2026,
+    "version": "1.0",
+    "contributor": "Label Studio"
+  }
+}

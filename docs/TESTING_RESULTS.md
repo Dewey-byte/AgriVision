@@ -118,6 +118,27 @@ After training, the best checkpoint (`best.pt`) was evaluated on the validation 
 
 ---
 
+## Held-out test set evaluation
+
+After training, evaluate the deployed checkpoint on the **31-image test split** (never used during training):
+
+```powershell
+python tools/evaluate_test_set.py
+python tools/evaluate_test_set.py --split val
+python tools/evaluate_test_set.py --stats-only
+```
+
+Artifacts are written to `output/metrics/`:
+
+| File | Description |
+|------|-------------|
+| `test_report_latest.json` | Canonical structured report (overall + per-class metrics) |
+| `test_report_latest.csv` | Flat table for spreadsheets |
+| `test_report_latest.md` | Thesis-ready markdown summary |
+| `runs/test_eval/` | Ultralytics confusion matrix and PR curves (when `--plots`) |
+
+---
+
 ## System Testing (Smoke Test)
 
 Automated system testing was performed using `python smoke_test.py`, which verifies module imports, preprocessing, detection pipeline, geo export, report generation, and UI lifecycle.

@@ -1,0 +1,9 @@
+path: D:/GitHub/AgriVision/datasets/yolo_banana
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: black_sigatoka
+  1: bunchy_top
+  2: healthy
+  3: panama

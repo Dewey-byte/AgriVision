@@ -41,7 +41,10 @@ def main() -> int:
         "backend.session",
         "backend.status",
         "backend.geo",
+        "backend.exif_geo",
+        "backend.storage",
         "backend.map_export",
+        "backend.validation_metrics",
     ]
     for mod in modules:
         check(f"import {mod}", lambda m=mod: __import__(m))
@@ -166,8 +169,79 @@ def main() -> int:
     check("export_leaflet_map", lambda: map_out.is_file())
 
     status = get_defense_status()
-    check("defense backend 50%", lambda: status["backend_pct"] == 50)
+    check("defense backend 50%", lambda: status["backend_pct"] >= 50)
     check("defense frontend 100%", lambda: status["frontend_pct"] == 100)
+
+    from backend.storage import SessionStorage, make_video_id, normalize_video_id
+    from backend.exif_geo import read_exif_gps, scan_folder_gps_summary
+
+    sample_jpg = next(Path("datasets/yolo_banana/images/test").glob("*.JPG"), None)
+    check("read exif gps", lambda: sample_jpg and read_exif_gps(sample_jpg) is not None)
+    check(
+        "scan folder gps",
+        lambda: scan_folder_gps_summary(Path("datasets/yolo_banana/images/test"))[
+            "gps_image_count"
+        ]
+        > 0,
+    )
+    check("make video id", lambda: make_video_id().startswith("AGV-"))
+    check("normalize video id", lambda: normalize_video_id(make_video_id()) is not None)
+
+    storage = SessionStorage()
+    manifest = storage.begin_session(video_id=make_video_id(), field_name="smoke")
+    check("session folder created", lambda: manifest.folder.is_dir())
+    check("video id on manifest", lambda: manifest.video_id.startswith("AGV-"))
+    storage.finalize_session({"frames_processed": 1})
+
+    from backend.validation_metrics import (
+        build_markdown_report,
+        resolve_data_yaml,
+        split_dataset_stats,
+        write_validation_report,
+    )
+
+    stats = split_dataset_stats(Path("datasets/yolo_banana"), "test")
+    check("test split stats", lambda: stats["images"] > 0 and stats["instances"] > 0)
+    check("resolve data yaml", lambda: resolve_data_yaml(Path("datasets/yolo_banana")).is_file())
+
+    mock_report = {
+        "generated_at": "2026-08-03T00:00:00+00:00",
+        "project": "AgriVision",
+        "split": "test",
+        "weights": "models/best.pt",
+        "dataset": "datasets/yolo_banana",
+        "dataset_stats": stats,
+        "overall": {
+            "precision": 0.5,
+            "recall": 0.25,
+            "f1": 0.33,
+            "mAP50": 0.2,
+            "mAP50_95": 0.06,
+        },
+        "per_class": [
+            {
+                "class_id": i,
+                "name": name,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "mAP50": 0.0,
+                "mAP50_95": 0.0,
+                "instances_in_split": stats["instances_by_class"].get(name, 0),
+                "images_with_class": stats["images_with_class"].get(name, 0),
+            }
+            for i, name in enumerate(stats["class_names"])
+        ],
+    }
+    check("build markdown report", lambda: "Overall metrics" in build_markdown_report(mock_report))
+    paths = write_validation_report(
+        mock_report,
+        out_dir="output/_smoke_test/metrics",
+        basename="smoke_test_report",
+    )
+    check("validation report json", lambda: paths["json"].is_file())
+    check("validation report csv", lambda: paths["csv"].is_file())
+    check("validation report md", lambda: paths["markdown"].is_file())
 
     from PyQt5.QtWidgets import QApplication
 

@@ -28,6 +28,7 @@ def _dot(color: str) -> str:
 
 class Sidebar(QWidget):
     geo_updated = pyqtSignal()
+    video_id_changed = pyqtSignal()
     mirror_start_requested = pyqtSignal()
     mirror_stop_requested = pyqtSignal()
     android_ip_detect_requested = pyqtSignal()
@@ -69,6 +70,36 @@ class Sidebar(QWidget):
         src_heading = QLabel("Video Source")
         src_heading.setObjectName("cardTitle")
         source_lay.addWidget(src_heading)
+
+        source_lay.addWidget(src_heading)
+
+        video_hint = QLabel(
+            "Assign a unique Video ID before take-off. This ID is required before "
+            "you start analysis and is saved with every capture and report."
+        )
+        video_hint.setWordWrap(True)
+        video_hint.setObjectName("mutedLabel")
+        source_lay.addWidget(video_hint)
+
+        video_row = QHBoxLayout()
+        video_row.addWidget(QLabel("Video ID"))
+        self.video_id_edit = QLineEdit()
+        self.video_id_edit.setObjectName("videoIdEdit")
+        self.video_id_edit.setPlaceholderText("AGV-YYYYMMDD-HHMMSS-XXXXXX")
+        self.video_id_edit.editingFinished.connect(self._on_video_id_edited)
+        self.video_id_edit.textChanged.connect(self._emit_video_id_changed)
+        video_row.addWidget(self.video_id_edit, 1)
+        self.btn_new_video_id = QPushButton("New ID")
+        self.btn_new_video_id.setObjectName("btnSecondary")
+        self.btn_new_video_id.setCursor(Qt.PointingHandCursor)
+        self.btn_new_video_id.clicked.connect(self.assign_new_video_id)
+        video_row.addWidget(self.btn_new_video_id)
+        source_lay.addLayout(video_row)
+
+        self.video_id_status_label = QLabel("")
+        self.video_id_status_label.setObjectName("mutedLabel")
+        self.video_id_status_label.setWordWrap(True)
+        source_lay.addWidget(self.video_id_status_label)
 
         self.grp_mirror = QWidget()
         mirror_lay = QVBoxLayout(self.grp_mirror)
@@ -140,6 +171,7 @@ class Sidebar(QWidget):
         geo_hint = QLabel(
             "With your phone on the laptop hotspot, click Detect My Location to read phone GPS "
             "over ADB (Wireless debugging). Otherwise uses laptop Wi‑Fi / Windows Location. "
+            "Set Drone EXIF folder to auto-read GPS from the newest DJI .JPG in that folder. "
             "For exact plantation mapping, paste field or drone coordinates."
         )
         geo_hint.setWordWrap(True)
@@ -184,6 +216,18 @@ class Sidebar(QWidget):
         self.btn_detect_geo.setObjectName("btnSecondary")
         self.btn_detect_geo.setCursor(Qt.PointingHandCursor)
         l_geo.addWidget(self.btn_detect_geo)
+
+        drone_row = QHBoxLayout()
+        drone_row.addWidget(QLabel("Drone EXIF folder"))
+        self.drone_dir_edit = QLineEdit()
+        self.drone_dir_edit.setObjectName("droneExifDir")
+        env_drone = os.environ.get("AGRIVISION_DRONE_IMAGE_DIR", "").strip()
+        self.drone_dir_edit.setPlaceholderText("Folder with DJI .JPG files (optional)")
+        if env_drone:
+            self.drone_dir_edit.setText(env_drone)
+        drone_row.addWidget(self.drone_dir_edit)
+        l_geo.addLayout(drone_row)
+
         layout.addWidget(card_geo)
 
         card3, l3 = create_card("Field Map (Leaflet + Heatmap)")
@@ -245,6 +289,56 @@ class Sidebar(QWidget):
         layout.addStretch(0)
         scroll.setWidget(inner)
         outer.addWidget(scroll)
+
+        self.prepare_preflight_video_id()
+
+    def _emit_video_id_changed(self) -> None:
+        self._refresh_video_id_status()
+        self.video_id_changed.emit()
+
+    def _on_video_id_edited(self) -> None:
+        self._refresh_video_id_status()
+        self.video_id_changed.emit()
+
+    def _refresh_video_id_status(self) -> None:
+        from backend.storage import normalize_video_id
+
+        normalized = normalize_video_id(self.video_id_edit.text())
+        if normalized:
+            self.video_id_status_label.setText(f"Ready for take-off: {normalized}")
+        else:
+            self.video_id_status_label.setText(
+                "Generate or enter a Video ID before starting analysis."
+            )
+
+    def assign_new_video_id(self) -> None:
+        from backend.storage import make_video_id
+
+        self.video_id_edit.setText(make_video_id())
+        self._refresh_video_id_status()
+        self.video_id_changed.emit()
+
+    def prepare_preflight_video_id(self) -> None:
+        if not self.video_id_edit.text().strip():
+            self.assign_new_video_id()
+        else:
+            self._refresh_video_id_status()
+
+    def normalized_video_id(self) -> str | None:
+        from backend.storage import normalize_video_id
+
+        return normalize_video_id(self.video_id_edit.text())
+
+    def video_id_ready(self) -> bool:
+        return self.normalized_video_id() is not None
+
+    def set_video_id_locked(self, locked: bool, *, active_id: str = "") -> None:
+        self.video_id_edit.setReadOnly(locked)
+        self.btn_new_video_id.setEnabled(not locked)
+        if locked and active_id:
+            self.video_id_status_label.setText(f"Session active — recording as {active_id}")
+        elif not locked:
+            self._refresh_video_id_status()
 
     def _build_mirror_manager(self, parent_lay) -> None:
         """Built-in wireless mirror (Android via scrcpy)."""
@@ -506,6 +600,20 @@ class Sidebar(QWidget):
 
     def set_geo_detect_enabled(self, enabled: bool) -> None:
         self.btn_detect_geo.setEnabled(enabled)
+
+    def drone_image_dir(self):
+        from pathlib import Path
+
+        raw = self.drone_dir_edit.text().strip() or os.environ.get(
+            "AGRIVISION_DRONE_IMAGE_DIR", ""
+        ).strip()
+        if not raw:
+            return None
+        path = Path(raw)
+        return path if path.is_dir() else None
+
+    def field_name(self) -> str:
+        return os.environ.get("AGRIVISION_FIELD_NAME", "").strip()
 
     def update_leaflet_map(self, html: str, file_path=None, map_data: dict | None = None) -> None:
         self.map_panel.load_map_html(html, file_path, map_data)

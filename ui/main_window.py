@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 import cv2
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSplitter, QFrame
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSplitter, QFrame, QMessageBox
 from PyQt5.QtCore import QTimer, Qt
 
 from utils.screen_capture import LiveMirrorCapture, pick_mirror_cast_window
@@ -19,6 +19,8 @@ from core.preprocess import FramePreprocessor
 
 from backend.report import export_field_report
 from backend.session import SessionRecorder
+from backend.storage import SessionStorage
+from backend.exif_geo import import_drone_gps_detailed
 from backend.map_export import build_map_html, build_map_payload, write_map_html
 
 from ui.components.feed_panel import PrimaryFeedPanel
@@ -98,6 +100,7 @@ class MainWindow(QWidget):
         )
         self._preprocessor = FramePreprocessor()
         self._session = SessionRecorder()
+        self._session_storage = SessionStorage()
         self._cast_ok_streak = 0
         self._last_display_frame = None
         self._drone_dot = None
@@ -181,6 +184,7 @@ class MainWindow(QWidget):
 
         self.feed.btn_toggle.clicked.connect(self._on_toggle_feed)
         self.feed.btn_capture.clicked.connect(self.capture_frame)
+        self.sidebar.video_id_changed.connect(self._update_takeoff_controls)
         self.sidebar.mirror_start_requested.connect(self._on_mirror_start)
         self.sidebar.mirror_stop_requested.connect(self._on_mirror_stop)
         self.sidebar.android_ip_detect_requested.connect(self._start_android_ip_detect)
@@ -192,6 +196,31 @@ class MainWindow(QWidget):
         root.addWidget(self._splitter, 1)
 
         self._apply_stylesheet()
+        self._update_takeoff_controls()
+
+    def _update_takeoff_controls(self) -> None:
+        ready = self.sidebar.video_id_ready()
+        if not self._running:
+            self.feed.btn_toggle.setEnabled(ready)
+            if not ready:
+                self.feed.btn_toggle.setToolTip("Assign a Video ID before take-off")
+            else:
+                self.feed.btn_toggle.setToolTip("")
+        else:
+            self.feed.btn_toggle.setEnabled(True)
+            self.feed.btn_toggle.setToolTip("")
+
+    def _ensure_video_id_for_takeoff(self) -> str | None:
+        video_id = self.sidebar.normalized_video_id()
+        if video_id:
+            return video_id
+        QMessageBox.warning(
+            self,
+            "Video ID required",
+            "Assign a Video ID in Video Source before take-off.\n\n"
+            "Click **New ID** to generate one, then press **Start**.",
+        )
+        return None
         QTimer.singleShot(0, self._sync_splitter_sizes)
         QTimer.singleShot(0, self.feed._fit_landscape_display)
 
@@ -262,9 +291,15 @@ class MainWindow(QWidget):
         if self._running:
             self.stop()
         else:
+            if not self._ensure_video_id_for_takeoff():
+                return
             self.start()
 
     def start(self):
+        video_id = self.sidebar.normalized_video_id()
+        if not video_id:
+            return
+
         self._running = True
         self._frame_n = 0
         self._cast_ok_streak = 0
@@ -273,6 +308,25 @@ class MainWindow(QWidget):
         self._capture.reset()
         self._preprocessor.reset()
         self._session.reset()
+
+        manifest = self._session_storage.begin_session(
+            video_id=video_id,
+            field_name=self.sidebar.field_name(),
+        )
+        self._session.bind_storage(
+            session_id=manifest.session_id,
+            flight_id=manifest.flight_id,
+            video_id=manifest.video_id,
+            folder=str(manifest.folder),
+            field_name=manifest.field_name,
+        )
+        self.sidebar.set_video_id_locked(True, active_id=manifest.video_id)
+        self._update_takeoff_controls()
+        self.sidebar.add_log(
+            log(f"Take-off {manifest.video_id} → {manifest.folder.name}/")
+        )
+        self._try_import_drone_exif_gps(log_success=True)
+
         self._infer.set_active(True)
         self._capture_thread.set_title(self._capture_window_title)
         self._capture_thread.start_capture()
@@ -291,8 +345,49 @@ class MainWindow(QWidget):
         self._set_status_dot(self._drone_dot, False)
         self._set_status_dot(self._processing_dot, False)
 
+        if self._session_storage.active:
+            session_path = self._session_storage.finalize_session(self._session.to_dict())
+            if session_path is not None:
+                self.sidebar.add_log(log(f"Session saved: {session_path.parent.name}/session.json"))
+            self.sidebar.set_video_id_locked(False)
+            self.sidebar.assign_new_video_id()
+            self._update_takeoff_controls()
+
+    def _try_import_drone_exif_gps(self, *, log_success: bool = False) -> bool:
+        folder = self.sidebar.drone_image_dir()
+        if folder is None:
+            return False
+        if self.sidebar.geo_tag().source == "manual" and not log_success:
+            return False
+
+        found = import_drone_gps_detailed(folder)
+        if found is None:
+            if log_success:
+                self.sidebar.add_log(log(f"No GPS EXIF in {folder}"))
+            return False
+
+        tag = found.tag
+        self.sidebar.set_geo_coordinates(
+            tag.latitude,
+            tag.longitude,
+            label=found.to_detected_location().label,
+            source=tag.source,
+            accuracy_m=tag.accuracy_m,
+            altitude_m=tag.altitude_m,
+        )
+        if log_success:
+            self.sidebar.add_log(
+                log(
+                    f"Drone GPS from EXIF: {found.image_name} "
+                    f"({tag.latitude:.5f}, {tag.longitude:.5f})"
+                )
+            )
+        return True
+
     def closeEvent(self, event):
         try:
+            if self._session_storage.active:
+                self._session_storage.finalize_session(self._session.to_dict())
             if getattr(self, "_capture_thread", None) is not None:
                 self._capture_thread.stop_capture()
             if getattr(self, "_geo_worker", None) is not None and self._geo_worker.isRunning():
@@ -492,6 +587,8 @@ class MainWindow(QWidget):
         return self._display_frame(frame)
 
     def _run_field_report_export(self, *, save_captured_jpg: bool = False) -> dict[str, str] | None:
+        self._try_import_drone_exif_gps(log_success=False)
+
         frame = self._latest_frame_bgr(fresh=save_captured_jpg)
         if frame is None or frame.size == 0:
             return None
@@ -500,13 +597,21 @@ class MainWindow(QWidget):
         if save_captured_jpg:
             cv2.imwrite("captured_frame.jpg", annotated)
 
+        capture_dir = self._session_storage.capture_dir()
+        capture_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+
         paths = export_field_report(
             annotated,
             detections,
             self._last_stress,
+            out_dir=capture_dir,
             video_source=self.sidebar.video_source(),
             geo=self.sidebar.geo_tag(),
             session=self._session.to_dict(),
+            flight_id=self._session.flight_id,
+            video_id=self._session.video_id,
+            session_id=self._session.session_id,
+            capture_id=capture_id,
             vegetation=self._session.last_vegetation,
             heat_points=self._session.heatmap_for_display(),
             geo_markers=self._session.geo_markers,

@@ -1,0 +1,41 @@
+{
+  "models": [
+    {
+      "id": "yolov8n-primary",
+      "name": "YOLOv8n — Primary Aerial Dataset",
+      "task": "detection",
+      "weights": "models/best.pt",
+      "dataset": "Primary: 315 aerial banana images (80-10-10 split)",
+      "status": "deployed",
+      "description": "Fine-tuned YOLOv8n detector used by the desktop app for live inference. Trained 100 epochs, AdamW, imgsz 640, batch 16 on RTX 4050.",
+      "results_csv": "runs/detect/runs/banana_disease/results.csv"
+    },
+    {
+      "id": "yolov8n-cls",
+      "name": "YOLOv8n-cls — Leaf Classifier (Two-Stage)",
+      "task": "classification",
+      "weights": "models/banana-cls.pt",
+      "dataset": "Close-range banana leaf images (secondary dataset)",
+      "status": "optional",
+      "description": "Full-frame / per-box classifier that refines detector labels when AGRIVISION_INFER_MODE=both. Distinguishes Black Sigatoka, Bunchy Top, Panama, Moko, Yellow Sigatoka, Healthy, Not-Banana.",
+      "metrics": {}
+    },
+    {
+      "id": "yolov8n-augmented",
+      "name": "YOLOv8n — Primary + Secondary Datasets",
+      "task": "detection",
+      "weights": "(retraining planned)",
+      "dataset": "Primary aerial set supplemented with public banana-disease datasets (see docs/SECONDARY_DATASETS.md)",
+      "status": "planned",
+      "description": "Retraining run that supplements the imbalanced primary dataset with secondary sources to lift rare-class recall (panama, bunchy_top). Metrics populate automatically once its results.csv path is configured here.",
+      "metrics": {}
+    }
+  ],
+  "class_metrics": [
+    { "model_id": "yolov8n-primary", "class": "all", "precision": 0.454, "recall": 0.173, "map50": 0.177, "map50_95": 0.046 },
+    { "model_id": "yolov8n-primary", "class": "healthy", "precision": 0.521, "recall": 0.54, "map50": 0.501, "map50_95": 0.143 },
+    { "model_id": "yolov8n-primary", "class": "black_sigatoka", "precision": 0.294, "recall": 0.154, "map50": 0.182, "map50_95": 0.035 },
+    { "model_id": "yolov8n-primary", "class": "panama", "precision": 1.0, "recall": 0.0, "map50": 0.026, "map50_95": 0.007 },
+    { "model_id": "yolov8n-primary", "class": "bunchy_top", "precision": 0.0, "recall": 0.0, "map50": 0.0, "map50_95": 0.0 }
+  ]
+}

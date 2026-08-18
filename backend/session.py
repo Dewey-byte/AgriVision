@@ -32,6 +32,16 @@ class SessionRecorder:
 
     started_at: str = field(default_factory=lambda: _utc_now())
 
+    session_id: str = ""
+
+    flight_id: str = ""
+
+    video_id: str = ""
+
+    field_name: str = ""
+
+    storage_folder: str = ""
+
     frames_processed: int = 0
 
     frames_analyzed: int = 0
@@ -65,6 +75,16 @@ class SessionRecorder:
     def reset(self) -> None:
 
         self.started_at = _utc_now()
+
+        self.session_id = ""
+
+        self.flight_id = ""
+
+        self.video_id = ""
+
+        self.field_name = ""
+
+        self.storage_folder = ""
 
         self.frames_processed = 0
 
@@ -198,9 +218,35 @@ class SessionRecorder:
             return manual_tags_to_heat_points(self.manual_tags)
         return []
 
+    def bind_storage(
+        self,
+        *,
+        session_id: str,
+        flight_id: str,
+        video_id: str,
+        folder: str,
+        field_name: str = "",
+    ) -> None:
+        self.session_id = session_id
+        self.flight_id = flight_id
+        self.video_id = video_id
+        self.storage_folder = folder
+        self.field_name = field_name
+        self.started_at = _utc_now()
+
     def to_dict(self) -> dict[str, Any]:
 
         return {
+
+            "session_id": self.session_id,
+
+            "flight_id": self.flight_id,
+
+            "video_id": self.video_id,
+
+            "field_name": self.field_name,
+
+            "storage_folder": self.storage_folder,
 
             "started_at": self.started_at,
 
