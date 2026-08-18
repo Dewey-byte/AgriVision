@@ -112,6 +112,10 @@ def export_field_report(
 
 
 
+    resolved_video_id = str(
+        video_id or (session or {}).get("video_id") or flight_id or ""
+    ).strip()
+
     payload: dict[str, Any] = {
 
         "system": "AgriVision",
@@ -132,7 +136,7 @@ def export_field_report(
 
         "flight_id": flight_id or (session or {}).get("flight_id", ""),
 
-        "video_id": video_id or (session or {}).get("video_id", "") or flight_id or "",
+        "video_id": resolved_video_id,
 
         "session_id": session_id or (session or {}).get("session_id", ""),
 
@@ -224,7 +228,7 @@ def export_field_report(
 
     csv_path = base.with_name(base.name + "_report.csv")
 
-    _write_csv(csv_path, summary, detections, geo_block, vegetation or {})
+    _write_csv(csv_path, summary, detections, geo_block, vegetation or {}, video_id=resolved_video_id)
 
     paths["csv"] = str(csv_path)
 
@@ -266,6 +270,10 @@ def _write_csv(
 
     vegetation: dict[str, float | str],
 
+    *,
+
+    video_id: str = "",
+
 ) -> None:
 
     with path.open("w", newline="", encoding="utf-8") as f:
@@ -273,6 +281,10 @@ def _write_csv(
         writer = csv.writer(f)
 
         writer.writerow(["section", "field", "value"])
+
+        if video_id:
+
+            writer.writerow(["flight", "video_id", video_id])
 
         writer.writerow(["summary", "total", summary["total"]])
 
