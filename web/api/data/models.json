@@ -48,13 +48,22 @@
         "notes": "Same architecture the desktop app deploys. Retrained under the shared benchmark recipe so the comparison is apples-to-apples."
       },
       {
+        "id": "yolov9t-bench",
+        "name": "YOLOv9t",
+        "family": "YOLOv9",
+        "runner": "ultralytics",
+        "weights": "runs/detect/bench_yolov9t/weights/best.pt",
+        "results_csv": "runs/detect/bench_yolov9t/results.csv",
+        "notes": "The size-matched YOLOv9: 2.0M params and 7.9 GFLOPs against YOLOv8n's 3.0M and 8.2 GFLOPs. Because it is slightly smaller at equal compute, beating YOLOv8n here is evidence about the architecture rather than about capacity."
+      },
+      {
         "id": "yolov9s-bench",
         "name": "YOLOv9s",
         "family": "YOLOv9",
         "runner": "ultralytics",
         "weights": "runs/detect/bench_yolov9s/weights/best.pt",
         "results_csv": "runs/detect/bench_yolov9s/results.csv",
-        "notes": "GELAN backbone with programmable gradient information. Larger than YOLOv8n, so expect better accuracy at a higher inference cost."
+        "notes": "GELAN backbone with programmable gradient information. At 2.4x YOLOv8n's parameters it is not a like-for-like comparison; treat its win as the expected result of a bigger model."
       },
       {
         "id": "yolonas-s-bench",
@@ -62,7 +71,7 @@
         "family": "YOLO-NAS",
         "runner": "super-gradients",
         "weights": "models/yolo_nas_s_banana.pth",
-        "results_csv": null,
+        "results_csv": "runs/nas/bench_yolo_nas_s/results.csv",
         "notes": "Neural-architecture-searched detector from Deci. Ultralytics ships no trainer for it, so it is fine-tuned and scored in the separate venv-nas environment via tools/train_yolo_nas.py."
       }
     ]

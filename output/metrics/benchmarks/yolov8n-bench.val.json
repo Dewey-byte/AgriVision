@@ -1,0 +1,98 @@
+{
+  "model_id": "yolov8n-bench",
+  "name": "YOLOv8n",
+  "family": "YOLOv8",
+  "runner": "ultralytics",
+  "weights": "runs\\detect\\bench_yolov8n\\weights\\best.pt",
+  "split": "val",
+  "evaluated_at": "2026-09-14T22:00:17.510343+00:00",
+  "overall": {
+    "precision": 0.4526,
+    "recall": 0.1433,
+    "f1": 0.2177,
+    "mAP50": 0.1346,
+    "mAP50_95": 0.0445
+  },
+  "per_class": [
+    {
+      "class_id": 0,
+      "name": "black_sigatoka",
+      "precision": 1.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0,
+      "instances_in_split": 5,
+      "images_with_class": 4
+    },
+    {
+      "class_id": 1,
+      "name": "bunchy_top",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0,
+      "instances_in_split": 1,
+      "images_with_class": 1
+    },
+    {
+      "class_id": 2,
+      "name": "healthy",
+      "precision": 0.4864,
+      "recall": 0.4822,
+      "f1": 0.4843,
+      "mAP50": 0.439,
+      "mAP50_95": 0.1432,
+      "instances_in_split": 365,
+      "images_with_class": 33
+    },
+    {
+      "class_id": 3,
+      "name": "panama",
+      "precision": 0.324,
+      "recall": 0.0909,
+      "f1": 0.142,
+      "mAP50": 0.0994,
+      "mAP50_95": 0.0347,
+      "instances_in_split": 33,
+      "images_with_class": 13
+    }
+  ],
+  "speed_ms_per_image": {
+    "preprocess": 0.389,
+    "inference": 3.139,
+    "loss": 0.001,
+    "postprocess": 0.897
+  },
+  "dataset_stats": {
+    "split": "val",
+    "images": 33,
+    "instances": 404,
+    "instances_by_class": {
+      "black_sigatoka": 5,
+      "bunchy_top": 1,
+      "healthy": 365,
+      "panama": 33
+    },
+    "images_with_class": {
+      "black_sigatoka": 4,
+      "bunchy_top": 1,
+      "healthy": 33,
+      "panama": 13
+    },
+    "class_names": [
+      "black_sigatoka",
+      "bunchy_top",
+      "healthy",
+      "panama"
+    ]
+  },
+  "params_millions": 3.012,
+  "gflops": 8.2,
+  "training": {
+    "results_csv": "runs/detect/bench_yolov8n/results.csv",
+    "epochs_trained": 67,
+    "best_val_map50": 0.1424
+  }
+}

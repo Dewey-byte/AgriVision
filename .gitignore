@@ -3,3 +3,5 @@ venv-nas/
 .env.deploy
 # Downloaded base checkpoints (YOLO-NAS COCO weights are ~73 MB each)
 weights/
+# Console logs from background launches
+runs/api*.log

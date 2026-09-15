@@ -49,16 +49,23 @@ def load_benchmark_config() -> dict:
 
 
 def model_complexity(weights: Path) -> dict[str, float]:
-    """Parameter count and GFLOPs, so size differences stay visible."""
+    """Parameter count and GFLOPs, so size differences stay visible.
+
+    Read from the module directly rather than via ``Model.info()``, which
+    returns None unless it is printing.
+    """
     from ultralytics import YOLO
+    from ultralytics.utils.torch_utils import get_flops
 
     try:
-        model = YOLO(str(weights))
-        n_params, _, _, flops = model.info(detailed=False, verbose=False)
-        return {
-            "params_millions": round(n_params / 1e6, 3),
-            "gflops": round(float(flops), 2),
+        module = YOLO(str(weights)).model
+        complexity = {
+            "params_millions": round(sum(p.numel() for p in module.parameters()) / 1e6, 3)
         }
+        flops = get_flops(module)
+        if flops:
+            complexity["gflops"] = round(float(flops), 2)
+        return complexity
     except Exception as exc:  # noqa: BLE001 - complexity is nice-to-have only
         print(f"    (could not read model complexity: {exc})")
         return {}
@@ -82,6 +89,18 @@ def training_summary(results_csv: Path) -> dict:
 
 def rel(path: Path) -> str:
     return str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path)
+
+
+def output_path(model_id: str, split: str, benchmark_split: str) -> Path:
+    """Where a contender's results are written.
+
+    The dashboard reads ``<id>.json``, so only the benchmark's own split claims
+    that name. Ad-hoc runs on another split are suffixed instead of silently
+    overwriting the published numbers.
+    """
+    if split == benchmark_split:
+        return BENCHMARKS_DIR / f"{model_id}.json"
+    return BENCHMARKS_DIR / f"{model_id}.{split}.json"
 
 
 def evaluate_contender(contender: dict, bench: dict, split: str) -> dict:
@@ -153,8 +172,11 @@ def main() -> int:
     args = parser.parse_args()
 
     bench = load_benchmark_config()
-    split = args.split or bench.get("split", "test")
+    benchmark_split = bench.get("split", "test")
+    split = args.split or benchmark_split
     BENCHMARKS_DIR.mkdir(parents=True, exist_ok=True)
+    if split != benchmark_split:
+        print(f"Scoring the {split} split; the dashboard keeps showing {benchmark_split}.")
 
     contenders = bench["contenders"]
     if args.only:
@@ -167,7 +189,7 @@ def main() -> int:
     records: list[dict] = []
     for contender in contenders:
         runner = contender.get("runner", "ultralytics")
-        out_path = BENCHMARKS_DIR / f"{contender['id']}.json"
+        out_path = output_path(contender["id"], split, benchmark_split)
 
         if runner not in NATIVE_RUNNERS and not args.force:
             print(f"[skip] {contender['name']} — runner '{runner}' runs in its own environment")

@@ -27,6 +27,12 @@ shown in the dashboard. YOLO-NAS S trains at batch 8 rather than 16 because it
 is roughly 19M parameters against YOLOv8n's 3M and will not fit a 6 GB card at
 batch 16.
 
+Weight averaging (`average_best_models`) is switched off for YOLO-NAS. It would
+otherwise select an average of the top snapshots while Ultralytics selects a
+single best epoch, handing YOLO-NAS a checkpoint-selection advantage the others
+do not get. It also pickles model snapshots every epoch, which intermittently
+fails on Windows and killed one 42-epoch run outright.
+
 ---
 
 ## Why YOLO-NAS needs its own environment
@@ -96,6 +102,13 @@ Then train and score in one step:
 
 This writes `output/metrics/benchmarks/yolonas-s-bench.json` itself, plus a
 `results.csv` in Ultralytics' column format so the convergence chart works.
+Add `--resume` to continue the latest run of the same experiment after an
+interruption.
+
+Unlike `train.py`, this defaults to `--workers 4`. super-gradients' mosaic and
+affine transforms are expensive enough that with `--workers 0` the GPU sits idle
+around 90% of the time; four workers cut epoch time from ~3.5 min to ~1.1 min on
+this dataset.
 
 ### 3. Score everything on the held-out test split
 
@@ -157,6 +170,88 @@ For an architecture Ultralytics cannot train, give it a different `runner`
 value. `benchmark_models.py` skips unknown runners instead of failing, and
 whatever process trains it just has to drop a JSON file in the same schema into
 `output/metrics/benchmarks/`.
+
+---
+
+## Results
+
+Scored on the 34-image held-out test split (468 boxes). Regenerate with
+`python tools/benchmark_models.py`.
+
+| # | Model | mAP@0.5 | mAP@0.5:0.95 | Precision | Recall | F1 | Params | Inference |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| 1 | **YOLOv9s** | **19.29%** | **5.92%** | 66.4% | 21.8% | 32.8% | 7.29 M | 6.5 ms |
+| 2 | YOLOv8n | 17.30% | 4.98% | 61.7% | 19.0% | 29.1% | 3.01 M | 2.9 ms |
+| 3 | YOLO-NAS S | 12.84% | 3.94% | 7.1% | 38.7% | 12.0% | 19.02 M | — |
+
+Per-class mAP@0.5:
+
+| Class | Test boxes | YOLOv9s | YOLOv8n | YOLO-NAS S |
+|---|---:|---:|---:|---:|
+| `healthy` | 410 | 37.6% | **40.1%** | 31.8% |
+| `panama` | 49 | **12.9%** | 11.3% | 4.3% |
+| `black_sigatoka` | 9 | **7.4%** | 0.5% | 2.4% |
+| `bunchy_top` | 0 | not measurable | not measurable | not measurable |
+
+**YOLOv9s is the most accurate**, winning on both mAP thresholds and on the two
+rare disease classes. It costs roughly 2.2× the inference time of YOLOv8n.
+
+**YOLOv8n remains the sensible deployment choice** unless accuracy on rare
+classes is the priority: it is within 2 points of mAP@0.5, is the best model on
+`healthy` (the overwhelming majority of boxes), and is more than twice as fast
+on a third of the parameters.
+
+**YOLO-NAS S came last despite being the largest model** — 19M parameters for the
+lowest mAP. Its error profile is also completely different: 38.7% recall against
+just 7.1% precision, meaning it fires far more boxes and is right much less
+often. On a dataset this small, the neural-architecture-searched backbone had
+nothing to exploit.
+
+### Does the ranking hold on another split?
+
+Yes. Re-scored on the 33-image validation split, the order is unchanged and the
+gap is similar:
+
+| Model | mAP@0.5 (test) | mAP@0.5 (val) |
+|---|---:|---:|
+| YOLOv9s | 19.29% | 14.86% |
+| YOLOv8n | 17.30% | 13.46% |
+
+Reproduce with `python tools/benchmark_models.py --split val`. That writes
+`<id>.val.json` and leaves the published `<id>.json` test results — the ones the
+dashboard shows — alone.
+
+Note that `best.pt` was selected by validation fitness, so val is not an
+independent measurement for either model. It is a consistency check, not a
+second opinion.
+
+### Caveats to state if you present these numbers
+
+1. **`bunchy_top` is unmeasurable here.** The test split contains zero
+   `bunchy_top` boxes, so its 0% is an absence of ground truth, not a model
+   failure. The dashboard labels it "not measurable" rather than charting a zero.
+2. **YOLOv9s is 2.4× the size of YOLOv8n** (7.29M vs 3.01M parameters). A larger
+   model winning is the expected outcome, not a finding about YOLOv9's
+   architecture. For a size-matched fight, benchmark `yolov9t.pt` (~2M) against
+   YOLOv8n.
+3. **YOLOv9's biggest per-class win rests on 9 boxes.** `black_sigatoka` at 7.4%
+   vs 0.5% comes from a handful of detections in the test split; do not lean on
+   that number as evidence.
+4. **YOLO-NAS is not a perfectly controlled comparison.** The dataset, splits,
+   image size and epoch budget are identical, but super-gradients applies its own
+   augmentation pipeline and optimiser schedule, which cannot be made
+   bit-identical to Ultralytics'. Some of the gap is the training recipe rather
+   than the architecture. The YOLOv8-vs-YOLOv9 comparison *is* fully controlled —
+   same code, same hyperparameters, only `--model` differs.
+
+Both Ultralytics runs stopped early on `patience=50` (YOLOv9s at epoch 63, best
+at 13; YOLOv8n at epoch 67, best at 17), so neither was cut short while still
+improving. YOLO-NAS ran its full 100 epochs.
+
+> Absolute mAP is low across the board because the dataset is small (593 training
+> images) and dominated by `healthy`. The benchmark answers "which architecture
+> is best *here*", not "is this model production-accurate". See
+> [`SECONDARY_DATASETS.md`](SECONDARY_DATASETS.md) for raising the ceiling.
 
 ---
 

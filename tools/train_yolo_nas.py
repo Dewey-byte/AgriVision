@@ -245,9 +245,11 @@ def build_metrics(names: list[str]):
 class EpochCsvLogger:
     """Append per-epoch validation metrics in Ultralytics' results.csv format."""
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, append: bool = False):
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        if append and self.path.is_file():
+            return
         with self.path.open("w", newline="", encoding="utf-8") as fh:
             csv.writer(fh).writerow(CSV_COLUMNS)
 
@@ -306,11 +308,18 @@ def train(args, names: list[str]) -> Path:
     trainer = Trainer(experiment_name=args.name, ckpt_root_dir=str(RUNS_DIR))
     model = load_model(args.model, len(names))
 
-    csv_logger = EpochCsvLogger(RUNS_DIR / args.name / "results.csv")
+    csv_logger = EpochCsvLogger(RUNS_DIR / args.name / "results.csv", append=args.resume)
 
     train_params = {
         "silent_mode": False,
-        "average_best_models": True,
+        # Off deliberately, for two reasons. It pickles model snapshots to
+        # averaging_snapshots.pkl every epoch, which intermittently fails on
+        # Windows with "file cannot be opened" and killed a 42-epoch run. It
+        # also selects a different kind of checkpoint than Ultralytics' best.pt
+        # (an average of top snapshots vs the single best epoch), which would
+        # hand YOLO-NAS an advantage the other contenders do not get.
+        "average_best_models": False,
+        "resume": args.resume,
         "warmup_mode": "linear_epoch_step",
         "warmup_initial_lr": 1e-6,
         "lr_warmup_epochs": 3,
@@ -445,7 +454,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default="yolo_nas_s", choices=("yolo_nas_s", "yolo_nas_m", "yolo_nas_l"))
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch", type=int, default=8, help="Lower than train.py: YOLO-NAS S is ~19M params")
-    parser.add_argument("--workers", type=int, default=0)
+    # Unlike Ultralytics (which needs workers=0 on Windows), super-gradients is
+    # fine with worker processes, and its mosaic/affine transforms are heavy
+    # enough that workers=0 leaves the GPU idle ~90% of the time. Going to 4
+    # cut epoch time from ~3.5 min to ~1.1 min.
+    parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--name", default="bench_yolo_nas_s")
     parser.add_argument(
         "--eval-only",
@@ -456,6 +469,11 @@ def parse_args() -> argparse.Namespace:
         "--smoke",
         action="store_true",
         help="Throwaway run: keep the checkpoint in the run dir and export under a -smoke id",
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Continue the latest run of this experiment instead of starting over",
     )
     return parser.parse_args()
 

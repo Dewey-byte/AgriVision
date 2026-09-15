@@ -122,6 +122,11 @@ function BenchmarkSection({ bench }) {
     map50_95: c.overall.mAP50_95,
   }));
 
+  // A class with no ground-truth boxes in this split cannot be scored. Charting
+  // it would read as "every model failed" rather than "nothing to measure".
+  const measurable = (bench.per_class_matrix || []).filter((r) => r.instances > 0);
+  const unmeasurable = (bench.per_class_matrix || []).filter((r) => r.instances === 0);
+
   return (
     <>
       <div className="card section">
@@ -173,10 +178,12 @@ function BenchmarkSection({ bench }) {
           <h3>Per-class mAP@0.5</h3>
           <p className="sub">
             Where each architecture wins or collapses — the rare classes are the hard ones.
+            {unmeasurable.length > 0 &&
+              ` ${unmeasurable.map((r) => r.class).join(", ")} omitted: no boxes in this split.`}
           </p>
           <div className="chart-box">
             <ResponsiveContainer>
-              <BarChart data={bench.per_class_matrix}>
+              <BarChart data={measurable}>
                 <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
                 <XAxis dataKey="class" tick={{ fill: "#5e7268", fontSize: 11 }} />
                 <YAxis
@@ -263,6 +270,17 @@ function BenchmarkSection({ bench }) {
             </thead>
             <tbody>
               {bench.per_class_matrix.map((row) => {
+                if (row.instances === 0) {
+                  return (
+                    <tr key={row.class}>
+                      <td className="mono">{row.class}</td>
+                      <td>0</td>
+                      <td colSpan={series.length} className="muted">
+                        Not measurable — this class has no boxes in the {bench.split} split
+                      </td>
+                    </tr>
+                  );
+                }
                 const best = Math.max(...series.map((s) => row[s.id] ?? 0));
                 return (
                   <tr key={row.class}>
