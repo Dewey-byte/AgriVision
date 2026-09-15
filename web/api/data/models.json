@@ -31,6 +31,42 @@
       "metrics": {}
     }
   ],
+  "benchmark": {
+    "split": "test",
+    "dataset": "datasets/yolo_banana",
+    "imgsz": 640,
+    "batch": 8,
+    "protocol": "All contenders fine-tuned on the same datasets/yolo_banana split (593 train / 33 val / 34 test) for 100 epochs at imgsz 640, then scored on the held-out test split with identical inference settings.",
+    "contenders": [
+      {
+        "id": "yolov8n-bench",
+        "name": "YOLOv8n",
+        "family": "YOLOv8",
+        "runner": "ultralytics",
+        "weights": "runs/detect/bench_yolov8n/weights/best.pt",
+        "results_csv": "runs/detect/bench_yolov8n/results.csv",
+        "notes": "Same architecture the desktop app deploys. Retrained under the shared benchmark recipe so the comparison is apples-to-apples."
+      },
+      {
+        "id": "yolov9s-bench",
+        "name": "YOLOv9s",
+        "family": "YOLOv9",
+        "runner": "ultralytics",
+        "weights": "runs/detect/bench_yolov9s/weights/best.pt",
+        "results_csv": "runs/detect/bench_yolov9s/results.csv",
+        "notes": "GELAN backbone with programmable gradient information. Larger than YOLOv8n, so expect better accuracy at a higher inference cost."
+      },
+      {
+        "id": "yolonas-s-bench",
+        "name": "YOLO-NAS S",
+        "family": "YOLO-NAS",
+        "runner": "super-gradients",
+        "weights": "models/yolo_nas_s_banana.pth",
+        "results_csv": null,
+        "notes": "Neural-architecture-searched detector from Deci. Ultralytics ships no trainer for it, so it is fine-tuned and scored in the separate venv-nas environment via tools/train_yolo_nas.py."
+      }
+    ]
+  },
   "class_metrics": [
     { "model_id": "yolov8n-primary", "class": "all", "precision": 0.454, "recall": 0.173, "map50": 0.177, "map50_95": 0.046 },
     { "model_id": "yolov8n-primary", "class": "healthy", "precision": 0.521, "recall": 0.54, "map50": 0.501, "map50_95": 0.143 },

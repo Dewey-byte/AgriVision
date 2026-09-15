@@ -15,6 +15,6 @@ class AndroidIpWorker(QThread):
             self.ready.emit(ip, source)
             return
         self.failed.emit(
-            "No phone found on laptop hotspot. Connect the phone to your PC hotspot, "
-            "enable Wireless debugging (or run adb tcpip 5555 once over USB), then retry."
+            "No phone found on the laptop hotspot. Turn on Mobile Hotspot on this PC, "
+            "join it from the phone, then retry Detect Phone."
         )

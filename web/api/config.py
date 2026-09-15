@@ -19,6 +19,8 @@ REPORTS_DIR = Path(os.environ.get("AGRIVISION_REPORTS_DIR", OUTPUT_DIR / "report
 MAPS_DIR = OUTPUT_DIR / "maps"
 TRAINING_RUN_DIR = REPO_ROOT / "runs" / "detect" / "runs" / "banana_disease"
 MODELS_CONFIG = Path(__file__).resolve().parent / "data" / "models.json"
+# Per-model evaluation results written by tools/benchmark_models.py
+BENCHMARKS_DIR = OUTPUT_DIR / "metrics" / "benchmarks"
 FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend" / "dist"
 
 # Single administrative user. Override via environment for deployment.

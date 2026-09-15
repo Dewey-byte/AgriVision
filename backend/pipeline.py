@@ -41,7 +41,9 @@ class AnalysisPipeline:
 
     def __init__(self):
         self._preprocessor = FramePreprocessor()
-        self._mode = os.environ.get("AGRIVISION_INFER_MODE", "both").strip().lower()
+        # Default to aerial YOLO labels. Close-range banana-cls.pt was trained on
+        # leaf photos and must not overwrite DJI box labels unless explicitly enabled.
+        self._mode = os.environ.get("AGRIVISION_INFER_MODE", "detection").strip().lower()
         self._last_stress: np.ndarray | None = None
 
     def reset(self) -> None:
@@ -84,9 +86,10 @@ class AnalysisPipeline:
                 classification = {}
             if self._mode in ("detection", "detect", "both"):
                 detections = run_yolo(frame)
-                if self._mode == "both":
+                refine = os.environ.get("AGRIVISION_CLS_REFINE", "0").strip().lower()
+                if self._mode == "both" and refine not in ("0", "false", "no", "off"):
                     detections = self._refine_with_classifier(frame, detections)
-                if os.environ.get("AGRIVISION_GRID_FALLBACK", "1").strip().lower() not in (
+                if os.environ.get("AGRIVISION_GRID_FALLBACK", "0").strip().lower() not in (
                     "0",
                     "false",
                     "no",
@@ -134,13 +137,27 @@ class AnalysisPipeline:
     def _refine_with_classifier(
         frame_bgr: np.ndarray, detections: list[dict[str, Any]]
     ) -> list[dict[str, Any]]:
-        """Label each YOLO box with the classifier (per leaf / tree crop)."""
+        """Optionally re-label YOLO boxes with banana-cls (close-range leaf model).
+
+        Off by default: aerial crops are out-of-domain for that classifier and it
+        often forces Black Sigatoka. Enable only with AGRIVISION_CLS_REFINE=1.
+        """
         if not detections:
             return detections
 
+        # Prefer YOLO when it is already confident — classifier is secondary.
+        yolo_keep = float(os.environ.get("AGRIVISION_CLS_REFINE_YOLO_KEEP", "0.45"))
         refined: list[dict[str, Any]] = []
         h, w = frame_bgr.shape[:2]
         for det in detections:
+            yolo_conf = float(det.get("confidence", 0.0))
+            yolo_label = str(det.get("label", "")).lower()
+            if yolo_conf >= yolo_keep and any(
+                k in yolo_label for k in ("healthy", "panama", "bunchy", "sigatoka")
+            ):
+                refined.append(det)
+                continue
+
             x1, y1, x2, y2 = [int(v) for v in det["bbox"]]
             x1, y1 = max(0, x1), max(0, y1)
             x2, y2 = min(w, x2), min(h, y2)
@@ -151,12 +168,14 @@ class AnalysisPipeline:
                 refined.append(det)
                 continue
             if cls.get("skip"):
+                refined.append(det)
                 continue
             out = dict(det)
             conf = float(cls.get("confidence", det.get("confidence", 0.0)))
             display = cls.get("display", cls.get("label", "plant"))
             out["label"] = f"{display} ({conf:.2f})"
             out["confidence"] = conf
+            out["refined_by"] = "cls"
             refined.append(out)
         return refined if refined else detections
 

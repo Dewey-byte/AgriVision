@@ -4,7 +4,16 @@ import time
 from datetime import datetime
 from pathlib import Path
 import cv2
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSplitter, QFrame, QMessageBox
+from PyQt5.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QSplitter,
+    QFrame,
+    QMessageBox,
+    QPushButton,
+)
 from PyQt5.QtCore import QTimer, Qt
 
 from utils.screen_capture import LiveMirrorCapture, pick_mirror_cast_window
@@ -45,8 +54,11 @@ def _apply_mirror_app_defaults() -> None:
         ("AGRIVISION_GRID", "0"),
         ("AGRIVISION_PHONE_CROP", "1"),
         ("AGRIVISION_PREPROC_ALIGN", "1"),
-        ("AGRIVISION_CLS_MIN_CONF", "0.45"),
-        ("AGRIVISION_INFER_MODE", "both"),
+        ("AGRIVISION_CLS_MIN_CONF", "0.55"),
+        # detection = aerial YOLO labels only. "both" + CLS_REFINE overwrites
+        # boxes with the close-range leaf classifier (wrong domain for DJI).
+        ("AGRIVISION_INFER_MODE", "detection"),
+        ("AGRIVISION_CLS_REFINE", "0"),
         ("AGRIVISION_DET_TILES", "4"),
         ("AGRIVISION_DET_TILE_OVERLAP", "0.25"),
         ("AGRIVISION_MAX_DET", "300"),
@@ -169,9 +181,18 @@ class MainWindow(QWidget):
         self._set_status_dot(self._drone_dot, False)
         self._set_status_dot(self._processing_dot, False)
 
+        self.btn_dashboard = QPushButton("Admin Dashboard")
+        self.btn_dashboard.setObjectName("btnHeader")
+        self.btn_dashboard.setCursor(Qt.PointingHandCursor)
+        self.btn_dashboard.setToolTip(
+            "Open records, analytics, and the disease map in your browser"
+        )
+        self.btn_dashboard.clicked.connect(self._on_open_dashboard)
+
         top_bar.addLayout(brand_col)
         top_bar.addStretch(1)
         top_bar.addLayout(status_wrap)
+        top_bar.addWidget(self.btn_dashboard)
         root.addWidget(header)
 
         self._splitter = QSplitter(Qt.Horizontal)
@@ -808,6 +829,73 @@ class MainWindow(QWidget):
         path = write_map_html(html, "output/maps/live_map.html")
         self.sidebar.map_panel.set_map_file(path)
         return Path(path)
+
+    def _on_open_dashboard(self) -> None:
+        from utils.dashboard_launch import frontend_built, is_listening, start_api
+
+        if is_listening():
+            self._open_dashboard_browser()
+            return
+
+        if not frontend_built():
+            choice = QMessageBox.question(
+                self,
+                "Admin Dashboard",
+                "The admin web UI has not been built yet.\n\n"
+                "Run deploy.ps1 once (needs Node.js), then try this button again.\n\n"
+                "Start the API anyway?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No,
+            )
+            if choice != QMessageBox.Yes:
+                return
+
+        try:
+            start_api()
+        except RuntimeError as exc:
+            QMessageBox.warning(self, "Admin Dashboard", str(exc))
+            return
+
+        self.btn_dashboard.setEnabled(False)
+        self.btn_dashboard.setText("Starting…")
+        self.sidebar.add_log(log("Starting admin dashboard…"))
+        self._dashboard_wait_n = 0
+        if not hasattr(self, "_dashboard_timer"):
+            self._dashboard_timer = QTimer(self)
+            self._dashboard_timer.timeout.connect(self._poll_dashboard_ready)
+        self._dashboard_timer.start(400)
+
+    def _poll_dashboard_ready(self) -> None:
+        from utils.dashboard_launch import is_listening
+
+        self._dashboard_wait_n = getattr(self, "_dashboard_wait_n", 0) + 1
+        if is_listening():
+            self._dashboard_timer.stop()
+            self._restore_dashboard_button()
+            self._open_dashboard_browser()
+            return
+        if self._dashboard_wait_n >= 40:
+            self._dashboard_timer.stop()
+            self._restore_dashboard_button()
+            QMessageBox.warning(
+                self,
+                "Admin Dashboard",
+                "The dashboard did not start in time.\n\n"
+                "From the repo root run:\n"
+                "  py -3.10 -m pip install -r web/requirements.txt\n"
+                "  .\\deploy.ps1 -SkipDesktop\n\n"
+                "Details: output/dashboard.log",
+            )
+
+    def _restore_dashboard_button(self) -> None:
+        self.btn_dashboard.setEnabled(True)
+        self.btn_dashboard.setText("Admin Dashboard")
+
+    def _open_dashboard_browser(self) -> None:
+        from utils.dashboard_launch import open_in_browser
+
+        url = open_in_browser()
+        self.sidebar.add_log(log(f"Admin dashboard: {url}"))
 
     def _open_map_in_browser(self) -> None:
         map_data = self._map_payload()

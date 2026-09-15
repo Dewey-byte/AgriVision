@@ -56,7 +56,9 @@ def main() -> int:
     from utils.cast_manager import (
         MirrorManager,
         QUALITY_PRESETS,
+        _arp_neighbors_for_interface,
         _hotspot_host_ips_from_ipconfig,
+        _is_unicast_lan_ipv4,
         _parse_wireless_adb_serials,
     )
 
@@ -77,6 +79,19 @@ def main() -> int:
             "Wireless LAN adapter Local Area Connection* 10:\n"
             "   IPv4 Address. . . . . . . . . . . : 192.168.137.1\n"
         ),
+    )
+    check("unicast lan ipv4 phone", lambda: _is_unicast_lan_ipv4("192.168.137.167") is True)
+    check("unicast lan ipv4 skip multicast", lambda: _is_unicast_lan_ipv4("224.0.0.22") is False)
+    check(
+        "arp neighbors skip multicast",
+        lambda: _arp_neighbors_for_interface(
+            "192.168.137.1",
+            "Interface: 192.168.137.1 --- 0x8\n"
+            "  192.168.137.167       0a-97-6b-48-f0-6f     static\n"
+            "  192.168.137.255       ff-ff-ff-ff-ff-ff     static\n"
+            "  224.0.0.22            01-00-5e-00-00-16     static\n",
+        )
+        == ["192.168.137.167"],
     )
 
     check("detection_category diseased", lambda: detection_category("Fusarium wilt") == "diseased")

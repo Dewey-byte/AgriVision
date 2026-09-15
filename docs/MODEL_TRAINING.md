@@ -203,7 +203,16 @@ The notebook mirrors `train.py`. Equivalent one-liner:
 python train.py --epochs 80 --imgsz 640 --batch 16 --device 0
 ```
 
-`train.py` also copies `best.pt` to `models/best.pt` when finished.
+`train.py` also copies `best.pt` to `models/best.pt` when finished. Pass
+`--no-deploy` to leave the deployed weights alone, and `--model` to train a
+different architecture:
+
+```powershell
+python train.py --model yolov9s.pt --name bench_yolov9s --no-deploy
+```
+
+Comparing architectures against each other is documented separately in
+[`MODEL_BENCHMARK.md`](MODEL_BENCHMARK.md).
 
 ### Resume interrupted training
 

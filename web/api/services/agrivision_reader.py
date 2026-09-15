@@ -414,6 +414,104 @@ def _read_results_csv(path: Path) -> list[dict[str, float]]:
     return rows
 
 
+def _load_benchmark_record(model_id: str) -> dict[str, Any] | None:
+    """One contender's evaluation output from tools/benchmark_models.py."""
+    path = config.BENCHMARKS_DIR / f"{model_id}.json"
+    if not path.is_file():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _benchmark(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Head-to-head accuracy table across the configured benchmark contenders.
+
+    Contenders without an evaluation file yet are still returned, flagged
+    ``evaluated: false``, so the dashboard can show the full line-up and which
+    runs are still outstanding.
+    """
+    bench = dict(cfg.get("benchmark") or {})
+    contenders: list[dict[str, Any]] = []
+
+    for entry in bench.get("contenders", []):
+        contender = dict(entry)
+        csv_rel = contender.get("results_csv")
+        if csv_rel:
+            rows = _read_results_csv(config.REPO_ROOT / csv_rel)
+            contender["training_curve"] = [
+                {"epoch": r["epoch"], "map50": round(r["map50"], 4)} for r in rows
+            ]
+
+        record = _load_benchmark_record(contender["id"])
+        if record:
+            contender.update(
+                {
+                    "evaluated": True,
+                    "evaluated_at": record.get("evaluated_at"),
+                    "overall": record.get("overall", {}),
+                    "per_class": record.get("per_class", []),
+                    "speed_ms_per_image": record.get("speed_ms_per_image", {}),
+                    "params_millions": record.get("params_millions"),
+                    "gflops": record.get("gflops"),
+                    "training": record.get("training", {}),
+                    "dataset_stats": record.get("dataset_stats", {}),
+                }
+            )
+        else:
+            contender["evaluated"] = False
+        contenders.append(contender)
+
+    scored = [c for c in contenders if c.get("evaluated") and c["overall"].get("mAP50") is not None]
+    scored.sort(key=lambda c: c["overall"]["mAP50"], reverse=True)
+    for rank, contender in enumerate(scored, start=1):
+        contender["rank"] = rank
+        contender["is_best"] = rank == 1
+
+    # Per-class mAP@0.5 for every evaluated model, shaped for a grouped chart.
+    class_names: list[str] = []
+    for contender in scored:
+        for row in contender.get("per_class", []):
+            if row["name"] not in class_names:
+                class_names.append(row["name"])
+
+    per_class_matrix = []
+    for name in class_names:
+        row: dict[str, Any] = {"class": name, "instances": 0}
+        for contender in scored:
+            match = next((r for r in contender["per_class"] if r["name"] == name), None)
+            if match:
+                row[contender["id"]] = match["mAP50"]
+                row["instances"] = max(row["instances"], match.get("instances_in_split", 0))
+        per_class_matrix.append(row)
+
+    # Convergence curves from every contender, merged onto a shared epoch axis.
+    curve_by_epoch: dict[int, dict[str, Any]] = {}
+    for contender in contenders:
+        for point in contender.get("training_curve") or []:
+            slot = curve_by_epoch.setdefault(point["epoch"], {"epoch": point["epoch"]})
+            slot[contender["id"]] = point["map50"]
+
+    bench.update(
+        {
+            "contenders": contenders,
+            "series": [{"id": c["id"], "name": c["name"], "family": c["family"]} for c in scored],
+            "per_class_matrix": per_class_matrix,
+            "convergence": [curve_by_epoch[e] for e in sorted(curve_by_epoch)],
+            "curve_series": [
+                {"id": c["id"], "name": c["name"]}
+                for c in contenders
+                if c.get("training_curve")
+            ],
+            "best": scored[0] if scored else None,
+            "evaluated_count": len(scored),
+            "pending": [c["name"] for c in contenders if not c.get("evaluated")],
+        }
+    )
+    return bench
+
+
 def model_comparison() -> dict[str, Any]:
     """Metrics for the configured models, enriched with live training CSVs."""
     try:
@@ -452,4 +550,8 @@ def model_comparison() -> dict[str, Any]:
                 ]
         models.append(model)
 
-    return {"models": models, "class_metrics": cfg.get("class_metrics", [])}
+    return {
+        "models": models,
+        "class_metrics": cfg.get("class_metrics", []),
+        "benchmark": _benchmark(cfg),
+    }

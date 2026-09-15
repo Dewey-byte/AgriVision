@@ -1,0 +1,332 @@
+--------- config parameters ----------
+{
+    "checkpoint_params": {
+        "load_checkpoint": false,
+        "schema": null
+    },
+    "training_hyperparams": {
+        "lr_warmup_epochs": 3,
+        "lr_warmup_steps": 0,
+        "lr_cooldown_epochs": 0,
+        "warmup_initial_lr": 1e-06,
+        "cosine_final_lr_ratio": 0.1,
+        "optimizer": "AdamW",
+        "optimizer_params": {
+            "weight_decay": 0.0001
+        },
+        "criterion_params": {},
+        "ema": true,
+        "batch_accumulate": 1,
+        "ema_params": {
+            "decay": 0.9,
+            "decay_type": "threshold"
+        },
+        "zero_weight_decay_on_bias_and_bn": true,
+        "load_opt_params": true,
+        "run_validation_freq": 1,
+        "run_test_freq": 1,
+        "save_model": true,
+        "metric_to_watch": "mAP@0.50",
+        "launch_tensorboard": false,
+        "tb_files_user_prompt": false,
+        "silent_mode": false,
+        "mixed_precision": true,
+        "tensorboard_port": null,
+        "save_ckpt_epoch_list": [],
+        "average_best_models": true,
+        "dataset_statistics": false,
+        "save_tensorboard_to_s3": false,
+        "lr_schedule_function": null,
+        "train_metrics_list": [],
+        "valid_metrics_list": [
+            "DetectionMetrics_050(\n  (post_prediction_callback): PPYoloEPostPredictionCallback()\n)",
+            "DetectionMetrics_050_095(\n  (post_prediction_callback): PPYoloEPostPredictionCallback()\n)"
+        ],
+        "greater_metric_to_watch_is_better": true,
+        "precise_bn": false,
+        "precise_bn_batch_size": null,
+        "seed": 42,
+        "lr_mode": "cosine",
+        "phase_callbacks": [
+            "_Callback"
+        ],
+        "log_installed_packages": true,
+        "sg_logger": "base_sg_logger",
+        "sg_logger_params": {
+            "tb_files_user_prompt": false,
+            "project_name": "",
+            "launch_tensorboard": false,
+            "tensorboard_port": null,
+            "save_checkpoints_remote": false,
+            "save_tensorboard_remote": false,
+            "save_logs_remote": false
+        },
+        "warmup_mode": "linear_epoch_step",
+        "step_lr_update_freq": null,
+        "lr_updates": [],
+        "initial_lr": 0.0005,
+        "clip_grad_norm": null,
+        "pre_prediction_callback": null,
+        "ckpt_best_name": "ckpt_best.pth",
+        "enable_qat": false,
+        "resume": false,
+        "resume_path": null,
+        "ckpt_name": "ckpt_latest.pth",
+        "resume_strict_load": false,
+        "sync_bn": false,
+        "kill_ddp_pgroup_on_end": true,
+        "max_train_batches": null,
+        "max_valid_batches": null,
+        "resume_from_remote_sg_logger": false,
+        "torch_compile": false,
+        "torch_compile_loss": false,
+        "torch_compile_options": {
+            "mode": "reduce-overhead",
+            "fullgraph": false,
+            "dynamic": false,
+            "backend": "inductor",
+            "options": null,
+            "disable": false
+        },
+        "finetune": false,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "max_epochs": {
+                    "type": "number",
+                    "minimum": 1
+                },
+                "lr_decay_factor": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "lr_warmup_epochs": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                },
+                "initial_lr": {
+                    "anyOf": [
+                        {
+                            "type": [
+                                "number",
+                                "string",
+                                "boolean",
+                                "null"
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[a-zA-Z0-9_.]+$": {
+                                    "type": "number"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    ]
+                }
+            },
+            "if": {
+                "properties": {
+                    "lr_mode": {
+                        "const": "StepLRScheduler"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "lr_updates",
+                    "lr_decay_factor"
+                ]
+            },
+            "required": [
+                "max_epochs",
+                "lr_mode",
+                "initial_lr",
+                "loss"
+            ]
+        },
+        "max_epochs": 1,
+        "loss": "PPYoloELoss(\n  (static_assigner): ATSSAssigner()\n  (assigner): TaskAlignedAssigner()\n)"
+    },
+    "dataset_params": {
+        "train_dataset_params": "{'data_dir': 'D:\\\\GitHub\\\\AgriVision\\\\datasets\\\\yolo_banana', 'images_dir': 'images/train', 'labels_dir': 'labels/train', 'classes': ['black_sigatoka', 'bunchy_top', 'healthy', 'panama'], 'input_dim': [640, 640], 'cache_annotations': True, 'ignore_empty_annotations': True, 'transforms': [{'DetectionMosaic': {'input_dim': [640, 640], 'prob': 1.0}}, {'DetectionRandomAffine': {'degrees': 10.0, 'translate': 0.1, 'scales': [0.1, 2], 'shear': 2.0, 'target_size': [640, 640], 'filter_box_candidates': True, 'wh_thr': 2, 'area_thr': 0.1, 'ar_thr': 20}}, {'DetectionMixup': {'input_dim': [640, 640], 'mixup_scale': [0.5, 1.5], 'prob': 1.0, 'flip_prob': 0.5}}, {'DetectionHSV': {'prob': 1.0, 'hgain': 5, 'sgain': 30, 'vgain': 30}}, {'DetectionHorizontalFlip': {'prob': 0.5}}, {'DetectionPaddedRescale': {'input_dim': [640, 640]}}, {'DetectionTargetsFormatTransform': {'input_dim': [640, 640], 'output_format': 'LABEL_CXCYWH'}}], 'class_inclusion_list': None, 'max_num_samples': None}",
+        "train_dataloader_params": {
+            "batch_size": 8,
+            "num_workers": 0,
+            "drop_last": false,
+            "shuffle": true,
+            "pin_memory": true,
+            "collate_fn": "<super_gradients.training.utils.collate_fn.detection_collate_fn.DetectionCollateFN object at 0x000001CBA238E440>"
+        },
+        "valid_dataset_params": "{'data_dir': 'D:\\\\GitHub\\\\AgriVision\\\\datasets\\\\yolo_banana', 'images_dir': 'images/val', 'labels_dir': 'labels/val', 'classes': ['black_sigatoka', 'bunchy_top', 'healthy', 'panama'], 'input_dim': [640, 640], 'cache_annotations': True, 'ignore_empty_annotations': True, 'transforms': [{'DetectionPaddedRescale': {'input_dim': [640, 640]}}, {'DetectionTargetsFormatTransform': {'input_dim': [640, 640], 'output_format': 'LABEL_CXCYWH'}}], 'class_inclusion_list': None, 'max_num_samples': None}",
+        "valid_dataloader_params": {
+            "batch_size": 8,
+            "num_workers": 0,
+            "drop_last": false,
+            "pin_memory": true,
+            "collate_fn": "<super_gradients.training.utils.collate_fn.detection_collate_fn.DetectionCollateFN object at 0x000001CBA2576BC0>"
+        }
+    },
+    "additional_log_items": {
+        "initial_LR": 0.0005,
+        "num_devices": 1,
+        "multi_gpu": "None",
+        "device_type": "NVIDIA GeForce RTX 4050 Laptop GPU",
+        "installed_packages": {
+            "sphinx": "4.0.3",
+            "absl-py": "2.5.0",
+            "aiohappyeyeballs": "2.7.1",
+            "aiohttp": "3.14.3",
+            "aiosignal": "1.4.0",
+            "alabaster": "0.7.16",
+            "albumentations": "1.3.1",
+            "antlr4-python3-runtime": "4.9.3",
+            "arabic-reshaper": "3.0.1",
+            "asn1crypto": "1.5.1",
+            "async-timeout": "5.0.1",
+            "attrs": "26.1.0",
+            "babel": "2.18.0",
+            "boto3": "1.43.93",
+            "botocore": "1.43.93",
+            "build": "1.6.1",
+            "certifi": "2026.7.22",
+            "cffi": "2.1.1",
+            "charset-normalizer": "3.5.1",
+            "click": "8.5.0",
+            "cloudpickle": "3.1.2",
+            "colorama": "0.4.6",
+            "coloredlogs": "15.0.1",
+            "contourpy": "1.3.2",
+            "coverage": "5.3.1",
+            "cryptography": "50.0.1",
+            "cssselect2": "0.10.1",
+            "cycler": "0.12.1",
+            "data-gradients": "0.3.2",
+            "deprecated": "1.3.1",
+            "docutils": "0.17.1",
+            "einops": "0.3.2",
+            "filelock": "3.32.3",
+            "flatbuffers": "25.12.19",
+            "fonttools": "4.65.0",
+            "frozenlist": "1.8.0",
+            "fsspec": "2026.7.0",
+            "future": "1.0.0",
+            "grpcio": "1.84.0",
+            "html5lib": "1.1",
+            "humanfriendly": "10.0",
+            "hydra-core": "1.3.6",
+            "idna": "3.19",
+            "imagededup": "0.3.3.post2",
+            "imageio": "2.37.4",
+            "imagesize": "2.0.1",
+            "jinja2": "3.1.6",
+            "jmespath": "1.1.0",
+            "joblib": "1.6.0",
+            "json-tricks": "3.16.1",
+            "jsonschema": "4.26.0",
+            "jsonschema-specifications": "2025.9.1",
+            "kiwisolver": "1.5.1",
+            "lazy-loader": "0.5",
+            "lxml": "6.1.3",
+            "markdown": "3.10.3",
+            "markdown-it-py": "4.2.0",
+            "markupsafe": "3.0.3",
+            "matplotlib": "3.10.9",
+            "mdurl": "0.1.2",
+            "mpmath": "1.3.0",
+            "multidict": "6.8.0",
+            "networkx": "3.4.2",
+            "numpy": "1.23.0",
+            "omegaconf": "2.3.1",
+            "onnx": "1.15.0",
+            "onnxruntime": "1.15.0",
+            "onnxsim": "0.7.3",
+            "opencv-python": "4.11.0.86",
+            "opencv-python-headless": "4.11.0.86",
+            "oscrypto": "1.3.0",
+            "packaging": "26.3",
+            "pandas": "2.3.3",
+            "pillow": "12.3.0",
+            "pip": "24.0",
+            "pip-tools": "7.6.1",
+            "platformdirs": "4.11.8",
+            "propcache": "0.5.2",
+            "protobuf": "3.20.3",
+            "psutil": "7.2.2",
+            "pydeprecate": "0.3.2",
+            "pycparser": "3.0",
+            "pygments": "2.21.0",
+            "pyhanko": "0.37.0",
+            "pyhanko-certvalidator": "0.32.1",
+            "pyparsing": "3.3.2",
+            "pypdf": "6.18.1",
+            "pyproject-hooks": "1.2.0",
+            "pyreadline3": "3.5.6",
+            "python-bidi": "0.6.11",
+            "python-dateutil": "2.9.0.post0",
+            "pytz": "2026.3.post1",
+            "pywavelets": "1.8.0",
+            "pyyaml": "6.0.3",
+            "qudida": "0.0.4",
+            "rapidfuzz": "3.14.5",
+            "referencing": "0.37.0",
+            "reportlab": "3.6.13",
+            "requests": "2.34.2",
+            "rich": "15.0.0",
+            "rpds-py": "0.30.0",
+            "s3transfer": "0.19.2",
+            "scikit-image": "0.24.0",
+            "scikit-learn": "1.7.2",
+            "scipy": "1.13.1",
+            "seaborn": "0.13.2",
+            "setuptools": "69.5.1",
+            "six": "1.17.0",
+            "snowballstemmer": "3.1.1",
+            "sphinx-rtd-theme": "1.3.0",
+            "sphinxcontrib-applehelp": "2.0.0",
+            "sphinxcontrib-devhelp": "2.0.0",
+            "sphinxcontrib-htmlhelp": "2.1.0",
+            "sphinxcontrib-jquery": "4.1",
+            "sphinxcontrib-jsmath": "1.0.1",
+            "sphinxcontrib-qthelp": "2.0.0",
+            "sphinxcontrib-serializinghtml": "2.0.0",
+            "stringcase": "1.2.0",
+            "super-gradients": "3.7.1",
+            "svglib": "1.5.1",
+            "sympy": "1.13.1",
+            "tensorboard": "2.20.0",
+            "tensorboard-data-server": "0.7.2",
+            "termcolor": "1.1.0",
+            "threadpoolctl": "3.6.0",
+            "tifffile": "2025.5.10",
+            "tinycss2": "1.5.1",
+            "tomli": "2.4.1",
+            "torch": "2.5.1+cu124",
+            "torchmetrics": "0.8.0",
+            "torchvision": "0.20.1+cu124",
+            "tqdm": "4.70.1",
+            "treelib": "1.6.1",
+            "typing-extensions": "4.16.0",
+            "tzdata": "2026.4",
+            "tzlocal": "5.4.4",
+            "uritools": "6.1.3",
+            "urllib3": "2.7.0",
+            "webencodings": "0.6.1",
+            "werkzeug": "3.1.8",
+            "wheel": "0.48.0",
+            "wrapt": "2.4.1",
+            "xhtml2pdf": "0.2.11",
+            "yarl": "1.24.5"
+        }
+    }
+}
+------- config parameters end --------
+
+Epoch 0 (1/1)  - Train_Inference_Time: 189563.859375	Train_PPYoloELoss/loss_cls: 1.6598610877990723	Train_PPYoloELoss/loss_iou: 1.3475147485733032	Train_PPYoloELoss/loss_dfl: 1.091746211051941	Train_PPYoloELoss/loss: 4.099121570587158	
+
+Epoch 0 (1/1)  - Valid_Inference_Time: 2772.70458984375	Valid_PPYoloELoss/loss_cls: 1.729162573814392	Valid_PPYoloELoss/loss_iou: 1.2957547903060913	Valid_PPYoloELoss/loss_dfl: 1.0710614919662476	Valid_PPYoloELoss/loss: 4.0959792137146	Valid_Precision@0.50: 0.0	Valid_Recall@0.50: 0.0	Valid_mAP@0.50: 0.0023148145992308855	Valid_F1@0.50: 0.0	Valid_AP@0.50_black_sigatoka: 0.0	Valid_AP@0.50_bunchy_top: 0.009259258396923542	Valid_AP@0.50_healthy: 0.0	Valid_AP@0.50_panama: 0.0	Valid_Best_score_threshold: 0.03999999910593033	Valid_Best_score_threshold_black_sigatoka: 0.0	Valid_Best_score_threshold_bunchy_top: 0.03999999910593033	Valid_Best_score_threshold_healthy: 0.0	Valid_Best_score_threshold_panama: 0.0	Valid_Precision@0.50:0.95: 0.0	Valid_Recall@0.50:0.95: 0.0	Valid_mAP@0.50:0.95: 0.00032722490141168237	Valid_F1@0.50:0.95: 0.0	Valid_AP@0.50:0.95_black_sigatoka: 0.0	Valid_AP@0.50:0.95_bunchy_top: 0.0013088996056467295	Valid_AP@0.50:0.95_healthy: 0.0	Valid_AP@0.50:0.95_panama: 0.0	
+
+Epoch 0 (1/1)  - LR/default: 1e-06	

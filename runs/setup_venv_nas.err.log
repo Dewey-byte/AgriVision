@@ -1,0 +1,59 @@
+
+[notice] A new release of pip is available: 24.0 -> 26.2.1
+[notice] To update, run: D:\GitHub\AgriVision\venv-nas\Scripts\python.exe -m pip install --upgrade pip
+
+[notice] A new release of pip is available: 24.0 -> 26.2.1
+[notice] To update, run: D:\GitHub\AgriVision\venv-nas\Scripts\python.exe -m pip install --upgrade pip
+Downloading: "https://sghub.deci.ai/models/yolo_nas_s_coco.pth" to C:\Users\Dewey-Byte/.cache\torch\hub\checkpoints\yolo_nas_s_coco.pth
+Traceback (most recent call last):
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 1348, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1282, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1328, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1277, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1037, in _send_output
+    self.send(msg)
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 975, in send
+    self.connect()
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1447, in connect
+    super().connect()
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 941, in connect
+    self.sock = self._create_connection(
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\socket.py", line 824, in create_connection
+    for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\socket.py", line 955, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 5, in <module>
+  File "D:\GitHub\AgriVision\venv-nas\lib\site-packages\super_gradients\common\decorators\factory_decorator.py", line 36, in wrapper
+    return func(*args, **kwargs)
+  File "D:\GitHub\AgriVision\venv-nas\lib\site-packages\super_gradients\training\models\model_factory.py", line 230, in get
+    net = instantiate_model(model_name, arch_params, checkpoint_num_classes, pretrained_weights, download_required_code)
+  File "D:\GitHub\AgriVision\venv-nas\lib\site-packages\super_gradients\training\models\model_factory.py", line 168, in instantiate_model
+    load_pretrained_weights(net, model_name, pretrained_weights)
+  File "D:\GitHub\AgriVision\venv-nas\lib\site-packages\super_gradients\training\utils\checkpoint_utils.py", line 1595, in load_pretrained_weights
+    pretrained_state_dict = load_state_dict_from_url(url=url, map_location=map_location, file_name=unique_filename)
+  File "D:\GitHub\AgriVision\venv-nas\lib\site-packages\torch\hub.py", line 867, in load_state_dict_from_url
+    download_url_to_file(url, cached_file, hash_prefix, progress=progress)
+  File "D:\GitHub\AgriVision\venv-nas\lib\site-packages\torch\hub.py", line 708, in download_url_to_file
+    u = urlopen(req)
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 519, in open
+    response = self._open(req, data)
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 496, in _call_chain
+    result = func(*args)
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 1391, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+  File "C:\Users\Dewey-Byte\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 1351, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [Errno 11001] getaddrinfo failed>

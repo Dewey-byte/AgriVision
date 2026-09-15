@@ -1,0 +1,24 @@
+{
+  "weights": "d:\\GitHub\\AgriVision\\models\\banana-cls.pt",
+  "dataset": "d:\\GitHub\\AgriVision\\datasets\\cls_healthy_panama_sigatoka",
+  "split": "test",
+  "top1": 0.9685767292976379,
+  "manual_accuracy": 0.9685767097966729,
+  "total": 541,
+  "confusion": {
+    "black_sigatoka": {
+      "black_sigatoka": 225,
+      "panama": 4,
+      "healthy": 1
+    },
+    "healthy": {
+      "healthy": 208,
+      "black_sigatoka": 6,
+      "panama": 4
+    },
+    "panama": {
+      "panama": 91,
+      "black_sigatoka": 2
+    }
+  }
+}

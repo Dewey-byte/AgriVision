@@ -41,7 +41,9 @@ def _load_model() -> YOLO:
     if not path.is_file():
         raise FileNotFoundError(
             f"Classification weights not found: {path}\n"
-            "Train with generate_dataset.py + train.py, then copy best-cls.pt to models/banana-cls.pt"
+            "Build + train with:\n"
+            "  python tools/prepare_cls_secondary.py\n"
+            "  python train_cls.py"
         )
 
     _model = YOLO(str(path))

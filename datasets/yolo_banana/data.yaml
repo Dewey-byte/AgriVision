@@ -1,4 +1,4 @@
-path: C:/Users/Dewey-Byte/Documents/GitHub/AgriVision/datasets/yolo_banana
+path: D:/GitHub/AgriVision/datasets/yolo_banana
 train: images/train
 val: images/val
 test: images/test

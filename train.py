@@ -1,4 +1,9 @@
-"""Fine-tune YOLOv8 on AgriVision banana disease data (Label Studio export)."""
+"""Fine-tune a YOLO detector on AgriVision banana disease data (Label Studio export).
+
+Defaults to YOLOv8n. Pass ``--model yolov9s.pt`` (or any Ultralytics-supported
+checkpoint) to train a different architecture under identical hyperparameters,
+which is how the Model Comparison benchmark keeps runs apples-to-apples.
+"""
 
 from __future__ import annotations
 
@@ -49,6 +54,17 @@ def resolve_data_yaml(dataset: Path | None = None) -> Path:
     return data_yaml
 
 
+def resolve_base_weights(model_name: str) -> str:
+    """Prefer a checkpoint vendored in the repo, else let Ultralytics fetch it."""
+    local = ROOT / model_name
+    if local.is_file():
+        return str(local)
+    if Path(model_name).is_file():
+        return model_name
+    print(f"{model_name} not vendored in repo root; Ultralytics will download it")
+    return model_name
+
+
 def train_model(
     data_yaml: Path,
     epochs: int,
@@ -60,10 +76,9 @@ def train_model(
     resume: str | None = None,
     workers: int = 0,
     model_name: str = "yolov8n.pt",
+    deploy: bool = True,
 ) -> Path:
-    weights = resume or str(ROOT / model_name)
-    if not Path(weights).is_file():
-        raise FileNotFoundError(f"Missing weights: {weights}")
+    weights = resume or resolve_base_weights(model_name)
 
     model = YOLO(weights)
     results = model.train(
@@ -96,9 +111,12 @@ def train_model(
     if not best_weights.is_file():
         raise RuntimeError(f"Training finished but weights were not found: {best_weights}")
 
-    MODELS_DIR.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(best_weights, MODELS_DIR / "best.pt")
-    print(f"Copied trained weights to {MODELS_DIR / 'best.pt'}")
+    if deploy:
+        MODELS_DIR.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(best_weights, MODELS_DIR / "best.pt")
+        print(f"Copied trained weights to {MODELS_DIR / 'best.pt'}")
+    else:
+        print(f"Left models/best.pt untouched; trained weights at {best_weights}")
     return best_weights
 
 
@@ -114,11 +132,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--imgsz", type=int, default=640)
     parser.add_argument("--batch", type=int, default=16)
     parser.add_argument("--device", default=default_device())
-    parser.add_argument("--project", default="runs")
+    parser.add_argument("--project", default=str(ROOT / "runs" / "detect"))
     parser.add_argument("--name", default="banana_disease")
     parser.add_argument("--resume", default=None, help="Path to last.pt to resume training")
     parser.add_argument("--workers", type=int, default=0)
-    parser.add_argument("--model", default="yolov8n.pt", help="Base weights (yolov8n.pt or yolov8s.pt)")
+    parser.add_argument(
+        "--model",
+        default="yolov8n.pt",
+        help="Base weights, e.g. yolov8n.pt, yolov8s.pt, yolov9t.pt, yolov9s.pt",
+    )
+    parser.add_argument(
+        "--no-deploy",
+        dest="deploy",
+        action="store_false",
+        default=True,
+        help="Do not copy the result over models/best.pt (use for benchmark runs)",
+    )
     parser.add_argument(
         "--data",
         type=Path,
@@ -142,6 +171,7 @@ def main() -> None:
         resume=args.resume,
         workers=args.workers,
         model_name=args.model,
+        deploy=args.deploy,
     )
 
 

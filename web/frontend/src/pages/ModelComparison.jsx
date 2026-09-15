@@ -25,6 +25,303 @@ const STATUS_PILL = {
   planned: "neutral",
 };
 
+// Stable per-contender colours so a model keeps its colour across every chart.
+const SERIES_COLORS = ["#2d6a4f", "#d4a373", "#457b9d", "#bc4749", "#7d5ba6"];
+
+const pct = (v) => (v == null ? "—" : `${(v * 100).toFixed(2)}%`);
+const pct1 = (v) => (v == null ? "—" : `${(v * 100).toFixed(1)}%`);
+
+function colorFor(id, series) {
+  const index = series.findIndex((s) => s.id === id);
+  return SERIES_COLORS[(index < 0 ? 0 : index) % SERIES_COLORS.length];
+}
+
+function Leaderboard({ bench, series }) {
+  return (
+    <div className="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Model</th>
+            <th>mAP@0.5</th>
+            <th>mAP@0.5:0.95</th>
+            <th>Precision</th>
+            <th>Recall</th>
+            <th>F1</th>
+            <th>Params</th>
+            <th>Inference</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bench.contenders.map((c) => {
+            if (!c.evaluated) {
+              return (
+                <tr key={c.id}>
+                  <td className="muted">—</td>
+                  <td>
+                    <strong>{c.name}</strong>
+                    <div className="muted" style={{ fontSize: 11.5 }}>{c.family}</div>
+                  </td>
+                  <td colSpan={7} className="muted">
+                    Not evaluated yet — no results in output/metrics/benchmarks
+                  </td>
+                </tr>
+              );
+            }
+            const o = c.overall;
+            const inference = c.speed_ms_per_image?.inference;
+            return (
+              <tr key={c.id} style={c.is_best ? { background: "rgba(64,145,108,0.10)" } : undefined}>
+                <td>
+                  <span className={`pill ${c.is_best ? "healthy" : "neutral"}`}>{c.rank}</span>
+                </td>
+                <td>
+                  <strong style={{ color: colorFor(c.id, series) }}>{c.name}</strong>
+                  <div className="muted" style={{ fontSize: 11.5 }}>{c.family}</div>
+                </td>
+                <td>
+                  <strong>{pct(o.mAP50)}</strong>
+                </td>
+                <td>{pct(o.mAP50_95)}</td>
+                <td>{pct1(o.precision)}</td>
+                <td>{pct1(o.recall)}</td>
+                <td>{pct1(o.f1)}</td>
+                <td>{c.params_millions ? `${c.params_millions.toFixed(2)} M` : "—"}</td>
+                <td>{inference ? `${inference.toFixed(1)} ms` : "—"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function BenchmarkSection({ bench }) {
+  const series = bench.series || [];
+  const scored = bench.contenders.filter((c) => c.evaluated);
+
+  if (scored.length === 0) {
+    return (
+      <div className="card section">
+        <h3>Head-to-head accuracy</h3>
+        <p className="sub">{bench.protocol}</p>
+        <div className="empty">
+          No benchmark results yet. Train the contenders, then run{" "}
+          <code className="mono">python tools/benchmark_models.py</code> to score them all on the
+          same held-out split.
+        </div>
+      </div>
+    );
+  }
+
+  const overallChart = scored.map((c) => ({
+    name: c.name,
+    map50: c.overall.mAP50,
+    map50_95: c.overall.mAP50_95,
+  }));
+
+  return (
+    <>
+      <div className="card section">
+        <h3>Head-to-head accuracy — {bench.split} split</h3>
+        <p className="sub">{bench.protocol}</p>
+        {bench.best && (
+          <p style={{ margin: "0 0 14px", fontSize: 14 }}>
+            <strong style={{ color: "var(--green)" }}>{bench.best.name}</strong> is the most
+            accurate of the {scored.length} evaluated model{scored.length === 1 ? "" : "s"}, at{" "}
+            <strong>{pct(bench.best.overall.mAP50)}</strong> mAP@0.5 and{" "}
+            <strong>{pct(bench.best.overall.mAP50_95)}</strong> mAP@0.5:0.95.
+          </p>
+        )}
+        <Leaderboard bench={bench} series={series} />
+        {bench.pending?.length > 0 && (
+          <p className="muted" style={{ fontSize: 12, marginTop: 12 }}>
+            Awaiting evaluation: {bench.pending.join(", ")}.
+          </p>
+        )}
+      </div>
+
+      <div className="grid cols-2 section">
+        <div className="card">
+          <h3>Overall accuracy</h3>
+          <p className="sub">Mean average precision on the held-out {bench.split} split.</p>
+          <div className="chart-box">
+            <ResponsiveContainer>
+              <BarChart data={overallChart}>
+                <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
+                <XAxis dataKey="name" tick={{ fill: "#5e7268", fontSize: 11 }} />
+                <YAxis
+                  tick={{ fill: "#5e7268", fontSize: 11 }}
+                  tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
+                />
+                <Tooltip
+                  contentStyle={TOOLTIP_STYLE}
+                  labelStyle={{ color: "#16221b" }}
+                  formatter={(v) => pct1(v)}
+                />
+                <Legend wrapperStyle={{ color: "#5e7268" }} />
+                <Bar dataKey="map50" name="mAP@0.5" fill="#52b788" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="map50_95" name="mAP@0.5:0.95" fill="#2d6a4f" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card">
+          <h3>Per-class mAP@0.5</h3>
+          <p className="sub">
+            Where each architecture wins or collapses — the rare classes are the hard ones.
+          </p>
+          <div className="chart-box">
+            <ResponsiveContainer>
+              <BarChart data={bench.per_class_matrix}>
+                <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
+                <XAxis dataKey="class" tick={{ fill: "#5e7268", fontSize: 11 }} />
+                <YAxis
+                  tick={{ fill: "#5e7268", fontSize: 11 }}
+                  tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
+                />
+                <Tooltip
+                  contentStyle={TOOLTIP_STYLE}
+                  labelStyle={{ color: "#16221b" }}
+                  formatter={(v) => pct1(v)}
+                />
+                <Legend wrapperStyle={{ color: "#5e7268" }} />
+                {series.map((s) => (
+                  <Bar
+                    key={s.id}
+                    dataKey={s.id}
+                    name={s.name}
+                    fill={colorFor(s.id, series)}
+                    radius={[6, 6, 0, 0]}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {bench.curve_series?.length > 0 && (
+        <div className="card section">
+          <h3>Convergence</h3>
+          <p className="sub">
+            Validation mAP@0.5 per epoch for every contender, on one axis — shows which
+            architecture learns this dataset faster, not just which ends up ahead.
+          </p>
+          <div className="chart-box">
+            <ResponsiveContainer>
+              <LineChart data={bench.convergence}>
+                <CartesianGrid stroke="#dde5e0" strokeDasharray="3 3" />
+                <XAxis dataKey="epoch" tick={{ fill: "#5e7268", fontSize: 11 }} />
+                <YAxis
+                  tick={{ fill: "#5e7268", fontSize: 11 }}
+                  tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
+                />
+                <Tooltip
+                  contentStyle={TOOLTIP_STYLE}
+                  labelStyle={{ color: "#16221b" }}
+                  formatter={(v) => pct1(v)}
+                />
+                <Legend wrapperStyle={{ color: "#5e7268" }} />
+                {bench.curve_series.map((s) => (
+                  <Line
+                    key={s.id}
+                    type="monotone"
+                    dataKey={s.id}
+                    name={s.name}
+                    stroke={colorFor(s.id, series)}
+                    dot={false}
+                    strokeWidth={2}
+                    connectNulls
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      <div className="card section">
+        <h3>Full per-class breakdown</h3>
+        <p className="sub">
+          mAP@0.5 for every class and contender on the {bench.split} split, with the number of
+          ground-truth boxes available to score against.
+        </p>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Class</th>
+                <th>Instances</th>
+                {series.map((s) => (
+                  <th key={s.id}>{s.name}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {bench.per_class_matrix.map((row) => {
+                const best = Math.max(...series.map((s) => row[s.id] ?? 0));
+                return (
+                  <tr key={row.class}>
+                    <td className="mono">{row.class}</td>
+                    <td>{row.instances}</td>
+                    {series.map((s) => (
+                      <td key={s.id}>
+                        {row[s.id] != null && row[s.id] === best && best > 0 ? (
+                          <strong style={{ color: colorFor(s.id, series) }}>{pct1(row[s.id])}</strong>
+                        ) : (
+                          pct1(row[s.id])
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="grid cols-3 section">
+        {bench.contenders.map((c) => (
+          <div className="card" key={`notes-${c.id}`}>
+            <h3 style={{ marginBottom: 6 }}>{c.name}</h3>
+            <span className={`pill ${c.is_best ? "healthy" : "neutral"}`}>
+              {c.evaluated ? (c.is_best ? "most accurate" : `rank ${c.rank}`) : "pending"}
+            </span>
+            <p className="muted" style={{ fontSize: 12.5, lineHeight: 1.5 }}>
+              {c.notes}
+            </p>
+            <dl className="kv">
+              <dt>Family</dt>
+              <dd>{c.family}</dd>
+              <dt>Trained by</dt>
+              <dd className="mono">{c.runner}</dd>
+              <dt>Weights</dt>
+              <dd className="mono">{c.weights}</dd>
+              {c.training?.epochs_trained != null && (
+                <>
+                  <dt>Epochs</dt>
+                  <dd>{c.training.epochs_trained}</dd>
+                </>
+              )}
+              {c.evaluated_at && (
+                <>
+                  <dt>Evaluated</dt>
+                  <dd>{c.evaluated_at.slice(0, 16).replace("T", " ")} UTC</dd>
+                </>
+              )}
+            </dl>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
 export default function ModelComparison() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
@@ -40,6 +337,7 @@ export default function ModelComparison() {
 
   const withCurve = data.models.filter((m) => (m.training_curve || []).length > 0);
   const classMetrics = data.class_metrics || [];
+  const bench = data.benchmark;
 
   return (
     <>
@@ -47,8 +345,20 @@ export default function ModelComparison() {
         <div>
           <h2>Model Comparison</h2>
           <p>
-            Three-model line-up: the deployed aerial detector, the two-stage leaf
-            classifier, and the secondary-dataset retraining track.
+            Architecture benchmark — YOLOv8, YOLOv9 and YOLO-NAS scored on one held-out split —
+            followed by the models the desktop pipeline actually deploys.
+          </p>
+        </div>
+      </div>
+
+      {bench?.contenders?.length > 0 && <BenchmarkSection bench={bench} />}
+
+      <div className="page-head" style={{ marginTop: 8 }}>
+        <div>
+          <h2 style={{ fontSize: 18 }}>Deployed pipeline</h2>
+          <p>
+            The deployed aerial detector, the two-stage leaf classifier, and the
+            secondary-dataset retraining track.
           </p>
         </div>
       </div>

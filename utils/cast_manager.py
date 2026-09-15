@@ -23,6 +23,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import time
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -227,6 +228,27 @@ def _hotspot_host_ips_from_ipconfig(text: str) -> list[str]:
     return list(dict.fromkeys(hosts))
 
 
+def _is_unicast_lan_ipv4(ip: str) -> bool:
+    """True for a usable LAN client IP (not multicast, broadcast, or APIPA)."""
+    parts = (ip or "").split(".")
+    if len(parts) != 4:
+        return False
+    try:
+        nums = [int(p) for p in parts]
+    except ValueError:
+        return False
+    if any(n < 0 or n > 255 for n in nums):
+        return False
+    first, last = nums[0], nums[3]
+    if first in (0, 127) or first >= 224:
+        return False
+    if last in (0, 255):
+        return False
+    if ip.startswith("169.254."):
+        return False
+    return True
+
+
 def _arp_neighbors_for_interface(interface_ip: str, arp_text: str) -> list[str]:
     neighbors: list[str] = []
     section = False
@@ -240,7 +262,7 @@ def _arp_neighbors_for_interface(interface_ip: str, arp_text: str) -> list[str]:
         parts = stripped.split()
         if len(parts) >= 2 and parts[0].count(".") == 3:
             ip = parts[0]
-            if ip != interface_ip and not ip.endswith(".255"):
+            if ip != interface_ip and _is_unicast_lan_ipv4(ip):
                 neighbors.append(ip)
     return neighbors
 
@@ -269,33 +291,59 @@ def _adb_mdns_text(adb: str) -> str:
     return (out.stdout or "") + (out.stderr or "")
 
 
-def _hotspot_neighbor_ips() -> list[str]:
-    if sys.platform != "win32":
-        return []
+def _run_hidden(cmd: list[str], timeout: float = 6.0) -> str:
     try:
-        ipcfg = subprocess.run(
-            ["ipconfig"],
+        out = subprocess.run(
+            cmd,
             capture_output=True,
             text=True,
-            timeout=6.0,
-            check=False,
-            creationflags=_NO_WINDOW,
-        )
-        arp = subprocess.run(
-            ["arp", "-a"],
-            capture_output=True,
-            text=True,
-            timeout=6.0,
+            timeout=timeout,
             check=False,
             creationflags=_NO_WINDOW,
         )
     except (OSError, subprocess.TimeoutExpired):
-        return []
+        return ""
+    return (out.stdout or "") + (out.stderr or "")
 
-    ipcfg_text = (ipcfg.stdout or "") + (ipcfg.stderr or "")
-    arp_text = (arp.stdout or "") + (arp.stderr or "")
+
+def _nudge_subnet_arp(host_ip: str) -> None:
+    """Send tiny UDP packets so Windows ARP learns hotspot clients (Android often ignores ICMP)."""
+    parts = host_ip.split(".")
+    if len(parts) != 4:
+        return
+    prefix = ".".join(parts[:3])
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        sock.settimeout(0.01)
+        for i in range(2, 255):
+            dest = f"{prefix}.{i}"
+            if dest == host_ip:
+                continue
+            try:
+                sock.sendto(b"\x00", (dest, 5353))
+            except OSError:
+                pass
+    finally:
+        sock.close()
+    time.sleep(0.4)
+
+
+def _hotspot_neighbor_ips() -> list[str]:
+    if sys.platform != "win32":
+        return []
+    ipcfg_text = _run_hidden(["ipconfig"])
+    arp_text = _run_hidden(["arp", "-a"])
+    hosts = _hotspot_host_ips_from_ipconfig(ipcfg_text)
     neighbors: list[str] = []
-    for host_ip in _hotspot_host_ips_from_ipconfig(ipcfg_text):
+    for host_ip in hosts:
+        neighbors.extend(_arp_neighbors_for_interface(host_ip, arp_text))
+    neighbors = list(dict.fromkeys(neighbors))
+    if neighbors or not hosts:
+        return neighbors
+    for host_ip in hosts:
+        _nudge_subnet_arp(host_ip)
+    arp_text = _run_hidden(["arp", "-a"])
+    for host_ip in hosts:
         neighbors.extend(_arp_neighbors_for_interface(host_ip, arp_text))
     return list(dict.fromkeys(neighbors))
 
@@ -315,24 +363,30 @@ def discover_android_device_ip() -> tuple[str, str]:
 
     Returns ``(ip_or_serial, source)`` where *source* is a short label such as
     ``adb``, ``mdns``, or ``hotspot``. Empty strings when nothing is found.
+
+    Laptop-hotspot clients are returned from ARP even when ADB port 5555 is
+    closed (typical until Wireless debugging / ``adb tcpip 5555`` is enabled).
     """
     adb = find_adb()
-    if not adb:
-        return "", ""
+    if adb:
+        for serial in _parse_wireless_adb_serials(_adb_devices_text(adb)):
+            return _serial_to_display_ip(serial), "adb"
 
-    for serial in _parse_wireless_adb_serials(_adb_devices_text(adb)):
-        return _serial_to_display_ip(serial), "adb"
+        for serial in _parse_mdns_adb_serials(_adb_mdns_text(adb)):
+            if _try_adb_connect_serial(adb, serial):
+                return _serial_to_display_ip(serial), "mdns"
 
-    for serial in _parse_mdns_adb_serials(_adb_mdns_text(adb)):
-        if _try_adb_connect_serial(adb, serial):
-            return _serial_to_display_ip(serial), "mdns"
+    hotspot_ips = _hotspot_neighbor_ips()
+    if adb:
+        for ip in hotspot_ips:
+            if not _tcp_reachable(ip, _DEFAULT_ADB_PORT):
+                continue
+            serial = f"{ip}:{_DEFAULT_ADB_PORT}"
+            if _try_adb_connect_serial(adb, serial):
+                return _serial_to_display_ip(serial), "hotspot"
 
-    for ip in _hotspot_neighbor_ips():
-        if not _tcp_reachable(ip, _DEFAULT_ADB_PORT):
-            continue
-        serial = f"{ip}:{_DEFAULT_ADB_PORT}"
-        if _try_adb_connect_serial(adb, serial):
-            return _serial_to_display_ip(serial), "hotspot"
+    if hotspot_ips:
+        return hotspot_ips[0], "hotspot"
 
     return "", ""
 
