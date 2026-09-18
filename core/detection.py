@@ -1,15 +1,71 @@
 import os
+import threading
 
 import cv2
 import numpy as np
 from ultralytics import YOLO
 
-try:
-    model = YOLO("models/best.pt")
-    print("Custom model loaded")
-except Exception as e:
-    print("Fallback to default model:", e)
-    model = YOLO("yolov8n.pt")
+from core.detectors import (
+    DetectorSpec,
+    fallback_weights,
+    get_spec,
+    load_saved_detector_id,
+    resolve_detector_id,
+)
+
+_model_lock = threading.Lock()
+_model = None
+_loaded_id: str | None = None
+
+
+def active_detector() -> DetectorSpec:
+    return get_spec(resolve_detector_id(_loaded_id))
+
+
+def active_detector_info() -> dict:
+    spec = active_detector()
+    weights = spec.weights_path()
+    return {
+        "id": spec.id,
+        "name": spec.name,
+        "label": spec.label,
+        "description": spec.description,
+        "recommended": spec.recommended,
+        "weights": str(weights) if weights else "",
+        "loaded": _loaded_id == spec.id and _model is not None,
+    }
+
+
+def load_detector(detector_id: str | None = None) -> DetectorSpec:
+    """Load (or reload) a banana detector. Safe to call from the inference thread."""
+    global _model, _loaded_id
+
+    spec = get_spec(resolve_detector_id(detector_id or load_saved_detector_id()))
+    with _model_lock:
+        if _model is not None and _loaded_id == spec.id:
+            return spec
+
+        weights = spec.weights_path()
+        source = str(weights) if weights else str(fallback_weights())
+        try:
+            loaded = YOLO(source)
+            print(f"Detector loaded: {spec.name} ({source})")
+        except Exception as exc:
+            print(f"Failed to load {spec.name} from {source}: {exc}")
+            loaded = YOLO(str(fallback_weights()))
+            spec = get_spec("yolov8n")
+            print(f"Fallback detector loaded: {spec.name}")
+
+        _model = loaded
+        _loaded_id = spec.id
+        os.environ["AGRIVISION_DETECTOR"] = spec.id
+        return spec
+
+
+def get_model():
+    if _model is None:
+        load_detector()
+    return _model
 
 
 def _want_half() -> bool:
@@ -46,7 +102,8 @@ def _detect_on_image(frame: np.ndarray, offset_x: int = 0, offset_y: int = 0) ->
     conf_thresh = float(os.environ.get("AGRIVISION_DET_CONF", "0.30"))
     iou_thresh = float(os.environ.get("AGRIVISION_DET_IOU", "0.55"))
 
-    results = model.predict(
+    yolo = get_model()
+    results = yolo.predict(
         small,
         imgsz=eff_imgsz,
         conf=conf_thresh,
@@ -57,7 +114,7 @@ def _detect_on_image(frame: np.ndarray, offset_x: int = 0, offset_y: int = 0) ->
     )
 
     detections = []
-    names = model.names
+    names = yolo.names
     conf_min = float(os.environ.get("AGRIVISION_DET_MIN_CONF", "0.35"))
     min_area = int(os.environ.get("AGRIVISION_DET_MIN_AREA", "300"))
 

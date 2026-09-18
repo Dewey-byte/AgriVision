@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import time
 from datetime import datetime
@@ -31,6 +32,7 @@ from backend.session import SessionRecorder
 from backend.storage import SessionStorage
 from backend.exif_geo import import_drone_gps_detailed
 from backend.map_export import build_map_html, build_map_payload, write_map_html
+from backend.map_sync import LiveMapSync
 
 from ui.components.feed_panel import PrimaryFeedPanel
 from ui.components.sidebar import Sidebar
@@ -84,6 +86,7 @@ class MainWindow(QWidget):
         _apply_mirror_app_defaults()
 
         self._running = False
+        self._detection_paused = False
         self._last_frame_mono = None
         self._fps_ema = 0.0
         self._last_log_t = 0.0
@@ -137,6 +140,13 @@ class MainWindow(QWidget):
         self.sidebar.map_panel.manual_tag_removed.connect(self._on_manual_tag_removed)
         self.sidebar.map_panel.manual_tags_cleared.connect(self._on_manual_tags_cleared)
 
+        self._map_sync = LiveMapSync(Path("output/maps"))
+        self._map_sync_url = self._map_sync.start()
+        self._map_sync_timer = QTimer(self)
+        self._map_sync_timer.timeout.connect(self._drain_map_sync_events)
+        if self._map_sync_url:
+            self._map_sync_timer.start(200)
+
         if should_auto_detect_location():
             QTimer.singleShot(300, self._start_geo_detect)
         else:
@@ -147,7 +157,10 @@ class MainWindow(QWidget):
 
         self._infer = InferenceWorker()
         self._infer.ready.connect(self._on_inference_ready, type=Qt.QueuedConnection)
+        self._infer.detector_ready.connect(self._on_detector_ready, type=Qt.QueuedConnection)
+        self._infer.detector_failed.connect(self._on_detector_failed, type=Qt.QueuedConnection)
         self._infer.start()
+        self.sidebar.set_detector_busy(True, "Loading recommended detector…")
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
@@ -209,6 +222,7 @@ class MainWindow(QWidget):
         self.sidebar.mirror_start_requested.connect(self._on_mirror_start)
         self.sidebar.mirror_stop_requested.connect(self._on_mirror_stop)
         self.sidebar.android_ip_detect_requested.connect(self._start_android_ip_detect)
+        self.sidebar.detector_change_requested.connect(self._on_detector_change_requested)
 
         self._splitter.addWidget(self.feed)
         self._splitter.addWidget(self.sidebar)
@@ -218,6 +232,38 @@ class MainWindow(QWidget):
 
         self._apply_stylesheet()
         self._update_takeoff_controls()
+
+    def _on_detector_change_requested(self, detector_id: str) -> None:
+        from core.detectors import get_spec, save_detector_id
+
+        spec = get_spec(detector_id)
+        save_detector_id(spec.id)
+        self.sidebar.set_detector_busy(True, f"Loading {spec.name}…")
+        self.sidebar.add_log(log(f"Switching live detector to {spec.name}"))
+        self._infer.set_detector(spec.id)
+
+    def _on_detector_ready(self, info: dict) -> None:
+        from core.detectors import save_detector_id
+
+        save_detector_id(info.get("id") or "")
+        name = info.get("name") or "detector"
+        note = "recommended" if info.get("recommended") else "faster"
+        self.sidebar.set_detector_busy(False, f"Active: {name} ({note}). {info.get('description', '')}")
+        self.sidebar.add_log(log(f"Live detector ready: {name}"))
+        self._session.detector = {
+            "id": info.get("id"),
+            "name": info.get("name"),
+            "weights": info.get("weights"),
+        }
+        idx_ids = getattr(self.sidebar, "_detector_ids", [])
+        if info.get("id") in idx_ids:
+            self.sidebar.detector_combo.blockSignals(True)
+            self.sidebar.detector_combo.setCurrentIndex(idx_ids.index(info["id"]))
+            self.sidebar.detector_combo.blockSignals(False)
+
+    def _on_detector_failed(self, message: str) -> None:
+        self.sidebar.set_detector_busy(False, f"Could not load detector: {message}")
+        self.sidebar.add_log(log(f"Detector load failed: {message}"))
 
     def _update_takeoff_controls(self) -> None:
         ready = self.sidebar.video_id_ready()
@@ -304,17 +350,35 @@ class MainWindow(QWidget):
             self._cast_ok_streak = 0
 
         cast_ok = self._cast_ok_streak >= 3
-        processing_ok = bool(self._running and cast_ok)
+        processing_ok = bool(self._running and not self._detection_paused and cast_ok)
         self._set_status_dot(self._drone_dot, cast_ok)
         self._set_status_dot(self._processing_dot, processing_ok)
 
     def _on_toggle_feed(self):
         if self._running:
-            self.stop()
-        else:
-            if not self._ensure_video_id_for_takeoff():
-                return
-            self.start()
+            if self._detection_paused:
+                self._resume_detection()
+            else:
+                self._pause_detection()
+            return
+        if not self._ensure_video_id_for_takeoff():
+            return
+        self.start()
+
+    def _pause_detection(self) -> None:
+        """Keep the live mirror on screen; only stop YOLO / analysis."""
+        self._detection_paused = True
+        self._infer.set_active(False)
+        self._cached_dets = []
+        self.feed.set_running(True, paused=True)
+        self._set_status_dot(self._processing_dot, False)
+        self.sidebar.add_log(log("Detection paused — screen mirroring continues"))
+
+    def _resume_detection(self) -> None:
+        self._detection_paused = False
+        self._infer.set_active(True, reset=False)
+        self.feed.set_running(True, paused=False)
+        self.sidebar.add_log(log("Detection resumed"))
 
     def start(self):
         video_id = self.sidebar.normalized_video_id()
@@ -322,6 +386,7 @@ class MainWindow(QWidget):
             return
 
         self._running = True
+        self._detection_paused = False
         self._frame_n = 0
         self._cast_ok_streak = 0
         self._exclude_rect = None
@@ -352,12 +417,13 @@ class MainWindow(QWidget):
         self._capture_thread.set_title(self._capture_window_title)
         self._capture_thread.start_capture()
         self.timer.start(max(1, self._timer_ms))
-        self.feed.set_running(True)
+        self.feed.set_running(True, paused=False)
         self._set_status_dot(self._drone_dot, False)
         self._set_status_dot(self._processing_dot, False)
 
     def stop(self):
         self._running = False
+        self._detection_paused = False
         self._cast_ok_streak = 0
         self._infer.set_active(False)
         self.timer.stop()
@@ -409,6 +475,10 @@ class MainWindow(QWidget):
         try:
             if self._session_storage.active:
                 self._session_storage.finalize_session(self._session.to_dict())
+            if getattr(self, "_map_sync_timer", None) is not None:
+                self._map_sync_timer.stop()
+            if getattr(self, "_map_sync", None) is not None:
+                self._map_sync.stop()
             if getattr(self, "_capture_thread", None) is not None:
                 self._capture_thread.stop_capture()
             if getattr(self, "_geo_worker", None) is not None and self._geo_worker.isRunning():
@@ -422,6 +492,8 @@ class MainWindow(QWidget):
             super().closeEvent(event)
 
     def _on_inference_ready(self, dets, stress_map, summary, vegetation):
+        if self._detection_paused:
+            return
         self._cached_dets = dets
         if stress_map is not None:
             self._last_stress = stress_map
@@ -618,14 +690,17 @@ class MainWindow(QWidget):
         if save_captured_jpg:
             cv2.imwrite("captured_frame.jpg", annotated)
 
-        capture_dir = self._session_storage.capture_dir()
+        reports_dir = self._session_storage.paths.captures
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        session_capture_dir = self._session_storage.capture_dir()
         capture_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+        detector = self._detector_for_export()
 
         paths = export_field_report(
             annotated,
             detections,
             self._last_stress,
-            out_dir=capture_dir,
+            out_dir=reports_dir,
             video_source=self.sidebar.video_source(),
             geo=self.sidebar.geo_tag(),
             session=self._session.to_dict(),
@@ -638,8 +713,52 @@ class MainWindow(QWidget):
             geo_markers=self._session.geo_markers,
             field_bounds=self._field_bounds_for_session(),
             manual_tags=self._session.manual_tags,
+            detector=detector,
         )
+        self._copy_export_into_session(paths, session_capture_dir, reports_dir)
         return paths
+
+    def _detector_for_export(self) -> dict:
+        detector = dict(self._session.detector or {})
+        if detector.get("name") or detector.get("id"):
+            return detector
+        try:
+            from core.detection import active_detector_info
+
+            info = active_detector_info()
+        except Exception:
+            return detector
+        filled = {
+            "id": info.get("id") or "",
+            "name": info.get("name") or "",
+            "weights": info.get("weights") or "",
+        }
+        if filled.get("name") or filled.get("id"):
+            self._session.detector = filled
+            return filled
+        return detector
+
+    def _copy_export_into_session(
+        self,
+        paths: dict[str, str],
+        session_dir: Path,
+        reports_dir: Path,
+    ) -> None:
+        """Keep a session-local copy; the dashboard always reads output/reports."""
+        try:
+            if session_dir.resolve() == reports_dir.resolve():
+                return
+        except OSError:
+            return
+        session_dir.mkdir(parents=True, exist_ok=True)
+        for src in paths.values():
+            src_path = Path(src)
+            if not src_path.is_file():
+                continue
+            try:
+                shutil.copy2(src_path, session_dir / src_path.name)
+            except OSError:
+                pass
 
     def _log_export_paths(self, paths: dict[str, str]) -> None:
         self.sidebar.add_log(f"Report JSON: {paths.get('json', '')}")
@@ -679,13 +798,20 @@ class MainWindow(QWidget):
             self.sidebar.btn_export_report.setEnabled(True)
 
     def capture_frame(self):
-        paths = self._run_field_report_export(save_captured_jpg=True)
-        if not paths:
-            self.sidebar.add_log("Capture skipped (no frame)")
-            return
-        self.sidebar.add_log("Frame captured and saved as captured_frame.jpg")
-        self._log_export_paths(paths)
-        self.feed.set_last_updated(f"Last updated: {self._clock_str()}")
+        self.feed.btn_capture.setEnabled(False)
+        try:
+            paths = self._run_field_report_export(save_captured_jpg=True)
+            if not paths:
+                self.sidebar.add_log("Capture skipped (no frame)")
+                self.feed.show_capture_failed("Capture skipped — start the live feed first")
+                return
+            saved = Path(paths.get("json") or paths.get("frame") or "output/reports")
+            self.sidebar.add_log("Frame captured and saved as captured_frame.jpg")
+            self._log_export_paths(paths)
+            self.feed.set_last_updated(f"Last updated: {self._clock_str()}")
+            self.feed.show_capture_saved(f"{saved.name}  ·  {self._clock_str()}")
+        finally:
+            self.feed.btn_capture.setEnabled(True)
 
     def _start_geo_detect(self) -> None:
         if self._geo_worker.isRunning():
@@ -765,6 +891,7 @@ class MainWindow(QWidget):
         self.sidebar.set_field_bounds_quiet(south, west, north, east)
         self._session.heatmap_points = []
         self.sidebar.add_log(log("Field area set on map."))
+        self._refresh_leaflet_map()
 
     def _on_field_area_cleared(self) -> None:
         self.sidebar.clear_field_bounds()
@@ -779,6 +906,7 @@ class MainWindow(QWidget):
         self.sidebar.add_log(
             log(f"Manual tag: {labels.get(category, category)} at {lat:.6f}, {lon:.6f}")
         )
+        self._refresh_leaflet_map()
 
     def _on_manual_tag_removed(self, lat: float, lon: float, category: str) -> None:
         if self._session.remove_manual_tag(lat, lon, category):
@@ -787,8 +915,7 @@ class MainWindow(QWidget):
             self.sidebar.add_log(
                 log(f"Removed tag: {labels.get(category, category)} at {lat:.6f}, {lon:.6f}")
             )
-            if not self._session.manual_tags:
-                self._refresh_leaflet_map()
+            self._refresh_leaflet_map()
 
     def _on_manual_tags_cleared(self) -> None:
         self._session.clear_manual_tags()
@@ -804,7 +931,7 @@ class MainWindow(QWidget):
             heat_points=self._session.heatmap_for_display(),
             markers=[],
             manual_tags=self._session.manual_tags,
-            field_bounds=self._field_bounds_for_session(),
+            field_bounds=self.sidebar.field_bounds(),
             accuracy_m=geo.accuracy_m,
             altitude_m=geo.altitude_m,
             source=geo.source,
@@ -821,13 +948,19 @@ class MainWindow(QWidget):
             heat_points=map_data["heatPoints"],
             markers=[],
             manual_tags=self._session.manual_tags,
-            field_bounds=self._field_bounds_for_session(),
+            field_bounds=self.sidebar.field_bounds(),
             accuracy_m=geo.accuracy_m,
             altitude_m=geo.altitude_m,
             source=geo.source,
+            sync_base_url=getattr(self, "_map_sync_url", None),
         )
         path = write_map_html(html, "output/maps/live_map.html")
         self.sidebar.map_panel.set_map_file(path)
+        if self._map_sync is not None and self._map_sync.base_url:
+            self._map_sync.publish(map_data)
+            self.sidebar.map_panel.set_browser_url(
+                self._map_sync.base_url.rstrip("/") + "/live_map.html"
+            )
         return Path(path)
 
     def _on_open_dashboard(self) -> None:
@@ -900,7 +1033,69 @@ class MainWindow(QWidget):
     def _open_map_in_browser(self) -> None:
         map_data = self._map_payload()
         self._write_live_map_file(map_data)
-        self.sidebar.map_panel.open_in_browser()
+        url = None
+        if self._map_sync is not None and self._map_sync.base_url:
+            url = self._map_sync.base_url.rstrip("/") + "/live_map.html"
+            self.sidebar.add_log(log(f"Field map: {url}"))
+        self.sidebar.map_panel.open_in_browser(url)
+
+    def _drain_map_sync_events(self) -> None:
+        if self._map_sync is None:
+            return
+        events = self._map_sync.drain_events()
+        if not events:
+            return
+        changed = False
+        labels = {"healthy": "Healthy", "stressed": "Moderate", "diseased": "High stress"}
+        for ev in events:
+            typ = str(ev.get("type") or "")
+            try:
+                if typ == "tag_added":
+                    lat, lon = float(ev["lat"]), float(ev["lon"])
+                    category = str(ev["category"])
+                    before = len(self._session.manual_tags)
+                    self._session.add_manual_tag(lat, lon, category)
+                    if len(self._session.manual_tags) != before:
+                        self.sidebar.add_log(
+                            log(
+                                f"Manual tag: {labels.get(category, category)} at {lat:.6f}, {lon:.6f}"
+                            )
+                        )
+                    changed = True
+                elif typ == "tag_removed":
+                    lat, lon = float(ev["lat"]), float(ev["lon"])
+                    category = str(ev["category"])
+                    if self._session.remove_manual_tag(lat, lon, category):
+                        self.sidebar.add_log(
+                            log(
+                                f"Removed tag: {labels.get(category, category)} at {lat:.6f}, {lon:.6f}"
+                            )
+                        )
+                        changed = True
+                elif typ == "tags_cleared":
+                    self._session.clear_manual_tags()
+                    self.sidebar.add_log(log("Manual tags cleared."))
+                    changed = True
+                elif typ == "field_drawn":
+                    self.sidebar.set_field_bounds_quiet(
+                        float(ev["south"]),
+                        float(ev["west"]),
+                        float(ev["north"]),
+                        float(ev["east"]),
+                    )
+                    self._session.heatmap_points = []
+                    self.sidebar.add_log(log("Field area set on map."))
+                    changed = True
+                elif typ == "field_cleared":
+                    self.sidebar.clear_field_bounds()
+                    self._session.heatmap_points = []
+                    self.sidebar.add_log(log("Field area cleared."))
+                    changed = True
+            except (KeyError, TypeError, ValueError):
+                continue
+        if changed:
+            self.sidebar.set_manual_tag_status(len(self._session.manual_tags))
+            self._refresh_leaflet_map()
 
     def _refresh_leaflet_map(self) -> None:
         map_data = self._map_payload()
@@ -949,14 +1144,18 @@ class MainWindow(QWidget):
             fps = int(round(self._fps_ema)) if self._fps_ema else 0
             self.feed.set_fps_text(f"Real-time Processing • {fps} FPS")
 
-        if analyzable and self._frame_n % self._infer_every == 0:
+        if self._detection_paused:
+            detections = []
+        elif analyzable and self._frame_n % self._infer_every == 0:
             self._infer.submit(self._infer_frame(raw_capture))
+            detections = self._cached_dets
         elif not analyzable:
             self._cached_dets = []
+            detections = []
             if (self._frame_n % 45) == 0:
                 self.sidebar.add_log(log("Waiting for live banana leaf video…"))
-
-        detections = self._cached_dets if analyzable else []
+        else:
+            detections = self._cached_dets if analyzable else []
 
         grid_on = (os.environ.get("AGRIVISION_GRID") or "1").strip().lower() not in (
             "0",
@@ -975,25 +1174,26 @@ class MainWindow(QWidget):
         if (self._frame_n % 12) == 0:
             self.feed._fit_landscape_display()
 
-        healthy = stressed = diseased = 0
-        for det in detections:
-            c = detection_category(det.get("label", ""))
-            if c == "none":
-                continue
-            if c == "diseased":
-                diseased += 1
-            elif c == "stressed":
-                stressed += 1
-            else:
-                healthy += 1
-        total = len(detections)
-        self.sidebar.update_stats(total, healthy, stressed, diseased)
+        if not self._detection_paused:
+            healthy = stressed = diseased = 0
+            for det in detections:
+                c = detection_category(det.get("label", ""))
+                if c == "none":
+                    continue
+                if c == "diseased":
+                    diseased += 1
+                elif c == "stressed":
+                    stressed += 1
+                else:
+                    healthy += 1
+            total = len(detections)
+            self.sidebar.update_stats(total, healthy, stressed, diseased)
 
-        now_wall = time.time()
-        if total != self._last_det_total or now_wall - self._last_log_t >= 3.0:
-            self._last_det_total = total
-            self._last_log_t = now_wall
-            self.sidebar.add_log(log(f"{total} object(s) in frame"))
+            now_wall = time.time()
+            if total != self._last_det_total or now_wall - self._last_log_t >= 3.0:
+                self._last_det_total = total
+                self._last_log_t = now_wall
+                self.sidebar.add_log(log(f"{total} object(s) in frame"))
 
         self._update_cast_status(self._live_cached)
         self._frame_n += 1

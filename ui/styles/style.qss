@@ -109,6 +109,46 @@ QLabel#lastUpdated {
     color: #6b7f70;
 }
 
+QLabel#captureSaved {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1b4332;
+    background-color: #d8f3dc;
+    border: 1px solid #95d5b2;
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+QLabel#captureFailed {
+    font-size: 12px;
+    font-weight: 600;
+    color: #9b2226;
+    background-color: #f8d7da;
+    border: 1px solid #e07a7a;
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+QPushButton#btnCaptureSaved {
+    background-color: #2d6a4f;
+    color: #f8faf7;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 700;
+    min-width: 150px;
+}
+
+QPushButton#btnCaptureFailed {
+    background-color: #bc4749;
+    color: #f8faf7;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 700;
+    min-width: 150px;
+}
+
 QPushButton#btnPrimary {
     background-color: #2d6a4f;
     color: #f8faf7;
@@ -318,6 +358,7 @@ QTextEdit#activityLog {
 
 QComboBox#mirrorOsCombo,
 QComboBox#mirrorQualityCombo,
+QComboBox#detectorCombo,
 QLineEdit#androidIpEdit {
     border: 1px solid #c8dcc9;
     border-radius: 9px;
@@ -328,18 +369,21 @@ QLineEdit#androidIpEdit {
 
 QComboBox#mirrorOsCombo:hover,
 QComboBox#mirrorQualityCombo:hover,
+QComboBox#detectorCombo:hover,
 QLineEdit#androidIpEdit:hover {
     border-color: #52b788;
 }
 
 QComboBox#mirrorOsCombo:focus,
 QComboBox#mirrorQualityCombo:focus,
+QComboBox#detectorCombo:focus,
 QLineEdit#androidIpEdit:focus {
     border-color: #40916c;
 }
 
 QComboBox#mirrorOsCombo::drop-down,
-QComboBox#mirrorQualityCombo::drop-down {
+QComboBox#mirrorQualityCombo::drop-down,
+QComboBox#detectorCombo::drop-down {
     border: none;
     width: 22px;
 }

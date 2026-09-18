@@ -49,8 +49,8 @@ OBJECTIVES: list[dict[str, Any]] = [
         "frontend_pct": 100,
         "status": "partial",
         "implemented": [
-            "YOLOv8 inference service",
-            "Custom banana disease weights (models/best.pt)",
+            "YOLO inference service with in-app detector switch (YOLOv9s default, YOLOv9t compact, YOLOv8n faster)",
+            "Custom banana disease weights under models/ (yolov9s_banana.pt, yolov9t_banana.pt, yolov8n_banana.pt)",
             "Background inference worker",
             "Detection summary in UI",
             "Held-out test/val metrics pipeline (backend/validation_metrics.py)",
@@ -102,7 +102,7 @@ def get_defense_status() -> dict[str, Any]:
         "architecture": {
             "frontend": "PyQt5 desktop UI (live feed, sidebar, controls)",
             "backend": "Python services: capture → preprocess → YOLO → report",
-            "persistence": "output/reports/, captured_frame.jpg, models/best.pt",
+            "persistence": "output/reports/, captured_frame.jpg, models/*.pt",
         },
     }
 

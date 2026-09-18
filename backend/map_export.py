@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from html import escape
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +19,7 @@ _CATEGORY_COLOR = CATEGORY_COLOR_HEX
 _CATEGORY_HEAT = CATEGORY_HEAT
 _CATEGORY_LABEL = CATEGORY_LABEL
 
-_MAP_JS_VERSION = 7
+_MAP_JS_VERSION = 11
 
 
 def manual_tags_to_heat_points(
@@ -26,14 +27,19 @@ def manual_tags_to_heat_points(
     *,
     spread: float = 0.000028,
 ) -> list[list[float]]:
-    """Convert manually tagged map pins into leaflet.heat points."""
+    """Convert stressed/diseased pins into leaflet.heat points.
+
+    Healthy tags stay as markers only — no intensity radius.
+    """
     if not tags:
         return []
     points: list[list[float]] = []
     for tag in tags:
+        cat = str(tag.get("category") or "healthy")
+        if cat not in ("stressed", "diseased"):
+            continue
         lat = float(tag["lat"])
         lon = float(tag["lon"])
-        cat = str(tag.get("category") or "healthy")
         weight = float(_CATEGORY_HEAT.get(cat, 0.5))
         points.append([round(lat, 7), round(lon, 7), round(weight, 3)])
         for dlat, dlon in ((spread, 0), (-spread, 0), (0, spread), (0, -spread)):
@@ -59,6 +65,33 @@ _MAP_DRAW_JS = """
     let drawMode = false;
     let drawCorner1 = null;
     let drawCornerMarker = null;
+    let drawPreview = null;
+
+    function clearDrawGuides() {
+      drawCorner1 = null;
+      if (drawCornerMarker != null) {
+        map.removeLayer(drawCornerMarker);
+        drawCornerMarker = null;
+      }
+      if (drawPreview != null) {
+        map.removeLayer(drawPreview);
+        drawPreview = null;
+      }
+    }
+
+    function syncDrawChrome() {
+      const cursor = drawMode ? 'crosshair'
+        : (typeof tagMode !== 'undefined' && tagMode ? 'crosshair'
+        : (typeof removeTagMode !== 'undefined' && removeTagMode ? 'pointer' : ''));
+      map.getContainer().style.cursor = cursor;
+      if (drawMode) map.dragging.disable();
+      else map.dragging.enable();
+      const btn = document.getElementById('drawFieldBtn');
+      if (btn) {
+        btn.textContent = drawMode ? 'Click 2 corners…' : 'Draw field area';
+        btn.style.background = drawMode ? '#d4a373' : '#1b4332';
+      }
+    }
 
     function renderFieldBounds(bounds, fitView) {
       if (fieldRect != null) {
@@ -82,26 +115,19 @@ _MAP_DRAW_JS = """
 
     window.agriVisionEnableDrawMode = function(on) {
       drawMode = !!on;
-      drawCorner1 = null;
-      if (drawCornerMarker != null) {
-        map.removeLayer(drawCornerMarker);
-        drawCornerMarker = null;
+      clearDrawGuides();
+      if (on) {
+        if (typeof tagMode !== 'undefined') tagMode = null;
+        if (typeof removeTagMode !== 'undefined') removeTagMode = false;
+        if (typeof styleTagButtons === 'function') styleTagButtons(null);
       }
-      if (on && typeof window.agriVisionSetTagMode === 'function') {
-        window.agriVisionSetTagMode(null);
-      }
-      map.getContainer().style.cursor = drawMode ? 'crosshair' : '';
-      const btn = document.getElementById('drawFieldBtn');
-      if (btn) {
-        btn.textContent = drawMode ? 'Click 2 corners…' : 'Draw field area';
-        btn.style.background = drawMode ? '#d4a373' : '#1b4332';
-      }
+      syncDrawChrome();
     };
 
     function finishFieldDraw(corner1, corner2) {
       const bounds = L.latLngBounds(corner1, corner2);
-      if (bounds.getNorth() - bounds.getSouth() < 1e-6) return;
-      if (bounds.getEast() - bounds.getWest() < 1e-6) return;
+      if (bounds.getNorth() - bounds.getSouth() < 1e-6) return false;
+      if (bounds.getEast() - bounds.getWest() < 1e-6) return false;
       const payload = {
         south: bounds.getSouth(),
         west: bounds.getWest(),
@@ -111,11 +137,19 @@ _MAP_DRAW_JS = """
       window.__agriVisionFieldBounds = payload;
       renderFieldBounds(payload, true);
       window.agriVisionEnableDrawMode(false);
+      if (typeof markLocalMapMutate === 'function') markLocalMapMutate();
       if (window.agriVisionBridge && window.agriVisionBridge.onFieldAreaDrawn) {
         window.agriVisionBridge.onFieldAreaDrawn(
           payload.south, payload.west, payload.north, payload.east
         );
+      } else if (typeof postSyncEvent === 'function') {
+        postSyncEvent({
+          type: 'field_drawn',
+          south: payload.south, west: payload.west,
+          north: payload.north, east: payload.east
+        });
       }
+      return true;
     }
 
     window.agriVisionHandleMapClick = function(lat, lon) {
@@ -130,11 +164,6 @@ _MAP_DRAW_JS = """
           return;
         }
         finishFieldDraw(drawCorner1, latlng);
-        drawCorner1 = null;
-        if (drawCornerMarker != null) {
-          map.removeLayer(drawCornerMarker);
-          drawCornerMarker = null;
-        }
         return;
       }
       if (tagMode && typeof addManualTag === 'function') {
@@ -142,15 +171,44 @@ _MAP_DRAW_JS = """
       }
     };
 
+    map.on('mousemove', (e) => {
+      if (!drawMode || !drawCorner1) {
+        if (drawPreview != null) {
+          map.removeLayer(drawPreview);
+          drawPreview = null;
+        }
+        return;
+      }
+      const bounds = L.latLngBounds(drawCorner1, e.latlng);
+      if (drawPreview != null) {
+        drawPreview.setBounds(bounds);
+      } else {
+        drawPreview = L.rectangle(bounds, {
+          color: '#d4a373', weight: 2, dashArray: '6 4', fillColor: '#d4a373', fillOpacity: 0.08
+        }).addTo(map);
+      }
+    });
+
     document.getElementById('drawFieldBtn').addEventListener('click', (ev) => {
-      ev.stopPropagation();
+      L.DomEvent.stop(ev);
       window.agriVisionEnableDrawMode(!drawMode);
     });
     document.getElementById('clearFieldBtn').addEventListener('click', (ev) => {
-      ev.stopPropagation();
+      L.DomEvent.stop(ev);
+      window.agriVisionEnableDrawMode(false);
       window.agriVisionSetFieldBounds(null, false);
+      if (typeof markLocalMapMutate === 'function') markLocalMapMutate();
       if (window.agriVisionBridge && window.agriVisionBridge.onFieldAreaCleared) {
         window.agriVisionBridge.onFieldAreaCleared();
+      } else if (typeof postSyncEvent === 'function') {
+        postSyncEvent({type: 'field_cleared'});
+      }
+    });
+    ['mapToolbar', 'fieldToolbar'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        L.DomEvent.disableClickPropagation(el);
+        L.DomEvent.disableScrollPropagation(el);
       }
     });
 """
@@ -160,8 +218,19 @@ _MAP_TAG_JS = """
     let removeTagMode = false;
     let manualTags = [];
     let tagIdCounter = 0;
+    let lastLocalMutateAt = 0;
     const manualTagLayer = L.layerGroup().addTo(map);
     const manualHeatLayer = L.layerGroup().addTo(map);
+
+    function markLocalMapMutate() {
+      lastLocalMutateAt = Date.now();
+    }
+
+    function postSyncEvent(event) {
+      if (typeof window.agriVisionPostSyncEvent === 'function') {
+        window.agriVisionPostSyncEvent(event);
+      }
+    }
 
     function raiseManualTagLayers() {
       manualTagLayer.eachLayer(layer => {
@@ -233,12 +302,14 @@ _MAP_TAG_JS = """
     function updateManualHeatVisual(tags) {
       manualHeatLayer.clearLayers();
       tags.forEach(t => {
+        if (t.category !== 'stressed' && t.category !== 'diseased') return;
         const c = tagColor(t.category);
+        const radius = t.category === 'diseased' ? 28 : 22;
         L.circle([t.lat, t.lon], {
-          radius: 22,
+          radius: radius,
           color: c,
           fillColor: c,
-          fillOpacity: 0.35,
+          fillOpacity: t.category === 'diseased' ? 0.38 : 0.32,
           weight: 1,
           opacity: 0.9
         }).addTo(manualHeatLayer);
@@ -273,9 +344,12 @@ _MAP_TAG_JS = """
 
     window.agriVisionSetTagMode = function(category) {
       tagMode = category || null;
-      if (tagMode) removeTagMode = false;
-      drawMode = false;
-      map.getContainer().style.cursor = tagMode ? 'crosshair' : (removeTagMode ? 'pointer' : '');
+      if (tagMode) {
+        removeTagMode = false;
+        if (drawMode) window.agriVisionEnableDrawMode(false);
+      }
+      if (typeof syncDrawChrome === 'function') syncDrawChrome();
+      else map.getContainer().style.cursor = tagMode ? 'crosshair' : (removeTagMode ? 'pointer' : '');
       styleTagButtons(tagMode);
     };
 
@@ -283,9 +357,10 @@ _MAP_TAG_JS = """
       removeTagMode = !!on;
       if (removeTagMode) {
         tagMode = null;
-        drawMode = false;
+        if (drawMode) window.agriVisionEnableDrawMode(false);
       }
-      map.getContainer().style.cursor = removeTagMode ? 'pointer' : '';
+      if (typeof syncDrawChrome === 'function') syncDrawChrome();
+      else map.getContainer().style.cursor = removeTagMode ? 'pointer' : '';
       styleTagButtons(null);
     };
 
@@ -296,8 +371,14 @@ _MAP_TAG_JS = """
       manualTags.splice(idx, 1);
       renderManualTags(manualTags);
       map.closePopup();
+      markLocalMapMutate();
       if (window.agriVisionBridge && window.agriVisionBridge.onManualTagRemoved) {
         window.agriVisionBridge.onManualTagRemoved(removed.lat, removed.lon, removed.category);
+      } else {
+        postSyncEvent({
+          type: 'tag_removed',
+          lat: removed.lat, lon: removed.lon, category: removed.category
+        });
       }
     }
 
@@ -324,8 +405,11 @@ _MAP_TAG_JS = """
       makeTagMarker(tag).addTo(manualTagLayer);
       syncHeatLayer();
       raiseManualTagLayers();
+      markLocalMapMutate();
       if (window.agriVisionBridge && window.agriVisionBridge.onManualTagAdded) {
         window.agriVisionBridge.onManualTagAdded(lat, lon, category);
+      } else {
+        postSyncEvent({type: 'tag_added', lat: lat, lon: lon, category: category});
       }
     }
 
@@ -366,6 +450,54 @@ _MAP_TAG_JS = """
       window.agriVisionSetRemoveTagMode(!removeTagMode);
     });
     styleTagButtons(null);
+"""
+
+_MAP_SYNC_JS = """
+    window.agriVisionPostSyncEvent = function(event) {
+      const base = window.AGRIVISION_SYNC_BASE || '';
+      if (!base || !event) return;
+      try {
+        fetch(base + '/api/event', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(event),
+          cache: 'no-store'
+        }).catch(function() {});
+      } catch (e) {}
+    };
+
+    (function startLiveMapSync() {
+      const base = window.AGRIVISION_SYNC_BASE || '';
+      if (!base) return;
+      let lastVersion = -1;
+      let lastKey = '';
+      function stateKey(payload) {
+        const tags = (payload.manualTags || []).map(function(t) {
+          return [Number(t.lat).toFixed(7), Number(t.lon).toFixed(7), String(t.category || '')].join(',');
+        }).sort().join(';');
+        const b = payload.fieldBounds;
+        const bounds = b ? [b.south, b.west, b.north, b.east].join(',') : '';
+        return tags + '|' + bounds;
+      }
+      function pull() {
+        if (typeof lastLocalMutateAt === 'number' && Date.now() - lastLocalMutateAt < 1000) return;
+        fetch(base + '/api/state', {cache: 'no-store'})
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .then(function(data) {
+            if (!data || !data.payload) return;
+            if (data.version === lastVersion) return;
+            if (typeof lastLocalMutateAt === 'number' && Date.now() - lastLocalMutateAt < 1000) return;
+            const key = stateKey(data.payload);
+            lastVersion = data.version;
+            if (key === lastKey) return;
+            lastKey = key;
+            if (window.agriVisionUpdateMap) window.agriVisionUpdateMap(data.payload);
+          })
+          .catch(function() {});
+      }
+      setInterval(pull, 400);
+      setTimeout(pull, 250);
+    })();
 """
 
 
@@ -418,6 +550,8 @@ def build_map_html(
     source: str = "",
     title: str = "AgriVision — Field Stress Map",
     interactive: bool = True,
+    sync_base_url: str | None = None,
+    model_name: str = "",
 ) -> str:
     """Build a standalone Leaflet HTML page with heat layer and geo markers."""
     payload = build_map_payload(
@@ -435,6 +569,7 @@ def build_map_html(
     draw_toolbar = ""
     draw_script = ""
     qwebchannel_script = ""
+    sync_script = ""
     if interactive:
         draw_toolbar = """
   <div id="mapToolbar" style="position:absolute;top:10px;left:10px;z-index:1000;display:flex;gap:6px;flex-wrap:wrap;max-width:70%;pointer-events:auto;">
@@ -457,13 +592,31 @@ def build_map_html(
     }
   </script>"""
         draw_script = _MAP_DRAW_JS + _MAP_TAG_JS
+        if sync_base_url:
+            sync_script = (
+                f"    window.AGRIVISION_SYNC_BASE = {json.dumps(sync_base_url.rstrip('/'))};\n"
+                + _MAP_SYNC_JS
+            )
+
+    model = (model_name or "").strip()
+    if model:
+        title = f"{title} · {model}"
+    safe_title = escape(title)
+    model_caption = ""
+    if model:
+        model_caption = (
+            '<div id="modelCaption" style="position:absolute;bottom:16px;left:12px;z-index:1000;'
+            "background:rgba(27,67,50,.9);color:#fff;padding:8px 12px;border-radius:8px;"
+            'font:13px/1.3 system-ui,sans-serif;pointer-events:none;">'
+            f"Model: {escape(model)}</div>"
+        )
 
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{title}</title>
+  <title>{safe_title}</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     html, body, #map {{ margin: 0; height: 100%; width: 100%; }}
@@ -472,6 +625,7 @@ def build_map_html(
 </head>
 <body>
   <div id="map"></div>
+  {model_caption}
   {draw_toolbar}
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
@@ -553,8 +707,8 @@ def build_map_html(
         }}).addTo(map).bindPopup('GPS accuracy radius');
       }}
 
-      if (payload.fieldBounds) {{
-        window.agriVisionSetFieldBounds && window.agriVisionSetFieldBounds(payload.fieldBounds, false);
+      if (!(typeof drawMode !== 'undefined' && drawMode) && window.agriVisionSetFieldBounds) {{
+        window.agriVisionSetFieldBounds(payload.fieldBounds || null, false);
       }}
 
       if (heatLayer == null) {{
@@ -605,6 +759,7 @@ def build_map_html(
     }};
 
     {draw_script}
+    {sync_script}
 
     window.agriVisionUpdateMap(initialPayload);
     if (initialPayload.fieldBounds) {{
@@ -631,6 +786,7 @@ def export_leaflet_map(
     heat_points: list[list[float]] | None = None,
     manual_tags: list[dict[str, Any]] | None = None,
     field_bounds: FieldBounds | None = None,
+    model_name: str = "",
 ) -> Path:
     html = build_map_html(
         center_lat=center.latitude,
@@ -643,5 +799,6 @@ def export_leaflet_map(
         altitude_m=center.altitude_m,
         source=center.source,
         interactive=False,
+        model_name=model_name,
     )
     return write_map_html(html, out_path)

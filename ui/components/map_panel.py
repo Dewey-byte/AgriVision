@@ -69,6 +69,7 @@ class MapPanel(QWidget):
         super().__init__(parent)
         self.setObjectName("leafletMapPanel")
         self._last_path = Path("output/maps/live_map.html")
+        self._browser_url: str | None = None
         self._view = None
         self._html_loaded = False
         self._pending_draw = False
@@ -188,6 +189,13 @@ class MapPanel(QWidget):
     def set_map_file(self, path: Path) -> None:
         self._last_path = Path(path).resolve()
 
-    def open_in_browser(self) -> None:
+    def set_browser_url(self, url: str | None) -> None:
+        self._browser_url = url
+
+    def open_in_browser(self, url: str | None = None) -> None:
+        target = url or self._browser_url
+        if target:
+            webbrowser.open(target)
+            return
         if self._last_path.is_file():
             webbrowser.open(self._last_path.resolve().as_uri())

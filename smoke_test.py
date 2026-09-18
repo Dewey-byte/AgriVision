@@ -44,6 +44,7 @@ def main() -> int:
         "backend.exif_geo",
         "backend.storage",
         "backend.map_export",
+        "backend.map_sync",
         "backend.validation_metrics",
     ]
     for mod in modules:
@@ -122,6 +123,15 @@ def main() -> int:
     check("draw_boxes with det", lambda: draw_boxes(frame.copy(), dets))
 
     from core.detection import run_detection
+    from core.detectors import DEFAULT_DETECTOR_ID, available_detectors, get_spec
+
+    specs = available_detectors()
+    check("detector catalog non-empty", lambda: len(specs) >= 1)
+    check("yolov9s is default", lambda: DEFAULT_DETECTOR_ID == "yolov9s")
+    check(
+        "recommended detector has weights",
+        lambda: get_spec("yolov9s").available() or get_spec("yolov8n").available(),
+    )
     from backend.pipeline import AnalysisPipeline
     from backend.report import export_field_report
     from backend.status import get_defense_status
@@ -155,7 +165,7 @@ def main() -> int:
         manual_tag_record(geo.latitude + 0.0001, geo.longitude, "diseased"),
     ]
     manual_heat = manual_tags_to_heat_points(manual)
-    check("manual_tags_to_heat_points", lambda: len(manual_heat) >= len(manual))
+    check("manual_tags_to_heat_points", lambda: len(manual_heat) >= 1)
 
     from backend.geo import should_auto_detect_location
 
@@ -168,6 +178,52 @@ def main() -> int:
         markers=markers,
     )
     check("build_map_html", lambda: "leaflet" in html.lower() and "heatLayer" in html)
+
+    live_html = build_map_html(
+        center_lat=geo.latitude,
+        center_lon=geo.longitude,
+        heat_points=heat_pts,
+        markers=markers,
+        sync_base_url="http://127.0.0.1:8765",
+    )
+    check("build_map_html sync", lambda: "AGRIVISION_SYNC_BASE" in live_html and "/api/state" in live_html)
+
+    from backend.map_sync import LiveMapSync
+    import urllib.request
+
+    def _map_sync_roundtrip() -> None:
+        import json
+
+        sync = LiveMapSync(Path("output/_smoke_test"))
+        url = sync.start()
+        try:
+            if not url:
+                raise AssertionError("sync server failed to start")
+            sync.publish({"manualTags": [{"lat": 1.0, "lon": 2.0, "category": "diseased"}]})
+            with urllib.request.urlopen(url + "/api/state", timeout=2) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            if data.get("version", 0) < 1:
+                raise AssertionError("state version not published")
+            if not data.get("payload", {}).get("manualTags"):
+                raise AssertionError("manual tags missing from state")
+            req = urllib.request.Request(
+                url + "/api/event",
+                data=json.dumps(
+                    {"type": "tag_added", "lat": 1.1, "lon": 2.2, "category": "healthy"}
+                ).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=2) as resp:
+                if resp.status not in (200, 202):
+                    raise AssertionError(f"unexpected POST status {resp.status}")
+            events = sync.drain_events()
+            if not any(e.get("type") == "tag_added" for e in events):
+                raise AssertionError("posted tag event was not queued")
+        finally:
+            sync.stop()
+
+    check("live map sync server", _map_sync_roundtrip)
 
     paths = export_field_report(
         frame,
@@ -269,6 +325,14 @@ def main() -> int:
     check("MainWindow init", lambda: win is not None)
     check("video_source default", lambda: win.sidebar.video_source() == "scrcpy")
     check("mirror quality default", lambda: win.sidebar.mirror_quality() in ("balanced", "high", "max"))
+    check(
+        "detector combo has yolov9s",
+        lambda: "yolov9s" in getattr(win.sidebar, "_detector_ids", []),
+    )
+    check(
+        "detector combo has yolov9t",
+        lambda: "yolov9t" in getattr(win.sidebar, "_detector_ids", []),
+    )
 
     win.start()
     for _ in range(5):

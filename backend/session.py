@@ -66,6 +66,8 @@ class SessionRecorder:
 
     last_geo: dict[str, Any] = field(default_factory=dict)
 
+    detector: dict[str, Any] = field(default_factory=dict)
+
     _max_heat_points: int = field(
         default_factory=lambda: int(os.environ.get("AGRIVISION_MAX_HEAT_POINTS", "900"))
     )
@@ -271,6 +273,8 @@ class SessionRecorder:
             "manual_tags": list(self.manual_tags),
 
             "last_geo": self.last_geo,
+
+            "detector": dict(self.detector),
 
         }
 

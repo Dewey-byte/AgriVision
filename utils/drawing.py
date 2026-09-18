@@ -134,3 +134,39 @@ def draw_boxes(frame, detections):
         )
 
     return frame
+
+
+def draw_model_banner(frame, model_name: str):
+    """Stamp the live detector name onto an exported report frame."""
+    name = (model_name or "").strip()
+    if not name:
+        return frame
+    if not frame.flags["C_CONTIGUOUS"]:
+        frame = np.ascontiguousarray(frame)
+
+    text = f"Model: {name}"
+    w = frame.shape[1]
+    scale = max(0.55, min(0.95, w / 980.0))
+    thickness = 2 if w >= 640 else 1
+    (tw, th), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, scale, thickness)
+    pad = 8
+    x, y = 12, 12
+    cv2.rectangle(
+        frame,
+        (x, y),
+        (min(w - 8, x + tw + 2 * pad), y + th + 2 * pad),
+        (27, 67, 50),
+        -1,
+        cv2.LINE_AA,
+    )
+    cv2.putText(
+        frame,
+        text,
+        (x + pad, y + th + pad - 2),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        scale,
+        (255, 255, 255),
+        thickness,
+        cv2.LINE_AA,
+    )
+    return frame

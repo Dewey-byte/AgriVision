@@ -1,14 +1,14 @@
 {
   "models": [
     {
-      "id": "yolov8n-primary",
-      "name": "YOLOv8n — Primary Aerial Dataset",
+      "id": "yolov9s-primary",
+      "name": "YOLOv9s — Live detector (recommended)",
       "task": "detection",
-      "weights": "models/best.pt",
-      "dataset": "Primary: 315 aerial banana images (80-10-10 split)",
+      "weights": "models/yolov9s_banana.pt",
+      "dataset": "Primary aerial banana images (same split as the architecture benchmark)",
       "status": "deployed",
-      "description": "Fine-tuned YOLOv8n detector used by the desktop app for live inference. Trained 100 epochs, AdamW, imgsz 640, batch 16 on RTX 4050.",
-      "results_csv": "runs/detect/runs/banana_disease/results.csv"
+      "description": "Default live detector in the desktop app. Operators can switch to YOLOv8n from the sidebar without restarting. Trained 100 epochs on datasets/yolo_banana; 19.29% mAP@0.5 on the held-out test split.",
+      "results_csv": "runs/detect/bench_yolov9s/results.csv"
     },
     {
       "id": "yolov8n-cls",

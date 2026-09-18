@@ -319,7 +319,7 @@ function BenchmarkSection({ bench }) {
               <dt>Trained by</dt>
               <dd className="mono">{c.runner}</dd>
               <dt>Weights</dt>
-              <dd className="mono">{c.weights}</dd>
+              <dd className="mono" title={c.weights}>{c.weights}</dd>
               {c.training?.epochs_trained != null && (
                 <>
                   <dt>Epochs</dt>
@@ -393,7 +393,7 @@ export default function ModelComparison() {
               <dt>Task</dt>
               <dd>{m.task}</dd>
               <dt>Weights</dt>
-              <dd className="mono">{m.weights}</dd>
+              <dd className="mono" title={m.weights}>{m.weights}</dd>
               <dt>Dataset</dt>
               <dd>{m.dataset}</dd>
               {m.metrics?.best_map50 != null && (

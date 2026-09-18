@@ -9,19 +9,32 @@ class InferenceWorker(QThread):
     """Keeps only the latest pending frame; drops backlog so inference stays current."""
 
     ready = pyqtSignal(list, object, dict, dict)
+    detector_ready = pyqtSignal(dict)
+    detector_failed = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
         self._mutex = QMutex()
         self._pending = None
+        self._pending_detector = None
         self._active = False
         self._stop = False
         self._pipeline = AnalysisPipeline()
 
-    def set_active(self, on: bool) -> None:
+    def set_active(self, on: bool, *, reset: bool = True) -> None:
         self._active = bool(on)
-        if on:
+        self._mutex.lock()
+        if not on:
+            self._pending = None
+        self._mutex.unlock()
+        if on and reset:
             self._pipeline.reset()
+
+    def set_detector(self, detector_id: str) -> None:
+        self._mutex.lock()
+        self._pending_detector = detector_id
+        self._pending = None
+        self._mutex.unlock()
 
     def submit(self, frame_bgr) -> None:
         if not self._active or frame_bgr is None or frame_bgr.size == 0:
@@ -35,8 +48,34 @@ class InferenceWorker(QThread):
         self._active = False
         self.wait(8000)
 
+    def _swap_detector(self, detector_id: str) -> None:
+        from core.detection import active_detector_info, load_detector
+
+        try:
+            spec = load_detector(detector_id)
+            info = active_detector_info()
+            info["id"] = spec.id
+            self.detector_ready.emit(info)
+        except Exception as exc:
+            self.detector_failed.emit(str(exc))
+
     def run(self) -> None:
+        from core.detection import active_detector_info, load_detector
+
+        try:
+            load_detector()
+            self.detector_ready.emit(active_detector_info())
+        except Exception as exc:
+            self.detector_failed.emit(str(exc))
+
         while not self._stop:
+            self._mutex.lock()
+            detector_id = self._pending_detector
+            self._pending_detector = None
+            self._mutex.unlock()
+            if detector_id:
+                self._swap_detector(detector_id)
+
             if not self._active:
                 self.msleep(40)
                 continue

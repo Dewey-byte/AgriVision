@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api.js";
-import { SummaryPills, HealthPill } from "../components/CategoryPills.jsx";
+import { SummaryPills, HealthPill, ModelPill } from "../components/CategoryPills.jsx";
 
 export default function Records() {
   const [tab, setTab] = useState("reports");
@@ -50,7 +50,7 @@ export default function Records() {
         <div className="card">
           <div className="toolbar" style={{ marginBottom: 14 }}>
             <input
-              placeholder="Search by video ID, report ID, source…"
+              placeholder="Search by video ID, report ID, source, or model…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               style={{ width: 300 }}
@@ -68,6 +68,7 @@ export default function Records() {
                 <tr>
                   <th>Report</th>
                   <th>Video ID</th>
+                  <th>Model</th>
                   <th>Exported</th>
                   <th>Detections</th>
                   <th>Vegetation</th>
@@ -80,6 +81,9 @@ export default function Records() {
                   <tr key={r.id} className="clickable" onClick={() => navigate(`/reports/${r.id}`)}>
                     <td className="mono">{r.id}</td>
                     <td className="mono">{r.video_id}</td>
+                    <td>
+                      <ModelPill detector={r.detector} />
+                    </td>
                     <td>{r.exported_at.replace("T", " ")}</td>
                     <td>
                       <SummaryPills summary={r.detection_summary} />
@@ -98,7 +102,7 @@ export default function Records() {
                 ))}
                 {reports && reports.items.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="empty">
+                    <td colSpan={8} className="empty">
                       No reports match the filters.
                     </td>
                   </tr>

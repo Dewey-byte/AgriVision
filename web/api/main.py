@@ -27,6 +27,7 @@ from fastapi.staticfiles import StaticFiles
 
 from web.api import config
 from web.api.routes import analytics, auth, maps, reports, sessions
+from web.api.services import agrivision_reader as reader
 
 app = FastAPI(
     title="AgriVision Admin API",
@@ -55,9 +56,7 @@ def health() -> dict:
     return {
         "status": "ok",
         "reports_dir": str(config.REPORTS_DIR),
-        "reports_found": len(list(config.REPORTS_DIR.glob("agrivision_*_report.json")))
-        if config.REPORTS_DIR.exists()
-        else 0,
+        "reports_found": len(reader.discover_report_json_paths()),
     }
 
 

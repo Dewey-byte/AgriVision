@@ -28,7 +28,7 @@ from backend.geo import GeoTag, FieldBounds, detections_to_markers, resolve_geo_
 
 from backend.map_export import export_leaflet_map, manual_tags_to_heat_points
 
-from utils.drawing import detection_category
+from utils.drawing import detection_category, draw_model_banner
 
 
 
@@ -69,6 +69,8 @@ def export_field_report(
     manual_tags: list[dict[str, Any]] | None = None,
 
     field_bounds: FieldBounds | None = None,
+
+    detector: dict[str, Any] | None = None,
 
 ) -> dict[str, str]:
 
@@ -116,6 +118,11 @@ def export_field_report(
         video_id or (session or {}).get("video_id") or flight_id or ""
     ).strip()
 
+    detector_block = dict(detector or (session or {}).get("detector") or {})
+    model_name = str(
+        detector_block.get("name") or detector_block.get("id") or ""
+    ).strip()
+
     payload: dict[str, Any] = {
 
         "system": "AgriVision",
@@ -142,11 +149,17 @@ def export_field_report(
 
         "capture_id": capture_stamp,
 
+        "detector": detector_block,
+
         "artifacts": {},
 
     }
 
 
+
+    if model_name:
+
+        frame_bgr = draw_model_banner(frame_bgr, model_name)
 
     frame_path = base.with_name(base.name + "_frame.jpg")
 
@@ -208,6 +221,7 @@ def export_field_report(
         heat_points=heat_points or [],
         manual_tags=manual_tags,
         field_bounds=field_bounds,
+        model_name=model_name,
     )
 
     payload["artifacts"]["leaflet_map"] = str(map_path)
@@ -228,7 +242,15 @@ def export_field_report(
 
     csv_path = base.with_name(base.name + "_report.csv")
 
-    _write_csv(csv_path, summary, detections, geo_block, vegetation or {}, video_id=resolved_video_id)
+    _write_csv(
+        csv_path,
+        summary,
+        detections,
+        geo_block,
+        vegetation or {},
+        video_id=resolved_video_id,
+        detector=detector_block,
+    )
 
     paths["csv"] = str(csv_path)
 
@@ -274,6 +296,8 @@ def _write_csv(
 
     video_id: str = "",
 
+    detector: dict[str, Any] | None = None,
+
 ) -> None:
 
     with path.open("w", newline="", encoding="utf-8") as f:
@@ -285,6 +309,16 @@ def _write_csv(
         if video_id:
 
             writer.writerow(["flight", "video_id", video_id])
+
+        detector = detector or {}
+
+        if detector.get("name") or detector.get("id"):
+
+            writer.writerow(["model", "name", detector.get("name") or detector.get("id")])
+
+            writer.writerow(["model", "id", detector.get("id", "")])
+
+            writer.writerow(["model", "weights", detector.get("weights", "")])
 
         writer.writerow(["summary", "total", summary["total"]])
 

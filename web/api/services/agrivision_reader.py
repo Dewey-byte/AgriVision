@@ -63,24 +63,65 @@ def _stamp_to_iso(stamp: str) -> str:
         return stamp
 
 
-def _artifact_path(report_id: str, suffix: str) -> Path:
-    return config.REPORTS_DIR / f"agrivision_{report_id}_{suffix}"
+_ARTIFACT_SUFFIXES = {
+    "frame": "frame.jpg",
+    "map": "map.html",
+    "json": "report.json",
+    "csv": "report.csv",
+}
+
+
+def discover_report_json_paths() -> list[Path]:
+    """JSON bundles in ``output/reports`` and session capture folders.
+
+    A live take-off writes into ``output/sessions/{stamp}_{id}/captures/``.
+    Prefer a copy under ``REPORTS_DIR`` when the same stamp exists in both.
+    """
+    by_id: dict[str, Path] = {}
+    if config.REPORTS_DIR.exists():
+        for path in config.REPORTS_DIR.glob("agrivision_*_report.json"):
+            match = _REPORT_RE.match(path.name)
+            if match:
+                by_id[match.group(1)] = path
+
+    sessions_dir = config.OUTPUT_DIR / "sessions"
+    if sessions_dir.is_dir():
+        for path in sessions_dir.glob("*/captures/agrivision_*_report.json"):
+            match = _REPORT_RE.match(path.name)
+            if match and match.group(1) not in by_id:
+                by_id[match.group(1)] = path
+
+    return sorted(by_id.values(), key=lambda p: p.name, reverse=True)
+
+
+def _json_path_for(report_id: str) -> Path | None:
+    if not re.fullmatch(r"\d{8}_\d{6}", report_id):
+        return None
+    direct = config.REPORTS_DIR / f"agrivision_{report_id}_report.json"
+    if direct.is_file():
+        return direct
+    sessions_dir = config.OUTPUT_DIR / "sessions"
+    if sessions_dir.is_dir():
+        matches = sorted(sessions_dir.glob(f"*/captures/agrivision_{report_id}_report.json"))
+        if matches:
+            return matches[0]
+    return None
+
+
+def _artifact_path(report_id: str, suffix: str, json_path: Path | None = None) -> Path:
+    folder = (json_path or _json_path_for(report_id) or (config.REPORTS_DIR / "_")).parent
+    return folder / f"agrivision_{report_id}_{suffix}"
 
 
 def artifact_file(report_id: str, kind: str) -> Path | None:
     """Resolve an artifact for a report id, refusing anything path-like."""
-    if not re.fullmatch(r"\d{8}_\d{6}", report_id):
-        return None
-    suffixes = {
-        "frame": "frame.jpg",
-        "map": "map.html",
-        "json": "report.json",
-        "csv": "report.csv",
-    }
-    suffix = suffixes.get(kind)
+    suffix = _ARTIFACT_SUFFIXES.get(kind)
     if suffix is None:
         return None
-    path = _artifact_path(report_id, suffix)
+    json_path = _json_path_for(report_id)
+    if json_path is None:
+        return None
+    path = _artifact_path(report_id, suffix, json_path)
     return path if path.exists() else None
 
 
@@ -102,11 +143,34 @@ def _load_report_file(path: Path) -> dict[str, Any] | None:
     return record
 
 
+def _weights_filename(weights: str) -> str:
+    """Basename of a detector weights path, Windows or POSIX."""
+    if not weights:
+        return ""
+    return str(weights).replace("\\", "/").rsplit("/", 1)[-1]
+
+
+def _normalize_detector(raw: dict[str, Any], session: dict[str, Any]) -> dict[str, str]:
+    """Pull the live detector used for this export (top-level or session)."""
+    det = raw.get("detector") or session.get("detector") or {}
+    if not isinstance(det, dict):
+        det = {}
+    det_id = str(det.get("id") or "").strip()
+    name = str(det.get("name") or "").strip()
+    weights = _weights_filename(str(det.get("weights") or ""))
+    if not name:
+        name = det_id or weights
+    if not (det_id or name or weights):
+        return {}
+    return {"id": det_id, "name": name, "weights": weights}
+
+
 def _normalize_report(path: Path, raw: dict[str, Any]) -> dict[str, Any]:
     m = _REPORT_RE.match(path.name)
     report_id = m.group(1) if m else path.stem
     session = raw.get("session") or {}
     detections = raw.get("detections") or []
+    detector = _normalize_detector(raw, session)
 
     classes: dict[str, int] = defaultdict(int)
     for det in detections:
@@ -120,11 +184,8 @@ def _normalize_report(path: Path, raw: dict[str, Any]) -> dict[str, Any]:
 
     artifacts = {
         kind: f"/api/reports/{report_id}/artifact/{kind}"
-        for kind in ("frame", "map", "json", "csv")
-        if _artifact_path(
-            report_id,
-            {"frame": "frame.jpg", "map": "map.html", "json": "report.json", "csv": "report.csv"}[kind],
-        ).exists()
+        for kind, suffix in _ARTIFACT_SUFFIXES.items()
+        if _artifact_path(report_id, suffix, path).exists()
     }
 
     return {
@@ -143,6 +204,7 @@ def _normalize_report(path: Path, raw: dict[str, Any]) -> dict[str, Any]:
         "class_counts": dict(classes),
         "vegetation": raw.get("vegetation") or {},
         "session": session,
+        "detector": detector,
         "session_started_at": session.get("started_at") or "",
         "manual_tags": session.get("manual_tags") or [],
         "artifacts": artifacts,
@@ -151,10 +213,8 @@ def _normalize_report(path: Path, raw: dict[str, Any]) -> dict[str, Any]:
 
 def list_reports() -> list[dict[str, Any]]:
     """All report records, newest first."""
-    if not config.REPORTS_DIR.exists():
-        return []
     records = []
-    for path in sorted(config.REPORTS_DIR.glob("agrivision_*_report.json"), reverse=True):
+    for path in discover_report_json_paths():
         rec = _load_report_file(path)
         if rec:
             records.append(rec)
@@ -162,8 +222,8 @@ def list_reports() -> list[dict[str, Any]]:
 
 
 def get_report(report_id: str) -> dict[str, Any] | None:
-    path = _artifact_path(report_id, "report.json")
-    if not path.exists():
+    path = _json_path_for(report_id)
+    if path is None:
         return None
     return _load_report_file(path)
 
@@ -177,6 +237,7 @@ def report_summary(rec: dict[str, Any]) -> dict[str, Any]:
         "video_source": rec["video_source"],
         "detection_summary": rec["detection_summary"],
         "vegetation": rec["vegetation"],
+        "detector": rec.get("detector") or {},
         "geo": {
             "latitude": rec["geo"].get("latitude"),
             "longitude": rec["geo"].get("longitude"),

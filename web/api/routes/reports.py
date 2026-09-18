@@ -15,7 +15,7 @@ router = APIRouter(
 
 @router.get("")
 def list_reports(
-    q: str = Query("", description="Search in video ID / report ID / source"),
+    q: str = Query("", description="Search in video ID / report ID / source / model"),
     category: str = Query("", description="Only reports containing this category (stressed/diseased)"),
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
@@ -29,6 +29,8 @@ def list_reports(
             if low in r["video_id"].lower()
             or low in r["id"].lower()
             or low in str(r["video_source"]).lower()
+            or low in str((r.get("detector") or {}).get("name", "")).lower()
+            or low in str((r.get("detector") or {}).get("id", "")).lower()
         ]
     if category in ("healthy", "stressed", "diseased"):
         records = [r for r in records if r["detection_summary"].get(category, 0) > 0]

@@ -29,6 +29,7 @@ def _dot(color: str) -> str:
 class Sidebar(QWidget):
     geo_updated = pyqtSignal()
     video_id_changed = pyqtSignal()
+    detector_change_requested = pyqtSignal(str)
     mirror_start_requested = pyqtSignal()
     mirror_stop_requested = pyqtSignal()
     android_ip_detect_requested = pyqtSignal()
@@ -100,6 +101,22 @@ class Sidebar(QWidget):
         self.video_id_status_label.setObjectName("mutedLabel")
         self.video_id_status_label.setWordWrap(True)
         source_lay.addWidget(self.video_id_status_label)
+
+        detector_label = QLabel("Live detector")
+        detector_label.setObjectName("mutedLabel")
+        source_lay.addWidget(detector_label)
+
+        self.detector_combo = QComboBox()
+        self.detector_combo.setObjectName("detectorCombo")
+        self._detector_ids: list[str] = []
+        source_lay.addWidget(self.detector_combo)
+
+        self.detector_status_label = QLabel("")
+        self.detector_status_label.setObjectName("mutedLabel")
+        self.detector_status_label.setWordWrap(True)
+        source_lay.addWidget(self.detector_status_label)
+        self._populate_detectors()
+        self.detector_combo.currentIndexChanged.connect(self._on_detector_combo_changed)
 
         self.grp_mirror = QWidget()
         mirror_lay = QVBoxLayout(self.grp_mirror)
@@ -339,6 +356,44 @@ class Sidebar(QWidget):
             self.video_id_status_label.setText(f"Session active — recording as {active_id}")
         elif not locked:
             self._refresh_video_id_status()
+
+    def _populate_detectors(self) -> None:
+        from core.detectors import available_detectors, load_saved_detector_id, resolve_detector_id
+
+        specs = available_detectors()
+        self._detector_ids = [spec.id for spec in specs]
+        self.detector_combo.blockSignals(True)
+        self.detector_combo.clear()
+        for spec in specs:
+            self.detector_combo.addItem(spec.label, spec.id)
+        chosen = resolve_detector_id(load_saved_detector_id())
+        if chosen in self._detector_ids:
+            self.detector_combo.setCurrentIndex(self._detector_ids.index(chosen))
+        self.detector_combo.blockSignals(False)
+        current = self.selected_detector_id()
+        match = next((s for s in specs if s.id == current), None)
+        if match:
+            self.detector_status_label.setText(match.description)
+
+    def selected_detector_id(self) -> str:
+        idx = self.detector_combo.currentIndex()
+        if 0 <= idx < len(self._detector_ids):
+            return self._detector_ids[idx]
+        from core.detectors import DEFAULT_DETECTOR_ID
+
+        return DEFAULT_DETECTOR_ID
+
+    def set_detector_busy(self, busy: bool, message: str = "") -> None:
+        self.detector_combo.setEnabled(not busy)
+        if message:
+            self.detector_status_label.setText(message)
+
+    def set_detector_status(self, text: str) -> None:
+        self.detector_status_label.setText(text)
+
+    def _on_detector_combo_changed(self, index: int) -> None:
+        if 0 <= index < len(self._detector_ids):
+            self.detector_change_requested.emit(self._detector_ids[index])
 
     def _build_mirror_manager(self, parent_lay) -> None:
         """Built-in wireless mirror (Android via scrcpy)."""

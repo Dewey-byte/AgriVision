@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
     QFrame,
     QSizePolicy,
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 
 from ui.components.video_feed import VideoFeed
 
@@ -60,14 +60,22 @@ class PrimaryFeedPanel(QFrame):
         self.btn_capture = QPushButton("Capture Frame")
         self.btn_capture.setObjectName("btnSecondary")
         self.btn_capture.setCursor(Qt.PointingHandCursor)
+        self.btn_capture.setMinimumWidth(150)
+        self.capture_status = QLabel("")
+        self.capture_status.setObjectName("captureStatus")
+        self.capture_status.setVisible(False)
         self.last_updated = QLabel("Last updated: —")
         self.last_updated.setObjectName("lastUpdated")
         self.last_updated.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         footer.addWidget(self.btn_toggle)
         footer.addWidget(self.btn_capture)
-        footer.addStretch(1)
+        footer.addWidget(self.capture_status, 1)
         footer.addWidget(self.last_updated)
         root.addLayout(footer)
+
+        self._capture_flash = QTimer(self)
+        self._capture_flash.setSingleShot(True)
+        self._capture_flash.timeout.connect(self._restore_capture_button)
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -100,5 +108,34 @@ class PrimaryFeedPanel(QFrame):
     def set_last_updated(self, text: str) -> None:
         self.last_updated.setText(text)
 
-    def set_running(self, running: bool) -> None:
-        self.btn_toggle.setText("⏸ Pause" if running else "▶ Start")
+    def show_capture_saved(self, detail: str) -> None:
+        self._flash_capture_button(True, "Saved ✓", f"Saved — {detail}")
+
+    def show_capture_failed(self, reason: str) -> None:
+        self._flash_capture_button(False, "Not saved", reason)
+
+    def _flash_capture_button(self, ok: bool, button_text: str, status: str) -> None:
+        self.btn_capture.setText(button_text)
+        self.btn_capture.setObjectName("btnCaptureSaved" if ok else "btnCaptureFailed")
+        self.btn_capture.style().unpolish(self.btn_capture)
+        self.btn_capture.style().polish(self.btn_capture)
+        self.capture_status.setText(status)
+        self.capture_status.setObjectName("captureSaved" if ok else "captureFailed")
+        self.capture_status.style().unpolish(self.capture_status)
+        self.capture_status.style().polish(self.capture_status)
+        self.capture_status.setVisible(True)
+        self._capture_flash.start(3200)
+
+    def _restore_capture_button(self) -> None:
+        self.btn_capture.setText("Capture Frame")
+        self.btn_capture.setObjectName("btnSecondary")
+        self.btn_capture.style().unpolish(self.btn_capture)
+        self.btn_capture.style().polish(self.btn_capture)
+
+    def set_running(self, running: bool, paused: bool = False) -> None:
+        if paused:
+            self.btn_toggle.setText("▶ Resume")
+        elif running:
+            self.btn_toggle.setText("⏸ Pause")
+        else:
+            self.btn_toggle.setText("▶ Start")

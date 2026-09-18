@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, fetchArtifactBlob } from "../api.js";
-import { SummaryPills, HealthPill } from "../components/CategoryPills.jsx";
+import { SummaryPills, HealthPill, ModelPill, modelLabel } from "../components/CategoryPills.jsx";
+import ZoomableImage from "../components/ZoomableImage.jsx";
 
 export default function Reports() {
   const { reportId } = useParams();
@@ -36,7 +37,7 @@ export default function Reports() {
       <div className="page-head">
         <div>
           <h2>Reports</h2>
-          <p>Exported field report bundles organized by day. Each bundle contains JSON, CSV, annotated frame, and a Leaflet map.</p>
+          <p>Exported field report bundles organized by day. Each bundle contains JSON, CSV, annotated frame, and a Leaflet map. The model column shows which live detector produced the report.</p>
         </div>
       </div>
 
@@ -53,6 +54,7 @@ export default function Reports() {
                 <tr>
                   <th>Time</th>
                   <th>Video ID</th>
+                  <th>Model</th>
                   <th>Detections</th>
                   <th>Vegetation</th>
                   <th>Artifacts</th>
@@ -63,6 +65,9 @@ export default function Reports() {
                   <tr key={r.id} className="clickable" onClick={() => navigate(`/reports/${r.id}`)}>
                     <td className="mono">{r.exported_at.slice(11)}</td>
                     <td className="mono">{r.video_id}</td>
+                    <td>
+                      <ModelPill detector={r.detector} />
+                    </td>
                     <td>
                       <SummaryPills summary={r.detection_summary} />
                     </td>
@@ -124,6 +129,7 @@ function ReportDetail({ reportId, onBack }) {
   if (!report) return <div className="spinner">Loading report {reportId}…</div>;
 
   const sess = report.session || {};
+  const detector = report.detector || sess.detector || {};
 
   return (
     <>
@@ -133,6 +139,10 @@ function ReportDetail({ reportId, onBack }) {
           <p>
             Video <span className="mono">{report.video_id}</span> · exported {report.exported_at.replace("T", " ")} · source {report.video_source}
           </p>
+          <p style={{ marginTop: 6, fontWeight: 600 }}>{modelLabel(detector)}</p>
+          <div style={{ marginTop: 8 }}>
+            <ModelPill detector={detector} />
+          </div>
         </div>
         <div className="toolbar">
           <button className="ghost" onClick={onBack}>
@@ -154,7 +164,11 @@ function ReportDetail({ reportId, onBack }) {
       <div className="grid cols-2 section">
         <div className="card">
           <h3>Annotated frame</h3>
-          {frameUrl ? <img className="frame-img" src={frameUrl} alt={`Report ${report.id} frame`} /> : <div className="empty">No frame artifact</div>}
+          {frameUrl ? (
+            <ZoomableImage src={frameUrl} alt={`Report ${report.id} annotated frame`} />
+          ) : (
+            <div className="empty">No frame artifact</div>
+          )}
         </div>
         <div className="card">
           <h3>Field map</h3>
@@ -203,6 +217,15 @@ function ReportDetail({ reportId, onBack }) {
         <div className="card">
           <h3>Session</h3>
           <dl className="kv">
+            <dt>Model</dt>
+            <dd>
+              <div style={{ fontWeight: 600 }}>{detector.name || detector.id || "not recorded"}</div>
+              <div style={{ marginTop: 6 }}>
+                <ModelPill detector={detector} />
+              </div>
+            </dd>
+            <dt>Weights</dt>
+            <dd className="mono" title={detector.weights || ""}>{detector.weights || "—"}</dd>
             <dt>Video ID</dt>
             <dd className="mono">{sess.video_id || report.video_id}</dd>
             <dt>Started (UTC)</dt>

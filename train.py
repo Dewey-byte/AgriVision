@@ -77,6 +77,7 @@ def train_model(
     workers: int = 0,
     model_name: str = "yolov8n.pt",
     deploy: bool = True,
+    patience: int = 50,
 ) -> Path:
     weights = resume or resolve_base_weights(model_name)
 
@@ -104,7 +105,7 @@ def train_model(
         fliplr=0.5,
         cls=1.0,
         box=7.5,
-        patience=50,
+        patience=patience,
     )
 
     best_weights = Path(results.save_dir) / "weights" / "best.pt"
@@ -154,6 +155,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="YOLO dataset folder or data.yaml (default: datasets/yolo_banana)",
     )
+    parser.add_argument(
+        "--patience",
+        type=int,
+        default=50,
+        help="Early-stop patience in epochs (0 disables early stopping)",
+    )
     return parser.parse_args()
 
 
@@ -172,6 +179,7 @@ def main() -> None:
         workers=args.workers,
         model_name=args.model,
         deploy=args.deploy,
+        patience=args.patience,
     )
 
 
