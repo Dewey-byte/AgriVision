@@ -8,18 +8,24 @@ export default function Records() {
   const [reports, setReports] = useState(null);
   const [sessions, setSessions] = useState(null);
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [category, setCategory] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
+    const handle = setTimeout(() => setDebouncedQ(q), 280);
+    return () => clearTimeout(handle);
+  }, [q]);
+
+  useEffect(() => {
     const params = new URLSearchParams({ limit: "200" });
-    if (q) params.set("q", q);
+    if (debouncedQ) params.set("q", debouncedQ);
     if (category) params.set("category", category);
     api(`/api/reports?${params}`)
       .then(setReports)
       .catch((e) => setError(e.message));
-  }, [q, category]);
+  }, [debouncedQ, category]);
 
   useEffect(() => {
     api("/api/sessions")

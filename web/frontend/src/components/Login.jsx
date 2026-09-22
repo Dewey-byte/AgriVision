@@ -13,7 +13,7 @@ export default function Login({ onLogin }) {
     setError("");
     try {
       await login(username, password);
-      onLogin();
+      onLogin(username);
     } catch (err) {
       setError(err.status === 401 ? "Invalid credentials" : err.message);
     } finally {

@@ -1,6 +1,10 @@
 import os
 import sys
 
+from utils.python_runtime import require_desktop_python
+
+require_desktop_python()
+
 # Import torch/Ultralytics before PyQt5 — Windows DLL load order (Qt + CUDA conflict).
 import core.detection  # noqa: F401
 

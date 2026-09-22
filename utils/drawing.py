@@ -1,57 +1,12 @@
 import cv2
 import numpy as np
 
+from utils.categories import detection_category
 from utils.stress_palette import CATEGORY_COLOR_BGR
 
 BGR_HEALTHY = CATEGORY_COLOR_BGR["healthy"]
 BGR_STRESSED = CATEGORY_COLOR_BGR["stressed"]
 BGR_DISEASED = CATEGORY_COLOR_BGR["diseased"]
-
-
-def detection_category(label: str) -> str:
-    L = (label or "").lower()
-    if any(
-        k in L
-        for k in (
-            "not_banana",
-            "not banana",
-            "unknown",
-            "uncertain",
-            "no banana",
-        )
-    ):
-        return "none"
-    if any(
-        k in L
-        for k in (
-            "fusarium",
-            "bbtv",
-            "bunchy_top",
-            "bunchy top",
-            "virus",
-            "disease",
-            "diseased",
-            "wilt",
-            "panama",
-            "moko",
-        )
-    ):
-        return "diseased"
-    if any(
-        k in L
-        for k in (
-            "sigatoka",
-            "stress",
-            "stressed",
-            "spot",
-            "mildew",
-            "yellow",
-            "black_sigatoka",
-            "yellow_sigatoka",
-        )
-    ):
-        return "stressed"
-    return "healthy"
 
 
 def draw_subtle_grid(frame: np.ndarray, step: int = 96) -> np.ndarray:

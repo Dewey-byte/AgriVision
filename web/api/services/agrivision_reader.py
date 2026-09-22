@@ -20,29 +20,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from utils.categories import detection_category as label_category  # re-exported for the admin API
 from web.api import config
 
 _REPORT_RE = re.compile(r"^agrivision_(\d{8}_\d{6})_report\.json$")
 _LABEL_CONF_RE = re.compile(r"^(.*?)\s*\(([\d.]+)\)\s*$")
 
-# Keyword rules mirrored from utils/drawing.detection_category so the API has
-# no import dependency on the desktop app's OpenCV/PyQt stack.
-_DISEASED_WORDS = ("panama", "moko", "bunchy", "virus", "wilt", "fusarium")
-_STRESSED_WORDS = ("sigatoka", "yellow", "stress", "spot")
-_IGNORED_WORDS = ("not_banana", "not banana", "unknown")
-
 _cache: dict[str, tuple[float, dict[str, Any]]] = {}
-
-
-def label_category(label: str) -> str:
-    low = (label or "").lower()
-    if any(w in low for w in _IGNORED_WORDS):
-        return "none"
-    if any(w in low for w in _DISEASED_WORDS):
-        return "diseased"
-    if any(w in low for w in _STRESSED_WORDS):
-        return "stressed"
-    return "healthy"
 
 
 def split_label(label: str) -> tuple[str, float | None]:
@@ -249,6 +233,22 @@ def report_summary(rec: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _session_started_sort_key(started_at: str) -> datetime:
+    """Parse session start for newest-first sort (ISO or unsessioned-YYYYMMDD_HHMMSS)."""
+    text = (started_at or "").strip()
+    if text.startswith("unsessioned-"):
+        stamp = text.split("unsessioned-", 1)[-1]
+        try:
+            return datetime.strptime(stamp, "%Y%m%d_%H%M%S")
+        except ValueError:
+            return datetime.min
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        return parsed.replace(tzinfo=None) if parsed.tzinfo else parsed
+    except ValueError:
+        return datetime.min
+
+
 def list_sessions() -> list[dict[str, Any]]:
     """Group reports into flight sessions keyed by session.started_at."""
     groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -279,7 +279,7 @@ def list_sessions() -> list[dict[str, Any]]:
                 "report_ids": [r["id"] for r in recs],
             }
         )
-    sessions.sort(key=lambda s: s["started_at"], reverse=True)
+    sessions.sort(key=lambda s: _session_started_sort_key(s["started_at"]), reverse=True)
     return sessions
 
 

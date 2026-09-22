@@ -194,7 +194,8 @@ _CAST_PREFER_DEFAULT = (
 _CAST_SKIP_DEFAULT = (
     "home,main,welcome,launcher,首页,主页,设置,settings,about,"
     "agrivision,cursor,visual studio,code,program manager,taskbar,python,"
-    "microsoft edge,chrome,firefox,explorer,windows input"
+    "microsoft edge,chrome,firefox,explorer,windows input,"
+    "nvidia,geforce,overlay,geforce overlay"
 )
 _MIRROR_FALLBACK_TITLES = ("AgriVision Android Mirror", "scrcpy")
 

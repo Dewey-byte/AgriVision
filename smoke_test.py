@@ -10,6 +10,10 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
+from utils.python_runtime import require_desktop_python
+
+require_desktop_python()
+
 FAILURES: list[tuple[str, str]] = []
 
 
@@ -29,6 +33,7 @@ def main() -> int:
 
     modules = [
         "utils.cast_manager",
+        "utils.categories",
         "utils.drawing",
         "utils.logger",
         "utils.screen_capture",
@@ -97,9 +102,33 @@ def main() -> int:
 
     check("detection_category diseased", lambda: detection_category("Fusarium wilt") == "diseased")
     check("detection_category bbtv", lambda: detection_category("Banana Bunchy Top Virus") == "diseased")
+    check("detection_category bbtv abbr", lambda: detection_category("bbtv") == "diseased")
+    check("detection_category disease word", lambda: detection_category("disease") == "diseased")
+    check("detection_category mildew", lambda: detection_category("mildew") == "stressed")
+    check("detection_category uncertain", lambda: detection_category("uncertain") == "none")
+    check("detection_category no banana", lambda: detection_category("no banana") == "none")
     check("detection_category stressed", lambda: detection_category("sigatoka spot") == "stressed")
     check("detection_category healthy", lambda: detection_category("banana plant") == "healthy")
     check("detection_category not_banana", lambda: detection_category("not_banana") == "none")
+
+    from utils.categories import label_category
+
+    check("web alias matches desktop category", lambda: label_category("bbtv") == detection_category("bbtv"))
+
+    from utils.screen_capture import _CAST_SKIP_DEFAULT
+
+    skip = _CAST_SKIP_DEFAULT.lower()
+    check("cast skip nvidia", lambda: "nvidia" in skip)
+    check("cast skip geforce", lambda: "geforce" in skip)
+    check("cast skip overlay", lambda: "overlay" in skip)
+
+    from web.api.services.agrivision_reader import _session_started_sort_key
+
+    check(
+        "session sort prefers ISO over unsessioned string",
+        lambda: _session_started_sort_key("unsessioned-20260704_040406")
+        < _session_started_sort_key("2026-09-19T12:20:21+00:00"),
+    )
 
     frame = np.random.randint(0, 255, (240, 320, 3), dtype=np.uint8)
     check("resize_max_side unchanged", lambda: resize_max_side(frame, 640).shape == (240, 320, 3))

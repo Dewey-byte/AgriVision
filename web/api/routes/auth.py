@@ -60,12 +60,18 @@ def require_admin(
     return username
 
 
+def _secrets_match(left: str, right: str) -> bool:
+    """Length-safe comparison (hmac.compare_digest raises if lengths differ)."""
+    digest = hashlib.sha256(left.encode("utf-8")).digest()
+    expected = hashlib.sha256(right.encode("utf-8")).digest()
+    return hmac.compare_digest(digest, expected)
+
+
 @router.post("/login")
 def login(body: LoginRequest) -> dict:
-    if not (
-        hmac.compare_digest(body.username, config.ADMIN_USERNAME)
-        and hmac.compare_digest(body.password, config.ADMIN_PASSWORD)
-    ):
+    user_ok = _secrets_match(body.username, config.ADMIN_USERNAME)
+    pass_ok = _secrets_match(body.password, config.ADMIN_PASSWORD)
+    if not (user_ok and pass_ok):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return {
         "token": create_token(body.username),

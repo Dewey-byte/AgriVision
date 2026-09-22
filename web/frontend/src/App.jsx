@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { getToken, setToken } from "./api.js";
+import { api, getToken, setToken } from "./api.js";
 import Layout from "./components/Layout.jsx";
 import Login from "./components/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -12,6 +12,7 @@ import Reports from "./pages/Reports.jsx";
 
 export default function App() {
   const [authed, setAuthed] = useState(Boolean(getToken()));
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     const onUnauthorized = () => setAuthed(false);
@@ -19,17 +20,36 @@ export default function App() {
     return () => window.removeEventListener("agrivision:unauthorized", onUnauthorized);
   }, []);
 
+  useEffect(() => {
+    if (!authed) {
+      setUsername("");
+      return undefined;
+    }
+    api("/api/auth/me")
+      .then((me) => setUsername(me.username || ""))
+      .catch(() => setUsername(""));
+    return undefined;
+  }, [authed]);
+
   if (!authed) {
-    return <Login onLogin={() => setAuthed(true)} />;
+    return (
+      <Login
+        onLogin={(name) => {
+          setUsername(name || "");
+          setAuthed(true);
+        }}
+      />
+    );
   }
 
   const logout = () => {
     setToken("");
+    setUsername("");
     setAuthed(false);
   };
 
   return (
-    <Layout onLogout={logout}>
+    <Layout onLogout={logout} username={username}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/records" element={<Records />} />

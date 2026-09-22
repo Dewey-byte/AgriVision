@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { api } from "../api.js";
 import StatCard from "../components/StatCard.jsx";
+import { HealthPill } from "../components/CategoryPills.jsx";
 
 const TOOLTIP_STYLE = {
   background: "#ffffff",
@@ -121,15 +122,14 @@ export default function Analytics() {
 
       <div className="card">
         <h3>Overall vegetation health labels</h3>
-        <p className="sub">Distribution of the health verdict (good / fair / poor) across reports.</p>
+        <p className="sub">Distribution of the health verdict (good / moderate / stressed) across reports.</p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           {Object.entries(data.health_label_distribution).map(([label, count]) => (
-            <span
-              key={label}
-              className={`pill ${label === "good" ? "healthy" : label === "fair" ? "stressed" : "diseased"}`}
-              style={{ fontSize: 14, padding: "8px 16px" }}
-            >
-              {label}: {count} report{count === 1 ? "" : "s"}
+            <span key={label} style={{ fontSize: 14, padding: "8px 16px" }}>
+              <HealthPill label={label} />
+              <span className="muted" style={{ marginLeft: 8 }}>
+                {count} report{count === 1 ? "" : "s"}
+              </span>
             </span>
           ))}
           {Object.keys(data.health_label_distribution).length === 0 && (

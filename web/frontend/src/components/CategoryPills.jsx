@@ -13,8 +13,13 @@ export function SummaryPills({ summary }) {
 
 export function HealthPill({ label }) {
   if (!label) return <span className="pill neutral">n/a</span>;
+  const key = String(label).toLowerCase();
   const cls =
-    label === "good" ? "healthy" : label === "fair" ? "stressed" : "diseased";
+    key === "good" || key === "healthy"
+      ? "healthy"
+      : key === "fair" || key === "moderate"
+        ? "stressed"
+        : "diseased";
   return <span className={`pill ${cls}`}>{label}</span>;
 }
 
