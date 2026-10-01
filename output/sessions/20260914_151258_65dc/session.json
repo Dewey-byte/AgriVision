@@ -1,0 +1,39 @@
+{
+  "session_id": "65dc",
+  "flight_id": "AGV-20260914-151217-1F0869",
+  "video_id": "AGV-20260914-151217-1F0869",
+  "folder": "output/sessions/20260914_151258_65dc",
+  "started_at": "2026-09-14T15:12:58+00:00",
+  "ended_at": "2026-09-14T15:23:07+00:00",
+  "field_name": "",
+  "status": "completed",
+  "stats": {
+    "session_id": "65dc",
+    "flight_id": "AGV-20260914-151217-1F0869",
+    "video_id": "AGV-20260914-151217-1F0869",
+    "field_name": "",
+    "storage_folder": "D:\\GitHub\\AgriVision\\output\\sessions\\20260914_151258_65dc",
+    "started_at": "2026-09-14T15:12:58+00:00",
+    "frames_processed": 26512,
+    "frames_analyzed": 1603,
+    "total_detections": 4006,
+    "peak_detections": 16,
+    "last_detection_summary": {
+      "total": 0,
+      "healthy": 0,
+      "stressed": 0,
+      "diseased": 0
+    },
+    "last_vegetation": {
+      "health_label": "good",
+      "mean_stress": 0.1261,
+      "high_stress_pct": 10.7,
+      "index_type": "exg_proxy"
+    },
+    "heatmap_point_count": 0,
+    "geo_marker_count": 0,
+    "manual_tag_count": 0,
+    "manual_tags": [],
+    "last_geo": {}
+  }
+}

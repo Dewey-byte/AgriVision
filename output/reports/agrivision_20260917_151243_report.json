@@ -1,0 +1,94 @@
+{
+  "system": "AgriVision",
+  "exported_at": "2026-09-17T15:12:43",
+  "video_source": "scrcpy",
+  "geo": {
+    "latitude": 7.639086,
+    "longitude": 126.095355,
+    "altitude_m": null,
+    "accuracy_m": 10.04,
+    "source": "android_gps"
+  },
+  "detection_summary": {
+    "total": 1,
+    "healthy": 1,
+    "stressed": 0,
+    "diseased": 0
+  },
+  "detections": [
+    {
+      "bbox": [
+        707,
+        274,
+        802,
+        364
+      ],
+      "class": 2,
+      "confidence": 0.373779296875,
+      "label": "healthy (0.37)"
+    }
+  ],
+  "vegetation": {
+    "health_label": "moderate",
+    "mean_stress": 0.4826,
+    "high_stress_pct": 47.46,
+    "index_type": "exg_proxy"
+  },
+  "session": {
+    "session_id": "8326",
+    "flight_id": "AGV-20260917-070004-0B245A",
+    "video_id": "AGV-20260917-070004-0B245A",
+    "field_name": "",
+    "storage_folder": "D:\\GitHub\\AgriVision\\output\\sessions\\20260917_070012_8326",
+    "started_at": "2026-09-17T07:00:12+00:00",
+    "frames_processed": 14498,
+    "frames_analyzed": 1090,
+    "total_detections": 3356,
+    "peak_detections": 11,
+    "last_detection_summary": {
+      "total": 1,
+      "healthy": 1,
+      "stressed": 0,
+      "diseased": 0
+    },
+    "last_vegetation": {
+      "health_label": "moderate",
+      "mean_stress": 0.4826,
+      "high_stress_pct": 47.46,
+      "index_type": "exg_proxy"
+    },
+    "heatmap_point_count": 0,
+    "geo_marker_count": 0,
+    "manual_tag_count": 1,
+    "manual_tags": [
+      {
+        "id": "cf1ee536",
+        "lat": 7.6393146,
+        "lon": 126.0954738,
+        "category": "healthy",
+        "label": "Healthy (manual)",
+        "source": "manual_tag"
+      }
+    ],
+    "last_geo": {},
+    "detector": {
+      "id": "yolov9t",
+      "name": "YOLOv9t",
+      "weights": "D:\\GitHub\\AgriVision\\models\\yolov9t_banana.pt"
+    }
+  },
+  "flight_id": "AGV-20260917-070004-0B245A",
+  "video_id": "AGV-20260917-070004-0B245A",
+  "session_id": "8326",
+  "capture_id": "20260917_151243",
+  "detector": {
+    "id": "yolov9t",
+    "name": "YOLOv9t",
+    "weights": "D:\\GitHub\\AgriVision\\models\\yolov9t_banana.pt"
+  },
+  "artifacts": {
+    "frame": "D:\\GitHub\\AgriVision\\output\\reports\\agrivision_20260917_151243_frame.jpg",
+    "leaflet_map": "D:\\GitHub\\AgriVision\\output\\reports\\agrivision_20260917_151243_map.html",
+    "report_json": "D:\\GitHub\\AgriVision\\output\\reports\\agrivision_20260917_151243_report.json"
+  }
+}

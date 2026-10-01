@@ -1,0 +1,18 @@
+section,field,value
+flight,video_id,AGV-20260916-114829-CA8EF7
+summary,total,1
+summary,healthy,1
+summary,stressed,0
+summary,diseased,0
+geo,latitude,7.663272
+geo,longitude,126.08575
+geo,altitude_m,
+geo,accuracy_m,100.0
+geo,source,android_gps
+vegetation,health_label,good
+vegetation,mean_stress,0.1269
+vegetation,high_stress_pct,10.74
+vegetation,index_type,exg_proxy
+
+label,confidence,class,bbox
+healthy (0.38),0.38037109375,2,205 317 316 412

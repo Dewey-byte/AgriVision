@@ -1,0 +1,53 @@
+{
+  "session_id": "8326",
+  "flight_id": "AGV-20260917-070004-0B245A",
+  "video_id": "AGV-20260917-070004-0B245A",
+  "folder": "output/sessions/20260917_070012_8326",
+  "started_at": "2026-09-17T07:00:12+00:00",
+  "ended_at": "2026-09-17T07:19:25+00:00",
+  "field_name": "",
+  "status": "completed",
+  "stats": {
+    "session_id": "8326",
+    "flight_id": "AGV-20260917-070004-0B245A",
+    "video_id": "AGV-20260917-070004-0B245A",
+    "field_name": "",
+    "storage_folder": "D:\\GitHub\\AgriVision\\output\\sessions\\20260917_070012_8326",
+    "started_at": "2026-09-17T07:00:12+00:00",
+    "frames_processed": 20119,
+    "frames_analyzed": 1425,
+    "total_detections": 3794,
+    "peak_detections": 11,
+    "last_detection_summary": {
+      "total": 0,
+      "healthy": 0,
+      "stressed": 0,
+      "diseased": 0
+    },
+    "last_vegetation": {
+      "health_label": "stressed",
+      "mean_stress": 0.8292,
+      "high_stress_pct": 83.34,
+      "index_type": "exg_proxy"
+    },
+    "heatmap_point_count": 0,
+    "geo_marker_count": 0,
+    "manual_tag_count": 1,
+    "manual_tags": [
+      {
+        "id": "cf1ee536",
+        "lat": 7.6393146,
+        "lon": 126.0954738,
+        "category": "healthy",
+        "label": "Healthy (manual)",
+        "source": "manual_tag"
+      }
+    ],
+    "last_geo": {},
+    "detector": {
+      "id": "yolov9t",
+      "name": "YOLOv9t",
+      "weights": "D:\\GitHub\\AgriVision\\models\\yolov9t_banana.pt"
+    }
+  }
+}

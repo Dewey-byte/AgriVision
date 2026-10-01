@@ -1,0 +1,20 @@
+section,field,value
+flight,video_id,AGV-20260916-203059-D15065
+summary,total,3
+summary,healthy,3
+summary,stressed,0
+summary,diseased,0
+geo,latitude,7.686831
+geo,longitude,126.01834
+geo,altitude_m,
+geo,accuracy_m,111.0
+geo,source,windows_gps
+vegetation,health_label,good
+vegetation,mean_stress,0.3291
+vegetation,high_stress_pct,29.38
+vegetation,index_type,exg_proxy
+
+label,confidence,class,bbox
+healthy (0.42),0.415771484375,2,472 429 547 486
+healthy (0.37),0.368408203125,2,445 422 552 512
+healthy (0.36),0.36376953125,2,426 153 522 249

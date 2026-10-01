@@ -4,7 +4,7 @@ model: D:\GitHub\AgriVision\yolov8n.pt
 data: D:\GitHub\AgriVision\datasets\yolo_banana\data.yaml
 epochs: 100
 time: null
-patience: 50
+patience: 100
 batch: 16
 imgsz: 640
 save: true

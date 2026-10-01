@@ -1,0 +1,7 @@
+class,class_id,images_with_class,instances_in_split,precision,recall,f1,mAP50,mAP50_95
+black_sigatoka,0,8,9,0.0,0.0,0.0,0.0,0.0
+bunchy_top,1,0,0,0.0,0.0,0.0,0.0,0.0
+healthy,2,34,410,0.0,0.0,0.0,0.0,0.0
+panama,3,18,49,0.0,0.0,0.0,0.0,0.0
+
+ALL,,34,468,0.5,0.25,0.33,0.2,0.06

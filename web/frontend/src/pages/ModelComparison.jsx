@@ -363,7 +363,7 @@ export default function ModelComparison() {
         <div>
           <h2>Model Comparison</h2>
           <p>
-            Architecture benchmark — YOLOv8, YOLOv9 and YOLO-NAS scored on one held-out split —
+            Architecture benchmark — YOLOv8 and YOLOv9 scored on one held-out split —
             followed by the models the desktop pipeline actually deploys.
           </p>
         </div>

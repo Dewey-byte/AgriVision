@@ -1,5 +1,9 @@
 {
     "cSpell.words": [
         "pyautogui"
-    ]
+    ],
+    "python.defaultInterpreterPath": "C:\\Users\\Dewey-Byte\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    "terminal.integrated.env.windows": {
+        "PATH": "C:\\Users\\Dewey-Byte\\AppData\\Local\\Programs\\Python\\Python310;C:\\Users\\Dewey-Byte\\AppData\\Local\\Programs\\Python\\Python310\\Scripts;${env:PATH}"
+    }
 }

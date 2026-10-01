@@ -5,25 +5,25 @@
   "runner": "ultralytics",
   "weights": "runs\\detect\\bench_yolov9s\\weights\\best.pt",
   "split": "test",
-  "evaluated_at": "2026-09-14T18:36:06.383481+00:00",
+  "evaluated_at": "2026-09-23T09:12:01.156769+00:00",
   "overall": {
-    "precision": 0.6643,
-    "recall": 0.2178,
-    "f1": 0.328,
-    "mAP50": 0.1929,
-    "mAP50_95": 0.0592
+    "precision": 0.4127,
+    "recall": 0.2958,
+    "f1": 0.3446,
+    "mAP50": 0.2766,
+    "mAP50_95": 0.0865
   },
   "per_class": [
     {
       "class_id": 0,
       "name": "black_sigatoka",
-      "precision": 1.0,
-      "recall": 0.0,
-      "f1": 0.0,
-      "mAP50": 0.0738,
-      "mAP50_95": 0.021,
-      "instances_in_split": 9,
-      "images_with_class": 8
+      "precision": 0.269,
+      "recall": 0.25,
+      "f1": 0.2592,
+      "mAP50": 0.1433,
+      "mAP50_95": 0.0499,
+      "instances_in_split": 8,
+      "images_with_class": 7
     },
     {
       "class_id": 1,
@@ -39,47 +39,47 @@
     {
       "class_id": 2,
       "name": "healthy",
-      "precision": 0.3428,
-      "recall": 0.5512,
-      "f1": 0.4228,
-      "mAP50": 0.3757,
-      "mAP50_95": 0.1163,
-      "instances_in_split": 410,
-      "images_with_class": 34
+      "precision": 0.4896,
+      "recall": 0.4217,
+      "f1": 0.4531,
+      "mAP50": 0.3884,
+      "mAP50_95": 0.125,
+      "instances_in_split": 332,
+      "images_with_class": 29
     },
     {
       "class_id": 3,
       "name": "panama",
-      "precision": 0.6502,
-      "recall": 0.102,
-      "f1": 0.1764,
-      "mAP50": 0.1291,
-      "mAP50_95": 0.0404,
-      "instances_in_split": 49,
-      "images_with_class": 18
+      "precision": 0.4794,
+      "recall": 0.2157,
+      "f1": 0.2975,
+      "mAP50": 0.298,
+      "mAP50_95": 0.0845,
+      "instances_in_split": 51,
+      "images_with_class": 21
     }
   ],
   "speed_ms_per_image": {
-    "preprocess": 0.386,
-    "inference": 6.463,
+    "preprocess": 0.657,
+    "inference": 15.524,
     "loss": 0.001,
-    "postprocess": 0.981
+    "postprocess": 1.301
   },
   "dataset_stats": {
     "split": "test",
-    "images": 34,
-    "instances": 468,
+    "images": 37,
+    "instances": 391,
     "instances_by_class": {
-      "black_sigatoka": 9,
-      "bunchy_top": 0,
-      "healthy": 410,
-      "panama": 49
-    },
-    "images_with_class": {
       "black_sigatoka": 8,
       "bunchy_top": 0,
-      "healthy": 34,
-      "panama": 18
+      "healthy": 332,
+      "panama": 51
+    },
+    "images_with_class": {
+      "black_sigatoka": 7,
+      "bunchy_top": 0,
+      "healthy": 29,
+      "panama": 21
     },
     "class_names": [
       "black_sigatoka",
@@ -92,7 +92,7 @@
   "gflops": 27.39,
   "training": {
     "results_csv": "runs/detect/bench_yolov9s/results.csv",
-    "epochs_trained": 63,
-    "best_val_map50": 0.1506
+    "epochs_trained": 100,
+    "best_val_map50": 0.1897
   }
 }

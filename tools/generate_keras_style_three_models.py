@@ -34,7 +34,7 @@ MODELS = [
         "slug": "yolov8n",
         "label": "YOLOv8n",
         "optimizer": "AdamW",
-        "csv": ROOT / "runs" / "detect" / "runs" / "banana_disease" / "results.csv",
+        "csv": ROOT / "runs" / "detect" / "bench_yolov8n" / "results.csv",
         "color": "C0",
     },
     {
@@ -50,13 +50,6 @@ MODELS = [
         "optimizer": "AdamW",
         "csv": ROOT / "runs" / "detect" / "bench_yolov9t" / "results.csv",
         "color": "C2",
-    },
-    {
-        "slug": "yolo_nas_s",
-        "label": "YOLO-NAS S",
-        "optimizer": "AdamW",
-        "csv": ROOT / "runs" / "nas" / "bench_yolo_nas_s" / "results.csv",
-        "color": "C3",
     },
 ]
 
@@ -257,7 +250,7 @@ def plot_overlay(
     fig.text(
         0.5,
         -0.02,
-        f"YOLOv8n vs YOLOv9t vs YOLO-NAS S  AdamW  {max_epoch} epochs",
+        f"YOLOv8n vs YOLOv9t vs YOLOv9s  AdamW  {max_epoch} epochs",
         ha="center",
         va="top",
         fontsize=11,
@@ -297,8 +290,7 @@ def build_table(loaded: list[tuple[dict, dict[str, np.ndarray]]], checkpoints: l
         [
             "",
             "*Accuracy = validation mAP@0.5. Train accuracy is a Keras-style proxy "
-            "`1 - train_loss / train_loss[0]`. YOLO-NAS has no DFL term, so its "
-            "loss magnitude is not directly comparable to Ultralytics YOLO.*",
+            "`1 - train_loss / train_loss[0]`.*",
             "",
         ]
     )

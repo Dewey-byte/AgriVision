@@ -30,7 +30,7 @@ flowchart LR
 
 ## Prerequisites
 
-1. **Python 3.10+** with a GPU recommended (CUDA). CPU training works but is slow.
+1. **Python 3.10** with a GPU recommended (CUDA). CPU training works but is slow.
 2. **Repository root** as the working directory for all commands and notebook cells.
 3. **Dependencies** (from repo root):
 

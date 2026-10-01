@@ -7,12 +7,6 @@ split with identical inference settings, then written to
 page reads that folder, so a run of this script is what makes new numbers show
 up in the browser.
 
-YOLO-NAS cannot be evaluated here: Ultralytics ships a predictor and validator
-for it but no trainer, so its fine-tuned weights live in a separate
-``super-gradients`` environment. ``tools/train_yolo_nas.py`` writes a JSON file
-in the same schema into the same folder, and this script leaves those files
-alone unless ``--force`` is passed.
-
 Usage:
     python tools/benchmark_models.py
     python tools/benchmark_models.py --only yolov9s-bench

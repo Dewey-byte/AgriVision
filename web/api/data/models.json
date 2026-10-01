@@ -7,7 +7,7 @@
       "weights": "models/yolov9s_banana.pt",
       "dataset": "Primary aerial banana images (same split as the architecture benchmark)",
       "status": "deployed",
-      "description": "Default live detector in the desktop app. Operators can switch to YOLOv8n from the sidebar without restarting. Trained 100 epochs on datasets/yolo_banana; 19.29% mAP@0.5 on the held-out test split.",
+      "description": "Default live detector in the desktop app. Operators can switch to YOLOv8n from the sidebar without restarting. Trained 100 epochs on datasets/yolo_banana; 27.66% mAP@0.5 on the held-out test split.",
       "results_csv": "runs/detect/bench_yolov9s/results.csv"
     },
     {
@@ -36,7 +36,7 @@
     "dataset": "datasets/yolo_banana",
     "imgsz": 640,
     "batch": 8,
-    "protocol": "All contenders fine-tuned on the same datasets/yolo_banana split (593 train / 33 val / 34 test) for 100 epochs at imgsz 640, then scored on the held-out test split with identical inference settings.",
+    "protocol": "All contenders fine-tuned on the same datasets/yolo_banana split (760 train / 33 val / 37 test, including the 23 Sep 2026 Panama export) for 100 epochs at imgsz 640, then scored on the held-out test split. YOLOv8n trained at batch 16; YOLOv9t and YOLOv9s at batch 8.",
     "contenders": [
       {
         "id": "yolov8n-bench",
@@ -64,15 +64,6 @@
         "weights": "runs/detect/bench_yolov9s/weights/best.pt",
         "results_csv": "runs/detect/bench_yolov9s/results.csv",
         "notes": "GELAN backbone with programmable gradient information. At 2.4x YOLOv8n's parameters it is not a like-for-like comparison; treat its win as the expected result of a bigger model."
-      },
-      {
-        "id": "yolonas-s-bench",
-        "name": "YOLO-NAS S",
-        "family": "YOLO-NAS",
-        "runner": "super-gradients",
-        "weights": "models/yolo_nas_s_banana.pth",
-        "results_csv": "runs/nas/bench_yolo_nas_s/results.csv",
-        "notes": "Neural-architecture-searched detector from Deci. Ultralytics ships no trainer for it, so it is fine-tuned and scored in the separate venv-nas environment via tools/train_yolo_nas.py."
       }
     ]
   },

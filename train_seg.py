@@ -6,6 +6,10 @@ import argparse
 import shutil
 from pathlib import Path
 
+from utils.python_runtime import require_desktop_python
+
+require_desktop_python()
+
 from ultralytics import YOLO
 
 try:

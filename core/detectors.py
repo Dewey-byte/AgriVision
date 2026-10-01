@@ -1,11 +1,8 @@
 """Live detectors the desktop app can switch between.
 
-Only Ultralytics ``.pt`` weights belong here. YOLO-NAS needs a separate
-``super-gradients`` runtime and must not ship inside the installable .exe —
-it would add a second deep-learning stack and it lost the accuracy benchmark.
-
-Weights live under ``models/`` with stable names so a packager can collect that
-one folder. Training-run paths under ``runs/`` stay out of the installer.
+Only Ultralytics ``.pt`` weights belong here. Weights live under ``models/``
+with stable names so a packager can collect that one folder. Training-run
+paths under ``runs/`` stay out of the installer.
 """
 
 from __future__ import annotations
@@ -60,7 +57,7 @@ DETECTORS: tuple[DetectorSpec, ...] = (
         id="yolov9t",
         name="YOLOv9t",
         label="YOLOv9t — compact",
-        description="Smallest YOLOv9 (2.0M params). Highest mAP@0.5 on the held-out test, close in live speed to YOLOv9s.",
+        description="Smallest YOLOv9 (2.0M params). Compact live detector, close in speed to YOLOv9s.",
         filename="yolov9t_banana.pt",
     ),
     DetectorSpec(

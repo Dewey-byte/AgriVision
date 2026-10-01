@@ -1,0 +1,85 @@
+{
+  "system": "AgriVision",
+  "exported_at": "2026-09-16T21:52:22",
+  "video_source": "scrcpy",
+  "geo": {
+    "latitude": 7.663272,
+    "longitude": 126.08575,
+    "altitude_m": null,
+    "accuracy_m": 100.0,
+    "source": "android_gps"
+  },
+  "detection_summary": {
+    "total": 1,
+    "healthy": 1,
+    "stressed": 0,
+    "diseased": 0
+  },
+  "detections": [
+    {
+      "bbox": [
+        205,
+        317,
+        316,
+        412
+      ],
+      "class": 2,
+      "confidence": 0.38037109375,
+      "label": "healthy (0.38)"
+    }
+  ],
+  "vegetation": {
+    "health_label": "good",
+    "mean_stress": 0.1269,
+    "high_stress_pct": 10.74,
+    "index_type": "exg_proxy"
+  },
+  "session": {
+    "session_id": "144b",
+    "flight_id": "AGV-20260916-114829-CA8EF7",
+    "video_id": "AGV-20260916-114829-CA8EF7",
+    "field_name": "",
+    "storage_folder": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_134025_144b",
+    "started_at": "2026-09-16T13:40:25+00:00",
+    "frames_processed": 27382,
+    "frames_analyzed": 2197,
+    "total_detections": 2125,
+    "peak_detections": 1,
+    "last_detection_summary": {
+      "total": 1,
+      "healthy": 1,
+      "stressed": 0,
+      "diseased": 0
+    },
+    "last_vegetation": {
+      "health_label": "good",
+      "mean_stress": 0.1269,
+      "high_stress_pct": 10.74,
+      "index_type": "exg_proxy"
+    },
+    "heatmap_point_count": 0,
+    "geo_marker_count": 0,
+    "manual_tag_count": 0,
+    "manual_tags": [],
+    "last_geo": {},
+    "detector": {
+      "id": "yolov8n",
+      "name": "YOLOv8n",
+      "weights": "D:\\GitHub\\AgriVision\\models\\yolov8n_banana.pt"
+    }
+  },
+  "flight_id": "AGV-20260916-114829-CA8EF7",
+  "video_id": "AGV-20260916-114829-CA8EF7",
+  "session_id": "144b",
+  "capture_id": "20260916_215222",
+  "detector": {
+    "id": "yolov8n",
+    "name": "YOLOv8n",
+    "weights": "D:\\GitHub\\AgriVision\\models\\yolov8n_banana.pt"
+  },
+  "artifacts": {
+    "frame": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_134025_144b\\captures\\agrivision_20260916_215222_frame.jpg",
+    "leaflet_map": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_134025_144b\\captures\\agrivision_20260916_215222_map.html",
+    "report_json": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_134025_144b\\captures\\agrivision_20260916_215222_report.json"
+  }
+}

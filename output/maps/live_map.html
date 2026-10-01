@@ -13,6 +13,7 @@
 <body>
   <div id="map"></div>
   
+  
   <div id="mapToolbar" style="position:absolute;top:10px;left:10px;z-index:1000;display:flex;gap:6px;flex-wrap:wrap;max-width:70%;pointer-events:auto;">
     <button id="tagHealthyBtn" data-category="healthy" type="button" style="padding:6px 8px;border:none;border-radius:6px;background:#40916c;color:#fff;font:11px system-ui;cursor:pointer;">Tag Healthy</button>
     <button id="tagModerateBtn" data-category="stressed" type="button" style="padding:6px 8px;border:none;border-radius:6px;background:#d4a373;color:#fff;font:11px system-ui;cursor:pointer;">Tag Moderate</button>
@@ -35,7 +36,7 @@
     }
   </script>
   <script>
-    const initialPayload = {"center": [7.668934, 126.102112], "heatPoints": [], "markers": [], "manualTags": [], "fieldBounds": {"south": 7.668664506647503, "west": 126.10174943261927, "north": 7.669203493352497, "east": 126.10247456738074}, "colors": {"healthy": "#40916c", "stressed": "#d4a373", "diseased": "#bc4749"}, "categoryHeat": {"healthy": 0.15, "stressed": 0.55, "diseased": 0.9}, "heatGradient": {"0.0": "#40916c", "0.15": "#40916c", "0.4": "#74c69d", "0.55": "#d4a373", "0.75": "#e9c46a", "0.9": "#bc4749", "1.0": "#9b2226"}, "manualOnly": false, "meta": {"accuracy_m": 149.0, "altitude_m": null, "source": "windows_gps"}};
+    const initialPayload = {"center": [7.686851, 126.01821], "heatPoints": [], "markers": [], "manualTags": [], "fieldBounds": null, "colors": {"healthy": "#40916c", "stressed": "#d4a373", "diseased": "#bc4749"}, "categoryHeat": {"healthy": 0.15, "stressed": 0.55, "diseased": 0.9}, "heatGradient": {"0.0": "#40916c", "0.15": "#40916c", "0.4": "#74c69d", "0.55": "#d4a373", "0.75": "#e9c46a", "0.9": "#bc4749", "1.0": "#9b2226"}, "manualOnly": false, "meta": {"accuracy_m": 102.0, "altitude_m": null, "source": "windows_gps"}};
     const center = initialPayload.center;
     const colors = initialPayload.colors;
     const defaultHeatGradient = {"0.0": "#40916c", "0.15": "#40916c", "0.4": "#74c69d", "0.55": "#d4a373", "0.75": "#e9c46a", "0.9": "#bc4749", "1.0": "#9b2226"};
@@ -111,8 +112,8 @@
         }).addTo(map).bindPopup('GPS accuracy radius');
       }
 
-      if (payload.fieldBounds) {
-        window.agriVisionSetFieldBounds && window.agriVisionSetFieldBounds(payload.fieldBounds, false);
+      if (!(typeof drawMode !== 'undefined' && drawMode) && window.agriVisionSetFieldBounds) {
+        window.agriVisionSetFieldBounds(payload.fieldBounds || null, false);
       }
 
       if (heatLayer == null) {
@@ -167,6 +168,33 @@
     let drawMode = false;
     let drawCorner1 = null;
     let drawCornerMarker = null;
+    let drawPreview = null;
+
+    function clearDrawGuides() {
+      drawCorner1 = null;
+      if (drawCornerMarker != null) {
+        map.removeLayer(drawCornerMarker);
+        drawCornerMarker = null;
+      }
+      if (drawPreview != null) {
+        map.removeLayer(drawPreview);
+        drawPreview = null;
+      }
+    }
+
+    function syncDrawChrome() {
+      const cursor = drawMode ? 'crosshair'
+        : (typeof tagMode !== 'undefined' && tagMode ? 'crosshair'
+        : (typeof removeTagMode !== 'undefined' && removeTagMode ? 'pointer' : ''));
+      map.getContainer().style.cursor = cursor;
+      if (drawMode) map.dragging.disable();
+      else map.dragging.enable();
+      const btn = document.getElementById('drawFieldBtn');
+      if (btn) {
+        btn.textContent = drawMode ? 'Click 2 corners…' : 'Draw field area';
+        btn.style.background = drawMode ? '#d4a373' : '#1b4332';
+      }
+    }
 
     function renderFieldBounds(bounds, fitView) {
       if (fieldRect != null) {
@@ -190,26 +218,19 @@
 
     window.agriVisionEnableDrawMode = function(on) {
       drawMode = !!on;
-      drawCorner1 = null;
-      if (drawCornerMarker != null) {
-        map.removeLayer(drawCornerMarker);
-        drawCornerMarker = null;
+      clearDrawGuides();
+      if (on) {
+        if (typeof tagMode !== 'undefined') tagMode = null;
+        if (typeof removeTagMode !== 'undefined') removeTagMode = false;
+        if (typeof styleTagButtons === 'function') styleTagButtons(null);
       }
-      if (on && typeof window.agriVisionSetTagMode === 'function') {
-        window.agriVisionSetTagMode(null);
-      }
-      map.getContainer().style.cursor = drawMode ? 'crosshair' : '';
-      const btn = document.getElementById('drawFieldBtn');
-      if (btn) {
-        btn.textContent = drawMode ? 'Click 2 corners…' : 'Draw field area';
-        btn.style.background = drawMode ? '#d4a373' : '#1b4332';
-      }
+      syncDrawChrome();
     };
 
     function finishFieldDraw(corner1, corner2) {
       const bounds = L.latLngBounds(corner1, corner2);
-      if (bounds.getNorth() - bounds.getSouth() < 1e-6) return;
-      if (bounds.getEast() - bounds.getWest() < 1e-6) return;
+      if (bounds.getNorth() - bounds.getSouth() < 1e-6) return false;
+      if (bounds.getEast() - bounds.getWest() < 1e-6) return false;
       const payload = {
         south: bounds.getSouth(),
         west: bounds.getWest(),
@@ -219,11 +240,19 @@
       window.__agriVisionFieldBounds = payload;
       renderFieldBounds(payload, true);
       window.agriVisionEnableDrawMode(false);
+      if (typeof markLocalMapMutate === 'function') markLocalMapMutate();
       if (window.agriVisionBridge && window.agriVisionBridge.onFieldAreaDrawn) {
         window.agriVisionBridge.onFieldAreaDrawn(
           payload.south, payload.west, payload.north, payload.east
         );
+      } else if (typeof postSyncEvent === 'function') {
+        postSyncEvent({
+          type: 'field_drawn',
+          south: payload.south, west: payload.west,
+          north: payload.north, east: payload.east
+        });
       }
+      return true;
     }
 
     window.agriVisionHandleMapClick = function(lat, lon) {
@@ -238,11 +267,6 @@
           return;
         }
         finishFieldDraw(drawCorner1, latlng);
-        drawCorner1 = null;
-        if (drawCornerMarker != null) {
-          map.removeLayer(drawCornerMarker);
-          drawCornerMarker = null;
-        }
         return;
       }
       if (tagMode && typeof addManualTag === 'function') {
@@ -250,15 +274,44 @@
       }
     };
 
+    map.on('mousemove', (e) => {
+      if (!drawMode || !drawCorner1) {
+        if (drawPreview != null) {
+          map.removeLayer(drawPreview);
+          drawPreview = null;
+        }
+        return;
+      }
+      const bounds = L.latLngBounds(drawCorner1, e.latlng);
+      if (drawPreview != null) {
+        drawPreview.setBounds(bounds);
+      } else {
+        drawPreview = L.rectangle(bounds, {
+          color: '#d4a373', weight: 2, dashArray: '6 4', fillColor: '#d4a373', fillOpacity: 0.08
+        }).addTo(map);
+      }
+    });
+
     document.getElementById('drawFieldBtn').addEventListener('click', (ev) => {
-      ev.stopPropagation();
+      L.DomEvent.stop(ev);
       window.agriVisionEnableDrawMode(!drawMode);
     });
     document.getElementById('clearFieldBtn').addEventListener('click', (ev) => {
-      ev.stopPropagation();
+      L.DomEvent.stop(ev);
+      window.agriVisionEnableDrawMode(false);
       window.agriVisionSetFieldBounds(null, false);
+      if (typeof markLocalMapMutate === 'function') markLocalMapMutate();
       if (window.agriVisionBridge && window.agriVisionBridge.onFieldAreaCleared) {
         window.agriVisionBridge.onFieldAreaCleared();
+      } else if (typeof postSyncEvent === 'function') {
+        postSyncEvent({type: 'field_cleared'});
+      }
+    });
+    ['mapToolbar', 'fieldToolbar'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        L.DomEvent.disableClickPropagation(el);
+        L.DomEvent.disableScrollPropagation(el);
       }
     });
 
@@ -266,8 +319,19 @@
     let removeTagMode = false;
     let manualTags = [];
     let tagIdCounter = 0;
+    let lastLocalMutateAt = 0;
     const manualTagLayer = L.layerGroup().addTo(map);
     const manualHeatLayer = L.layerGroup().addTo(map);
+
+    function markLocalMapMutate() {
+      lastLocalMutateAt = Date.now();
+    }
+
+    function postSyncEvent(event) {
+      if (typeof window.agriVisionPostSyncEvent === 'function') {
+        window.agriVisionPostSyncEvent(event);
+      }
+    }
 
     function raiseManualTagLayers() {
       manualTagLayer.eachLayer(layer => {
@@ -339,12 +403,14 @@
     function updateManualHeatVisual(tags) {
       manualHeatLayer.clearLayers();
       tags.forEach(t => {
+        if (t.category !== 'stressed' && t.category !== 'diseased') return;
         const c = tagColor(t.category);
+        const radius = t.category === 'diseased' ? 28 : 22;
         L.circle([t.lat, t.lon], {
-          radius: 22,
+          radius: radius,
           color: c,
           fillColor: c,
-          fillOpacity: 0.35,
+          fillOpacity: t.category === 'diseased' ? 0.38 : 0.32,
           weight: 1,
           opacity: 0.9
         }).addTo(manualHeatLayer);
@@ -379,9 +445,12 @@
 
     window.agriVisionSetTagMode = function(category) {
       tagMode = category || null;
-      if (tagMode) removeTagMode = false;
-      drawMode = false;
-      map.getContainer().style.cursor = tagMode ? 'crosshair' : (removeTagMode ? 'pointer' : '');
+      if (tagMode) {
+        removeTagMode = false;
+        if (drawMode) window.agriVisionEnableDrawMode(false);
+      }
+      if (typeof syncDrawChrome === 'function') syncDrawChrome();
+      else map.getContainer().style.cursor = tagMode ? 'crosshair' : (removeTagMode ? 'pointer' : '');
       styleTagButtons(tagMode);
     };
 
@@ -389,9 +458,10 @@
       removeTagMode = !!on;
       if (removeTagMode) {
         tagMode = null;
-        drawMode = false;
+        if (drawMode) window.agriVisionEnableDrawMode(false);
       }
-      map.getContainer().style.cursor = removeTagMode ? 'pointer' : '';
+      if (typeof syncDrawChrome === 'function') syncDrawChrome();
+      else map.getContainer().style.cursor = removeTagMode ? 'pointer' : '';
       styleTagButtons(null);
     };
 
@@ -402,8 +472,14 @@
       manualTags.splice(idx, 1);
       renderManualTags(manualTags);
       map.closePopup();
+      markLocalMapMutate();
       if (window.agriVisionBridge && window.agriVisionBridge.onManualTagRemoved) {
         window.agriVisionBridge.onManualTagRemoved(removed.lat, removed.lon, removed.category);
+      } else {
+        postSyncEvent({
+          type: 'tag_removed',
+          lat: removed.lat, lon: removed.lon, category: removed.category
+        });
       }
     }
 
@@ -430,8 +506,11 @@
       makeTagMarker(tag).addTo(manualTagLayer);
       syncHeatLayer();
       raiseManualTagLayers();
+      markLocalMapMutate();
       if (window.agriVisionBridge && window.agriVisionBridge.onManualTagAdded) {
         window.agriVisionBridge.onManualTagAdded(lat, lon, category);
+      } else {
+        postSyncEvent({type: 'tag_added', lat: lat, lon: lon, category: category});
       }
     }
 
@@ -472,6 +551,54 @@
       window.agriVisionSetRemoveTagMode(!removeTagMode);
     });
     styleTagButtons(null);
+
+        window.AGRIVISION_SYNC_BASE = "http://127.0.0.1:8765";
+
+    window.agriVisionPostSyncEvent = function(event) {
+      const base = window.AGRIVISION_SYNC_BASE || '';
+      if (!base || !event) return;
+      try {
+        fetch(base + '/api/event', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(event),
+          cache: 'no-store'
+        }).catch(function() {});
+      } catch (e) {}
+    };
+
+    (function startLiveMapSync() {
+      const base = window.AGRIVISION_SYNC_BASE || '';
+      if (!base) return;
+      let lastVersion = -1;
+      let lastKey = '';
+      function stateKey(payload) {
+        const tags = (payload.manualTags || []).map(function(t) {
+          return [Number(t.lat).toFixed(7), Number(t.lon).toFixed(7), String(t.category || '')].join(',');
+        }).sort().join(';');
+        const b = payload.fieldBounds;
+        const bounds = b ? [b.south, b.west, b.north, b.east].join(',') : '';
+        return tags + '|' + bounds;
+      }
+      function pull() {
+        if (typeof lastLocalMutateAt === 'number' && Date.now() - lastLocalMutateAt < 1000) return;
+        fetch(base + '/api/state', {cache: 'no-store'})
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .then(function(data) {
+            if (!data || !data.payload) return;
+            if (data.version === lastVersion) return;
+            if (typeof lastLocalMutateAt === 'number' && Date.now() - lastLocalMutateAt < 1000) return;
+            const key = stateKey(data.payload);
+            lastVersion = data.version;
+            if (key === lastKey) return;
+            lastKey = key;
+            if (window.agriVisionUpdateMap) window.agriVisionUpdateMap(data.payload);
+          })
+          .catch(function() {});
+      }
+      setInterval(pull, 400);
+      setTimeout(pull, 250);
+    })();
 
 
     window.agriVisionUpdateMap(initialPayload);

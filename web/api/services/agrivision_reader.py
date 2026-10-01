@@ -20,6 +20,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from core.ndvi import align_vegetation_with_detections
 from utils.categories import detection_category as label_category  # re-exported for the admin API
 from web.api import config
 
@@ -162,6 +163,12 @@ def _normalize_report(path: Path, raw: dict[str, Any]) -> dict[str, Any]:
         classes[name.lower().replace(" ", "_")] += 1
 
     summary = raw.get("detection_summary") or {}
+    vegetation = align_vegetation_with_detections(raw.get("vegetation") or {}, summary)
+    session = dict(session)
+    session["last_vegetation"] = align_vegetation_with_detections(
+        session.get("last_vegetation") or {},
+        session.get("last_detection_summary") or summary,
+    )
     video_id = str(raw.get("video_id") or session.get("video_id") or "").strip()
     if not video_id:
         video_id = f"legacy-{report_id}"
@@ -186,7 +193,7 @@ def _normalize_report(path: Path, raw: dict[str, Any]) -> dict[str, Any]:
         },
         "detections": detections,
         "class_counts": dict(classes),
-        "vegetation": raw.get("vegetation") or {},
+        "vegetation": vegetation,
         "session": session,
         "detector": detector,
         "session_started_at": session.get("started_at") or "",

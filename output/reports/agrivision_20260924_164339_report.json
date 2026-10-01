@@ -1,0 +1,124 @@
+{
+  "system": "AgriVision",
+  "exported_at": "2026-09-24T16:43:39",
+  "video_source": "scrcpy",
+  "geo": {
+    "latitude": 7.665249,
+    "longitude": 126.088491,
+    "altitude_m": null,
+    "accuracy_m": 400.0,
+    "source": "android_gps"
+  },
+  "detection_summary": {
+    "total": 3,
+    "healthy": 0,
+    "stressed": 0,
+    "diseased": 3
+  },
+  "detections": [
+    {
+      "bbox": [
+        734,
+        413,
+        793,
+        479
+      ],
+      "class": 3,
+      "confidence": 0.724810004234314,
+      "label": "panama (0.72)"
+    },
+    {
+      "bbox": [
+        402,
+        167,
+        481,
+        269
+      ],
+      "class": 3,
+      "confidence": 0.5717660784721375,
+      "label": "panama (0.57)"
+    },
+    {
+      "bbox": [
+        575,
+        279,
+        660,
+        348
+      ],
+      "class": 3,
+      "confidence": 0.4530290365219116,
+      "label": "panama (0.45)"
+    }
+  ],
+  "vegetation": {
+    "health_label": "good",
+    "mean_stress": 0.179,
+    "high_stress_pct": 13.35,
+    "index_type": "exg_proxy"
+  },
+  "session": {
+    "session_id": "638f",
+    "flight_id": "AGV-20260924-083753-3C5D64",
+    "video_id": "AGV-20260924-083753-3C5D64",
+    "field_name": "",
+    "storage_folder": "D:\\GitHub\\AgriVision\\output\\sessions\\20260924_084005_638f",
+    "started_at": "2026-09-24T08:40:05+00:00",
+    "frames_processed": 7162,
+    "frames_analyzed": 136,
+    "total_detections": 103,
+    "peak_detections": 4,
+    "last_detection_summary": {
+      "total": 3,
+      "healthy": 0,
+      "stressed": 0,
+      "diseased": 3
+    },
+    "last_vegetation": {
+      "health_label": "good",
+      "mean_stress": 0.179,
+      "high_stress_pct": 13.35,
+      "index_type": "exg_proxy"
+    },
+    "heatmap_point_count": 0,
+    "geo_marker_count": 0,
+    "manual_tag_count": 2,
+    "manual_tags": [
+      {
+        "id": "e9157387",
+        "lat": 7.6666502,
+        "lon": 126.0870634,
+        "category": "diseased",
+        "label": "High stress (manual)",
+        "source": "manual_tag"
+      },
+      {
+        "id": "3fc31ffd",
+        "lat": 7.6671817,
+        "lon": 126.087879,
+        "category": "stressed",
+        "label": "Moderate (manual)",
+        "source": "manual_tag"
+      }
+    ],
+    "last_geo": {},
+    "detector": {
+      "id": "yolov9s",
+      "name": "YOLOv9s",
+      "weights": "D:\\GitHub\\AgriVision\\models\\yolov9s_banana.pt"
+    }
+  },
+  "flight_id": "AGV-20260924-083753-3C5D64",
+  "video_id": "AGV-20260924-083753-3C5D64",
+  "session_id": "638f",
+  "capture_id": "20260924_164339",
+  "detector": {
+    "id": "yolov9s",
+    "name": "YOLOv9s",
+    "weights": "D:\\GitHub\\AgriVision\\models\\yolov9s_banana.pt"
+  },
+  "artifacts": {
+    "frame": "D:\\GitHub\\AgriVision\\output\\reports\\agrivision_20260924_164339_frame.jpg",
+    "leaflet_map": "D:\\GitHub\\AgriVision\\output\\reports\\agrivision_20260924_164339_map.html",
+    "report_json": "D:\\GitHub\\AgriVision\\output\\reports\\agrivision_20260924_164339_report.json"
+  }
+}

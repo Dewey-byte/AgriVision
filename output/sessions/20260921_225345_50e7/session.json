@@ -1,0 +1,13 @@
+{
+  "session_id": "50e7",
+  "flight_id": "AGV-20260921-225345-15CB17",
+  "video_id": "AGV-20260921-225345-15CB17",
+  "folder": "output/sessions/20260921_225345_50e7",
+  "started_at": "2026-09-21T22:53:45+00:00",
+  "ended_at": "2026-09-21T22:53:45+00:00",
+  "field_name": "smoke",
+  "status": "completed",
+  "stats": {
+    "frames_processed": 1
+  }
+}

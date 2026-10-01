@@ -1,0 +1,118 @@
+{
+  "system": "AgriVision",
+  "exported_at": "2026-09-17T04:39:59",
+  "video_source": "scrcpy",
+  "geo": {
+    "latitude": 7.686831,
+    "longitude": 126.01834,
+    "altitude_m": null,
+    "accuracy_m": 111.0,
+    "source": "windows_gps"
+  },
+  "detection_summary": {
+    "total": 4,
+    "healthy": 4,
+    "stressed": 0,
+    "diseased": 0
+  },
+  "detections": [
+    {
+      "bbox": [
+        790,
+        192,
+        895,
+        287
+      ],
+      "class": 2,
+      "confidence": 0.448486328125,
+      "label": "healthy (0.45)"
+    },
+    {
+      "bbox": [
+        465,
+        62,
+        563,
+        164
+      ],
+      "class": 2,
+      "confidence": 0.39599609375,
+      "label": "healthy (0.40)"
+    },
+    {
+      "bbox": [
+        591,
+        163,
+        697,
+        270
+      ],
+      "class": 2,
+      "confidence": 0.392333984375,
+      "label": "healthy (0.39)"
+    },
+    {
+      "bbox": [
+        639,
+        502,
+        738,
+        592
+      ],
+      "class": 2,
+      "confidence": 0.38671875,
+      "label": "healthy (0.39)"
+    }
+  ],
+  "vegetation": {
+    "health_label": "moderate",
+    "mean_stress": 0.4136,
+    "high_stress_pct": 38.7,
+    "index_type": "exg_proxy"
+  },
+  "session": {
+    "session_id": "9dab",
+    "flight_id": "AGV-20260916-203059-D15065",
+    "video_id": "AGV-20260916-203059-D15065",
+    "field_name": "",
+    "storage_folder": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_203847_9dab",
+    "started_at": "2026-09-16T20:38:47+00:00",
+    "frames_processed": 2905,
+    "frames_analyzed": 203,
+    "total_detections": 295,
+    "peak_detections": 7,
+    "last_detection_summary": {
+      "total": 4,
+      "healthy": 4,
+      "stressed": 0,
+      "diseased": 0
+    },
+    "last_vegetation": {
+      "health_label": "moderate",
+      "mean_stress": 0.4136,
+      "high_stress_pct": 38.7,
+      "index_type": "exg_proxy"
+    },
+    "heatmap_point_count": 0,
+    "geo_marker_count": 0,
+    "manual_tag_count": 0,
+    "manual_tags": [],
+    "last_geo": {},
+    "detector": {
+      "id": "yolov8n",
+      "name": "YOLOv8n",
+      "weights": "D:\\GitHub\\AgriVision\\models\\yolov8n_banana.pt"
+    }
+  },
+  "flight_id": "AGV-20260916-203059-D15065",
+  "video_id": "AGV-20260916-203059-D15065",
+  "session_id": "9dab",
+  "capture_id": "20260917_043959",
+  "detector": {
+    "id": "yolov8n",
+    "name": "YOLOv8n",
+    "weights": "D:\\GitHub\\AgriVision\\models\\yolov8n_banana.pt"
+  },
+  "artifacts": {
+    "frame": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_203847_9dab\\captures\\agrivision_20260917_043959_frame.jpg",
+    "leaflet_map": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_203847_9dab\\captures\\agrivision_20260917_043959_map.html",
+    "report_json": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_203847_9dab\\captures\\agrivision_20260917_043959_report.json"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "session_id": "b369",
+  "flight_id": "AGV-20260916-213446-8DAF5B",
+  "video_id": "AGV-20260916-213446-8DAF5B",
+  "folder": "output/sessions/20260916_213516_b369",
+  "started_at": "2026-09-16T21:35:16+00:00",
+  "ended_at": "2026-09-16T21:36:02+00:00",
+  "field_name": "",
+  "status": "completed",
+  "stats": {
+    "session_id": "b369",
+    "flight_id": "AGV-20260916-213446-8DAF5B",
+    "video_id": "AGV-20260916-213446-8DAF5B",
+    "field_name": "",
+    "storage_folder": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_213516_b369",
+    "started_at": "2026-09-16T21:35:16+00:00",
+    "frames_processed": 1039,
+    "frames_analyzed": 73,
+    "total_detections": 256,
+    "peak_detections": 12,
+    "last_detection_summary": {
+      "total": 2,
+      "healthy": 2,
+      "stressed": 0,
+      "diseased": 0
+    },
+    "last_vegetation": {
+      "health_label": "stressed",
+      "mean_stress": 0.5934,
+      "high_stress_pct": 57.69,
+      "index_type": "exg_proxy"
+    },
+    "heatmap_point_count": 0,
+    "geo_marker_count": 0,
+    "manual_tag_count": 0,
+    "manual_tags": [],
+    "last_geo": {},
+    "detector": {
+      "id": "yolov9s",
+      "name": "YOLOv9s",
+      "weights": "D:\\GitHub\\AgriVision\\models\\yolov9s_banana.pt"
+    }
+  }
+}

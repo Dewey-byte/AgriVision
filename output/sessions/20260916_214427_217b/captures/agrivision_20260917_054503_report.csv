@@ -1,0 +1,23 @@
+section,field,value
+flight,video_id,AGV-20260916-214417-9D1BBD
+model,name,YOLOv8n
+model,id,yolov8n
+model,weights,D:\GitHub\AgriVision\models\yolov8n_banana.pt
+summary,total,3
+summary,healthy,3
+summary,stressed,0
+summary,diseased,0
+geo,latitude,7.687078
+geo,longitude,126.018129
+geo,altitude_m,
+geo,accuracy_m,100.0
+geo,source,android_gps
+vegetation,health_label,stressed
+vegetation,mean_stress,0.5872
+vegetation,high_stress_pct,56.66
+vegetation,index_type,exg_proxy
+
+label,confidence,class,bbox
+healthy (0.38),0.37841796875,2,532 155 626 245
+healthy (0.38),0.37744140625,2,558 396 657 449
+healthy (0.35),0.351318359375,2,258 367 366 456

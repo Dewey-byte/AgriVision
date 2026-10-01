@@ -7,11 +7,14 @@ Label Studio's "YOLO" export is a zip containing:
     notes.json
 
 Each export uses a fresh <hash> prefix, so the same photo re-exported gets a new
-filename. This tool de-duplicates by the *original* DJI stem (e.g. ``DJI_0257``):
+filename. This tool de-duplicates by the *original* DJI stem (e.g. ``DJI_0257``),
+or by the screenshot stem after dropping the Label Studio hash:
 
   * If the stem already exists in the dataset, its image + label are replaced
     in-place (kept in whatever train/val split it was already in -> no leakage).
-  * New stems are split into train/val deterministically by the requested ratio.
+  * New stems are split into train/val/test by the requested ratio.
+  * Duplicate copies of the same photo (resized JPG vs original, re-exports)
+    keep the variant with the most boxes, then the larger image.
 
 Usage:
     python tools/merge_yolo_export.py \
@@ -62,6 +65,25 @@ def index_existing(dataset: Path) -> dict[str, dict[str, object]]:
     return index
 
 
+def box_count(label_text: str) -> int:
+    return sum(1 for line in label_text.splitlines() if line.strip())
+
+
+def is_better_item(candidate: dict[str, object], current: dict[str, object]) -> bool:
+    """Prefer more boxes, then the larger image bytes (original vs resized)."""
+    cand_boxes = box_count(str(candidate["label_text"]))
+    curr_boxes = box_count(str(current["label_text"]))
+    if cand_boxes != curr_boxes:
+        return cand_boxes > curr_boxes
+    return len(candidate["image_bytes"]) > len(current["image_bytes"])  # type: ignore[arg-type]
+
+
+def keep_best(dst: dict[str, dict[str, object]], key: str, item: dict[str, object]) -> None:
+    current = dst.get(key)
+    if current is None or is_better_item(item, current):
+        dst[key] = item
+
+
 def collect_from_zip(zip_path: Path) -> dict[str, dict[str, object]]:
     """Map canonical stem -> {name, image_bytes, ext, label_text} from one zip."""
     items: dict[str, dict[str, object]] = {}
@@ -79,13 +101,17 @@ def collect_from_zip(zip_path: Path) -> dict[str, dict[str, object]]:
             if label_name is None:
                 # Image with no annotations -> skip (no boxes to learn from).
                 continue
+            label_text = zf.read(label_name).decode("utf-8")
+            if box_count(label_text) == 0:
+                continue
             key = canonical_stem(img_name)
-            items[key] = {
+            item = {
                 "name": Path(img_name).name,
                 "image_bytes": zf.read(img_name),
                 "ext": Path(img_name).suffix.lower(),
-                "label_text": zf.read(label_name).decode("utf-8"),
+                "label_text": label_text,
             }
+            keep_best(items, key, item)
     return items
 
 
@@ -131,15 +157,16 @@ def main() -> None:
     existing = index_existing(dataset)
     print(f"Existing dataset: {len(existing)} unique photos")
 
-    # Collect new items; later zips win on intra-batch duplicate stems.
+    # Collect new items; keep the richest label / largest image per stem.
     incoming: dict[str, dict[str, object]] = {}
     for zip_path in args.zips:
         zp = zip_path.resolve()
         if not zp.is_file():
             raise FileNotFoundError(f"Zip not found: {zp}")
         found = collect_from_zip(zp)
-        print(f"  {zp.name}: {len(found)} labeled photos")
-        incoming.update(found)
+        print(f"  {zp.name}: {len(found)} unique labeled photos")
+        for key, item in found.items():
+            keep_best(incoming, key, item)
 
     updated = added_train = added_val = added_test = 0
     for key, item in incoming.items():

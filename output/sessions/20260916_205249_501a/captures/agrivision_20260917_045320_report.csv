@@ -1,0 +1,27 @@
+section,field,value
+flight,video_id,AGV-20260916-205212-451993
+summary,total,10
+summary,healthy,8
+summary,stressed,0
+summary,diseased,2
+geo,latitude,7.686874
+geo,longitude,126.018113
+geo,altitude_m,
+geo,accuracy_m,111.0
+geo,source,windows_gps
+vegetation,health_label,stressed
+vegetation,mean_stress,0.6566
+vegetation,high_stress_pct,63.78
+vegetation,index_type,exg_proxy
+
+label,confidence,class,bbox
+healthy (0.70),0.7041015625,2,526 596 606 649
+healthy (0.61),0.609375,2,952 456 1008 516
+healthy (0.57),0.56884765625,2,928 555 1013 638
+healthy (0.50),0.5,2,415 426 474 486
+healthy (0.50),0.49609375,2,773 350 853 407
+healthy (0.39),0.394287109375,2,560 598 613 675
+panama (0.39),0.388671875,3,300 259 373 327
+healthy (0.39),0.3876953125,2,369 173 444 249
+panama (0.37),0.368408203125,3,560 470 595 549
+healthy (0.36),0.36376953125,2,429 293 509 380

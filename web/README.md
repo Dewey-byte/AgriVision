@@ -20,14 +20,14 @@ Desktop app (PyQt5) ──writes──▶ output/reports/*.{json,csv,jpg,map.htm
 - **Dashboard** — KPIs, detections-per-report trend, health distribution, recent sessions.
 - **Records** — searchable/filterable management of every field report and flight session.
 - **Analytics** — class distribution, vegetation-stress trends, health-label breakdown.
-- **Model Comparison** — head-to-head accuracy benchmark of YOLOv8, YOLOv9 and YOLO-NAS on one held-out split (ranked leaderboard, overall and per-class mAP, overlaid convergence curves), plus the deployed pipeline line-up with live training curves from `results.csv`.
+- **Model Comparison** — head-to-head accuracy benchmark of YOLOv8 and YOLOv9 on one held-out split (ranked leaderboard, overall and per-class mAP, overlaid convergence curves), plus the deployed pipeline line-up with live training curves from `results.csv`.
 - **Disease Map** — confirmed disease/stress tags clustered into affected zones with an estimated radius, over satellite imagery.
 - **Reports** — day-organized report bundles with annotated frame, embedded Leaflet map, detection table, and JSON/CSV download.
 - **Auth** — single administrative user, HMAC bearer tokens.
 
 ## Requirements
 
-- Python 3.10+ (for the API)
+- Python 3.10 (for the API)
 - Node.js 18+ (only to build the frontend)
 
 ## Quick start
@@ -170,8 +170,8 @@ python tools/benchmark_models.py
 ```
 
 No API restart is needed — the benchmarks folder is read per request. See
-[`docs/MODEL_BENCHMARK.md`](../docs/MODEL_BENCHMARK.md) for the training recipe,
-why YOLO-NAS needs its own environment, and how to add a fourth contender.
+[`docs/MODEL_BENCHMARK.md`](../docs/MODEL_BENCHMARK.md) for the training recipe
+and how to add another contender.
 
 ### Video IDs
 
@@ -185,6 +185,6 @@ protocol.
 ## Related docs
 
 - [`docs/DRONE_REQUIREMENTS.md`](../docs/DRONE_REQUIREMENTS.md) — drone specs and pre-flight video-ID procedure
-- [`docs/MODEL_BENCHMARK.md`](../docs/MODEL_BENCHMARK.md) — the YOLOv8 / YOLOv9 / YOLO-NAS accuracy benchmark behind Model Comparison
+- [`docs/MODEL_BENCHMARK.md`](../docs/MODEL_BENCHMARK.md) — the YOLOv8 / YOLOv9 accuracy benchmark behind Model Comparison
 - [`docs/SECONDARY_DATASETS.md`](../docs/SECONDARY_DATASETS.md) — supplementing model accuracy and wiring metrics into Model Comparison
 - [`docs/TESTING_RESULTS.md`](../docs/TESTING_RESULTS.md) — model training/validation results

@@ -49,3 +49,909 @@ INFO:     127.0.0.1:54149 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1"
 INFO:     127.0.0.1:54149 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
 INFO:     127.0.0.1:60507 - "GET /api/sessions HTTP/1.1" 200 OK
 INFO:     127.0.0.1:54149 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59584 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59584 - "GET /assets/index-Dlc7NhRV.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50830 - "GET /assets/index-DSETKKkS.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50830 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59584 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59584 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53606 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59549 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52354 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59549 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64876 - "GET /api/reports/20260704_040626 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "GET /api/reports/20260704_040626/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "GET /api/reports/20260704_040626/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61387 - "GET /api/reports/20260704_040614 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61387 - "GET /api/reports/20260704_040614/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61387 - "GET /api/reports/20260704_040614/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55095 - "GET /api/reports/20260704_040614/artifact/json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61900 - "GET /api/reports/20260704_040614/artifact/csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55247 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53133 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53133 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51502 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51502 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53133 - "GET /api/sessions HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [26236]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:56241 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64888 - "GET /assets/index-CunG6WY5.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56944 - "GET /assets/index-DSETKKkS.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53938 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64613 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50448 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:65479 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:52805 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64479 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52805 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52805 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64479 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64479 - "GET /api/reports/20260704_040626 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52805 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52805 - "GET /api/reports/20260704_040626/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52805 - "GET /api/reports/20260704_040626/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50559 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50767 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62112 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61216 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63912 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63912 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60622 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60127 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64303 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64303 - "GET /api/reports/20260704_040626 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56575 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55356 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56575 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56575 - "GET /api/reports/20260704_040626 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55356 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [13056]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53576 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53576 - "GET /assets/index-CunG6WY5.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59947 - "GET /assets/index-DSETKKkS.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56753 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59947 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53576 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54922 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58095 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62733 - "GET /api/reports/20260704_040626 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57579 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61978 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62078 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62078 - "GET /assets/index-CunG6WY5.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49155 - "GET /assets/index-DSETKKkS.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62078 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:49155 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50684 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50684 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53195 - "GET /models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53195 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54724 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59735 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60265 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54256 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56882 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54630 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65478 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49977 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52228 - "GET /api/reports/20260915_224844 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51523 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51523 - "GET /api/reports/20260915_224844/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51523 - "GET /api/reports/20260915_224844/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63331 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63331 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64257 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63331 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54872 - "GET /api/reports/20260915_224844 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports/20260915_224844/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports/20260915_224844/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54872 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54872 - "GET /api/reports/20260704_040626 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54872 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54872 - "GET /api/reports/20260704_040614 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports/20260704_040614/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports/20260704_040614/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54872 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49263 - "GET /api/analytics/models HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [27620]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:62238 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62238 - "GET /assets/index-CunG6WY5.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61506 - "GET /assets/index-DSETKKkS.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:62238 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61506 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:64632 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:65269 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50895 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65269 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65269 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52755 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62278 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62278 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53892 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53892 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53892 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53892 - "GET /api/reports/20260915_224844 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53892 - "GET /api/reports/20260915_224844/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53892 - "GET /api/reports/20260915_224844/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65288 - "GET /api/reports/20260915_224844 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53251 - "GET /api/reports/20260704_040626 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65458 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56584 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [6996]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51197 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61957 - "GET /assets/index-DSETKKkS.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:51197 - "GET /assets/index-CunG6WY5.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:62112 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61957 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51197 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51826 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57731 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62446 - "GET /api/reports/20260915_224844 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61167 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61167 - "GET /api/reports/20260915_224844/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61167 - "GET /api/reports/20260915_224844/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59768 - "GET /api/reports/20260704_040626 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54021 - "GET /api/reports/20260704_040406 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54021 - "GET /api/reports/20260704_040406/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54021 - "GET /api/reports/20260704_040406/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54021 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54228 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54228 - "GET /api/reports/20260915_224844 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61425 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56641 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56641 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64644 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54347 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58671 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56325 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51955 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56325 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64644 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52214 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65122 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65122 - "GET /api/reports/20260915_224844 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52214 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59018 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59018 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59018 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49905 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59018 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59018 - "GET /api/reports/20260704_040626 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49905 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59049 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52269 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52269 - "GET /api/reports/20260915_224844 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59049 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59049 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52269 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52269 - "GET /records HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52269 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59049 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56595 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62425 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51275 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50254 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58715 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58723 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58715 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57357 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57357 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [26636]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58493 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51707 - "GET /assets/index-DSETKKkS.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:58493 - "GET /assets/index-CunG6WY5.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:57727 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58493 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51707 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57456 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:63655 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62176 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63655 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62176 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63655 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63655 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62176 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62176 - "GET /api/reports/20260917_043227/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62176 - "GET /api/reports/20260917_043227/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53365 - "GET /api/reports/20260704_040611 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53365 - "GET /api/reports/20260704_040611/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53365 - "GET /api/reports/20260704_040611/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60085 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56856 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62472 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63964 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63964 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62472 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63964 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63964 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62472 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53651 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57592 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57592 - "GET /api/reports/20260917_043227/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57592 - "GET /api/reports/20260917_043227/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57592 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53651 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53651 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57592 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49691 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports/20260917_044151 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports/20260917_044151/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52266 - "GET /api/reports/20260917_044151/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60198 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60198 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63414 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63414 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63414 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60138 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58399 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60148 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57628 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57628 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64490 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57628 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57628 - "GET /api/reports/20260917_044151 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64490 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64490 - "GET /api/reports/20260917_044151/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64490 - "GET /api/reports/20260917_044151/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52300 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64895 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58397 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64895 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58397 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52012 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports/20260917_044151 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports/20260917_044151/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports/20260917_044151/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports/20260917_043227 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports/20260917_043227/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51332 - "GET /api/reports/20260917_043227/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60922 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63372 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63372 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50090 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54098 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55366 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63372 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63372 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57327 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55826 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57529 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55826 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57529 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57529 - "GET /api/reports/20260917_044151 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55826 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55826 - "GET /api/reports/20260917_044151/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55826 - "GET /api/reports/20260917_044151/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56024 - "GET /reports/20260917_044151 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56024 - "GET /api/reports/20260917_044151 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56981 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56981 - "GET /reports/20260917_044151 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56981 - "GET /api/reports/20260917_044151 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56024 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60509 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55950 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54357 - "GET /api/reports/20260704_040406 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54357 - "GET /api/reports/20260704_040406/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54357 - "GET /api/reports/20260704_040406/artifact/map HTTP/1.1" 200 OK
+
+--- restarting dashboard after reports-path fix ---
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [14508]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50062 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59572 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59572 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53927 - "GET /api/reports/20260917_045326 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53927 - "GET /api/reports/20260917_045326/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53927 - "GET /api/reports/20260917_045326/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49745 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60723 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65415 - "GET /api/reports/20260916_215222 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63373 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65415 - "GET /api/reports/20260916_215222/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65415 - "GET /api/reports/20260916_215222/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49182 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56478 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53465 - "GET /api/reports?limit=200&category=healthy HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53465 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50080 - "GET /api/reports/20260917_045326 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50080 - "GET /api/reports/20260917_045326/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50080 - "GET /api/reports/20260917_045326/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58466 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64302 - "GET /models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64302 - "GET /assets/index-bJcuGOJh.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64457 - "GET /assets/index-Cz4bxbp_.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64302 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64457 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64302 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60393 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/reports/20260917_044151 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/reports/20260917_044151/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/reports/20260917_044151/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50060 - "GET /models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50060 - "GET /assets/index-bJcuGOJh.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56678 - "GET /assets/index-Cz4bxbp_.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56678 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56678 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "GET /api/reports/20260917_052520 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "GET /api/reports/20260917_052520/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "GET /api/reports/20260917_052520/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57231 - "GET /api/reports/20260917_052359 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57231 - "GET /api/reports/20260917_052359/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57231 - "GET /api/reports/20260917_052359/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58127 - "GET /api/reports/20260917_052344 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58127 - "GET /api/reports/20260917_052344/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58127 - "GET /api/reports/20260917_052344/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63712 - "GET /api/reports/20260917_045326 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63712 - "GET /api/reports/20260917_045326/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63712 - "GET /api/reports/20260917_045326/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /assets/index-bJcuGOJh.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:60978 - "GET /assets/index-Cz4bxbp_.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:60978 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60978 - "GET /api/reports/20260917_052911 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60978 - "GET /api/reports/20260917_052911/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60978 - "GET /api/reports/20260917_052911/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53790 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59416 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59416 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59416 - "GET /api/reports/20260917_053421 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59416 - "GET /api/reports/20260917_053421/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59416 - "GET /api/reports/20260917_053421/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53878 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53878 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/reports/20260917_053940 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/reports/20260917_053940/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63374 - "GET /api/reports/20260917_053940/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53813 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65153 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65153 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59835 - "GET /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59835 - "GET /assets/index-bJcuGOJh.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:57184 - "GET /assets/index-Cz4bxbp_.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:57184 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57184 - "GET /api/reports/20260917_054503 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57184 - "GET /api/reports/20260917_054503/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57184 - "GET /api/reports/20260917_054503/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51832 - "GET /api/reports/20260917_054449 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51832 - "GET /api/reports/20260917_054449/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51832 - "GET /api/reports/20260917_054449/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55354 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55354 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55354 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52924 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55354 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52924 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55354 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52924 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55354 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63762 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63530 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58580 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58580 - "GET /api/reports/20260917_055008 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58580 - "GET /api/reports/20260917_055008/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58580 - "GET /api/reports/20260917_055008/artifact/map HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [13420]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:57991 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58690 - "GET /assets/index-tGWWfe0L.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57991 - "GET /assets/index-Jj-vt6mM.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52908 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58690 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57991 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57991 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58690 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58690 - "GET /api/reports/20260917_151243 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58690 - "GET /api/reports/20260917_151243/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57991 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58690 - "GET /api/reports/20260917_151243/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63551 - "GET /api/reports/20260917_150307 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63551 - "GET /api/reports/20260917_150307/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63551 - "GET /api/reports/20260917_150307/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60472 - "GET /api/reports/20260917_150229 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60472 - "GET /api/reports/20260917_150229/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60472 - "GET /api/reports/20260917_150229/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63550 - "GET /api/reports/20260917_053940 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63550 - "GET /api/reports/20260917_053940/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63550 - "GET /api/reports/20260917_053940/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63550 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63550 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59944 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63550 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63550 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53542 - "GET /api/reports/20260917_054739 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53542 - "GET /api/reports/20260917_054739/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53542 - "GET /api/reports/20260917_054739/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59301 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64190 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59002 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50891 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59002 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50891 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59002 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59002 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [12612]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:64977 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64977 - "GET /assets/index-Jj-vt6mM.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55913 - "GET /assets/index-tGWWfe0L.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65303 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62031 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:59143 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:62914 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:62914 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55753 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50248 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50885 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50248 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51734 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60957 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61610 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62080 - "GET /api/reports/20260917_151243 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62080 - "GET /api/reports/20260917_151243/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62080 - "GET /api/reports/20260917_151243/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55728 - "GET /api/reports/20260917_150307 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55728 - "GET /api/reports/20260917_150307/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55728 - "GET /api/reports/20260917_150307/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57727 - "GET /api/reports/20260917_150229 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57727 - "GET /api/reports/20260917_150229/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57727 - "GET /api/reports/20260917_150229/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52828 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64226 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62944 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62944 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59384 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62944 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62944 - "GET /api/reports/20260917_150307 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59384 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59384 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59384 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62944 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62944 - "GET /api/reports/20260917_054739 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59384 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62944 - "GET /api/reports/20260917_054739/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62944 - "GET /api/reports/20260917_054739/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64873 - "GET /api/reports/20260917_055000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64873 - "GET /api/reports/20260917_055000/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64873 - "GET /api/reports/20260917_055000/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52772 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52328 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49375 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51224 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51224 - "GET /assets/index-Jj-vt6mM.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:64054 - "GET /assets/index-tGWWfe0L.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54680 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64054 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51224 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56339 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53096 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56339 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56339 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53096 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53096 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53096 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53096 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53096 - "GET /api/reports/20260917_151243 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53096 - "GET /api/reports/20260917_151243/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53096 - "GET /api/reports/20260917_151243/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52569 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52913 - "GET /reports/20260917_151243 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52913 - "GET /assets/index-DAWro_pz.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54112 - "GET /assets/index-BXP7N0mN.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52913 - "GET /api/reports/20260917_151243 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54112 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61232 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61232 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56010 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61232 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56010 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61232 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53974 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49668 - "GET /models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49668 - "GET /assets/index-DAWro_pz.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50060 - "GET /assets/index-BXP7N0mN.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50060 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49668 - "GET /api/analytics/models HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:52038 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52038 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52579 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52579 - "GET /assets/index-DAWro_pz.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57742 - "GET /assets/index-BXP7N0mN.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57742 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52579 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57742 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52579 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52579 - "GET /api/reports/20260919_202215 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57742 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52579 - "GET /api/reports/20260919_202215/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52579 - "GET /api/reports/20260919_202215/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54472 - "GET /api/reports/20260919_202215 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54472 - "GET /api/reports/20260919_202215/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54472 - "GET /api/reports/20260919_202215/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54472 - "GET /api/reports/20260919_202224 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54472 - "GET /api/reports/20260919_202224/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54472 - "GET /api/reports/20260919_202224/artifact/map HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [13728]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50255 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57502 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58677 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58677 - "GET /api/reports/20260919_202215 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58677 - "GET /api/reports/20260919_202215/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58677 - "GET /api/reports/20260919_202215/artifact/map HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [28012]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:49939 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49939 - "GET /assets/index-DAWro_pz.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57230 - "GET /assets/index-BXP7N0mN.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56492 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57230 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49939 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49939 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57230 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57230 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57230 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53671 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59904 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53671 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59904 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [21804]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:63841 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63841 - "GET /assets/index-DAWro_pz.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55846 - "GET /assets/index-BXP7N0mN.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63841 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52551 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55846 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:64811 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54972 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64811 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64811 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54972 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54972 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54972 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64811 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64811 - "GET /api/reports/20260919_202224 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64811 - "GET /api/reports/20260919_202224/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54972 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54972 - "GET /api/reports/20260919_202224/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49673 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53082 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53082 - "GET /api/reports/20260919_202224 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49673 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49673 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53082 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53082 - "GET /api/reports/20260917_150307 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53082 - "GET /api/reports/20260917_150307/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49673 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53082 - "GET /api/reports/20260917_150307/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65381 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50079 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50079 - "GET /api/reports/20260919_202215 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65381 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50079 - "GET /api/reports/20260919_202215/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50079 - "GET /api/reports/20260919_202215/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65203 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49941 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49941 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59770 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62281 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55846 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49907 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53153 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49907 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53153 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52810 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61863 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61863 - "GET /api/reports/20260919_202224 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52810 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51757 - "GET /api/reports/20260919_202215 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/analytics/models HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [4920]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58480 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58480 - "GET /assets/index-DAWro_pz.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53832 - "GET /assets/index-BXP7N0mN.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53832 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61169 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58480 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:62798 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64864 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62798 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62798 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64864 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51308 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64864 - "GET /api/reports/20260924_164339 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64864 - "GET /api/reports/20260924_164339/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64864 - "GET /api/reports/20260924_164339/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64855 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52436 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64931 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61850 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61850 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52653 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64855 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53493 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54322 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52640 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52640 - "GET /api/reports/20260924_164339 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52640 - "GET /api/reports/20260924_164339/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52640 - "GET /api/reports/20260924_164339/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60339 - "GET /api/reports/20260917_151243 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60339 - "GET /api/reports/20260917_151243/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60339 - "GET /api/reports/20260917_151243/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53965 - "GET /api/reports/20260917_151243 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56266 - "GET /api/maps/disease?cluster_radius_m=25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57579 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58524 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59583 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53757 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53757 - "GET /api/reports/20260919_202215 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59583 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59583 - "GET /api/reports/20260919_202215/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59583 - "GET /api/reports/20260919_202215/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59927 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55391 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55391 - "GET /api/reports/20260917_054739 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55391 - "GET /api/reports/20260917_054739/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59927 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55391 - "GET /api/reports/20260917_054739/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59927 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55391 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50598 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50407 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52168 - "GET /api/reports/20260919_202224 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50825 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50825 - "GET /api/reports/20260919_202224/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50825 - "GET /api/reports/20260919_202224/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50825 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49278 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50825 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49278 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50825 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50825 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49278 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50825 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49278 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50614 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51486 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51486 - "GET /api/reports/20260924_164339 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51486 - "GET /api/reports/20260924_164339/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50614 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51486 - "GET /api/reports/20260924_164339/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50614 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51486 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59034 - "GET /api/reports/20260924_164339 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49279 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50558 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54489 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [16900]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:62838 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61439 - "GET /assets/index-BXP7N0mN.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61617 - "GET /assets/index-DAWro_pz.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56667 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50811 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:49336 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:63439 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58616 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58616 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:64011 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56070 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64011 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63985 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+
+--- starting dashboard on port 8077 ---
+INFO:     Started server process [14552]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8077 (Press CTRL+C to quit)
+INFO:     127.0.0.1:49285 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49285 - "GET /assets/index-DAWro_pz.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61490 - "GET /assets/index-BXP7N0mN.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55093 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49285 - "GET /api/analytics/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:61490 - "GET /api/sessions HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56717 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56717 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60122 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65507 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60122 - "GET /api/analytics/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60122 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65507 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60074 - "GET /api/reports/20260924_164339 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60074 - "GET /api/reports/20260924_164339/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50772 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60074 - "GET /api/reports/20260924_164339/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50575 - "GET /api/analytics/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50575 - "GET /api/reports?limit=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51582 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51582 - "GET /api/reports/20260919_202224 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51582 - "GET /api/reports/20260919_202224/artifact/frame HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50575 - "GET /api/reports?limit=500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51582 - "GET /api/reports/20260919_202224/artifact/map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50269 - "GET /api/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51958 - "GET /api/analytics/overview HTTP/1.1" 200 OK

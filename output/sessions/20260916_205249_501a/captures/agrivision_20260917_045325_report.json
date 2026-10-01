@@ -1,0 +1,184 @@
+{
+  "system": "AgriVision",
+  "exported_at": "2026-09-17T04:53:25",
+  "video_source": "scrcpy",
+  "geo": {
+    "latitude": 7.686874,
+    "longitude": 126.018113,
+    "altitude_m": null,
+    "accuracy_m": 111.0,
+    "source": "windows_gps"
+  },
+  "detection_summary": {
+    "total": 10,
+    "healthy": 8,
+    "stressed": 0,
+    "diseased": 2
+  },
+  "detections": [
+    {
+      "bbox": [
+        526,
+        596,
+        606,
+        649
+      ],
+      "class": 2,
+      "confidence": 0.7041015625,
+      "label": "healthy (0.70)"
+    },
+    {
+      "bbox": [
+        952,
+        456,
+        1008,
+        516
+      ],
+      "class": 2,
+      "confidence": 0.609375,
+      "label": "healthy (0.61)"
+    },
+    {
+      "bbox": [
+        928,
+        555,
+        1013,
+        638
+      ],
+      "class": 2,
+      "confidence": 0.56884765625,
+      "label": "healthy (0.57)"
+    },
+    {
+      "bbox": [
+        415,
+        426,
+        474,
+        486
+      ],
+      "class": 2,
+      "confidence": 0.5,
+      "label": "healthy (0.50)"
+    },
+    {
+      "bbox": [
+        773,
+        350,
+        853,
+        407
+      ],
+      "class": 2,
+      "confidence": 0.49609375,
+      "label": "healthy (0.50)"
+    },
+    {
+      "bbox": [
+        560,
+        598,
+        613,
+        675
+      ],
+      "class": 2,
+      "confidence": 0.394287109375,
+      "label": "healthy (0.39)"
+    },
+    {
+      "bbox": [
+        300,
+        259,
+        373,
+        327
+      ],
+      "class": 3,
+      "confidence": 0.388671875,
+      "label": "panama (0.39)"
+    },
+    {
+      "bbox": [
+        369,
+        173,
+        444,
+        249
+      ],
+      "class": 2,
+      "confidence": 0.3876953125,
+      "label": "healthy (0.39)"
+    },
+    {
+      "bbox": [
+        560,
+        470,
+        595,
+        549
+      ],
+      "class": 3,
+      "confidence": 0.368408203125,
+      "label": "panama (0.37)"
+    },
+    {
+      "bbox": [
+        429,
+        293,
+        509,
+        380
+      ],
+      "class": 2,
+      "confidence": 0.36376953125,
+      "label": "healthy (0.36)"
+    }
+  ],
+  "vegetation": {
+    "health_label": "stressed",
+    "mean_stress": 0.6566,
+    "high_stress_pct": 63.78,
+    "index_type": "exg_proxy"
+  },
+  "session": {
+    "session_id": "501a",
+    "flight_id": "AGV-20260916-205212-451993",
+    "video_id": "AGV-20260916-205212-451993",
+    "field_name": "",
+    "storage_folder": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_205249_501a",
+    "started_at": "2026-09-16T20:52:49+00:00",
+    "frames_processed": 752,
+    "frames_analyzed": 50,
+    "total_detections": 496,
+    "peak_detections": 10,
+    "last_detection_summary": {
+      "total": 10,
+      "healthy": 8,
+      "stressed": 0,
+      "diseased": 2
+    },
+    "last_vegetation": {
+      "health_label": "stressed",
+      "mean_stress": 0.6566,
+      "high_stress_pct": 63.78,
+      "index_type": "exg_proxy"
+    },
+    "heatmap_point_count": 0,
+    "geo_marker_count": 0,
+    "manual_tag_count": 0,
+    "manual_tags": [],
+    "last_geo": {},
+    "detector": {
+      "id": "yolov9t",
+      "name": "YOLOv9t",
+      "weights": "D:\\GitHub\\AgriVision\\models\\yolov9t_banana.pt"
+    }
+  },
+  "flight_id": "AGV-20260916-205212-451993",
+  "video_id": "AGV-20260916-205212-451993",
+  "session_id": "501a",
+  "capture_id": "20260917_045325",
+  "detector": {
+    "id": "yolov9t",
+    "name": "YOLOv9t",
+    "weights": "D:\\GitHub\\AgriVision\\models\\yolov9t_banana.pt"
+  },
+  "artifacts": {
+    "frame": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_205249_501a\\captures\\agrivision_20260917_045325_frame.jpg",
+    "leaflet_map": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_205249_501a\\captures\\agrivision_20260917_045325_map.html",
+    "report_json": "D:\\GitHub\\AgriVision\\output\\sessions\\20260916_205249_501a\\captures\\agrivision_20260917_045325_report.json"
+  }
+}

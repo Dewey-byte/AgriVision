@@ -10,7 +10,7 @@ import numpy as np
 
 from core.detection import run_detection as run_yolo
 from core.classification import run_classification, run_classification_crop
-from core.ndvi import summarize_vegetation
+from core.ndvi import align_vegetation_with_detections, summarize_vegetation
 from core.processor import _stress_from_frame_bgr, reset_preprocessor
 from core.preprocess import FramePreprocessor
 from utils.drawing import detection_category
@@ -122,7 +122,10 @@ class AnalysisPipeline:
         else:
             stress = None
 
-        vegetation = summarize_vegetation(stress) if stress is not None else {}
+        if stress is not None:
+            vegetation = summarize_vegetation(stress, summary)
+        else:
+            vegetation = align_vegetation_with_detections({}, summary)
 
         return AnalysisResult(
             frame_bgr=frame,

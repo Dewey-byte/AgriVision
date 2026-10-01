@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-08-03T00:00:00+00:00",
+  "project": "AgriVision",
+  "split": "test",
+  "weights": "models/best.pt",
+  "dataset": "datasets/yolo_banana",
+  "dataset_stats": {
+    "split": "test",
+    "images": 34,
+    "instances": 468,
+    "instances_by_class": {
+      "black_sigatoka": 9,
+      "bunchy_top": 0,
+      "healthy": 410,
+      "panama": 49
+    },
+    "images_with_class": {
+      "black_sigatoka": 8,
+      "bunchy_top": 0,
+      "healthy": 34,
+      "panama": 18
+    },
+    "class_names": [
+      "black_sigatoka",
+      "bunchy_top",
+      "healthy",
+      "panama"
+    ]
+  },
+  "overall": {
+    "precision": 0.5,
+    "recall": 0.25,
+    "f1": 0.33,
+    "mAP50": 0.2,
+    "mAP50_95": 0.06
+  },
+  "per_class": [
+    {
+      "class_id": 0,
+      "name": "black_sigatoka",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0,
+      "instances_in_split": 9,
+      "images_with_class": 8
+    },
+    {
+      "class_id": 1,
+      "name": "bunchy_top",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0,
+      "instances_in_split": 0,
+      "images_with_class": 0
+    },
+    {
+      "class_id": 2,
+      "name": "healthy",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0,
+      "instances_in_split": 410,
+      "images_with_class": 34
+    },
+    {
+      "class_id": 3,
+      "name": "panama",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0,
+      "instances_in_split": 49,
+      "images_with_class": 18
+    }
+  ],
+  "artifacts": {
+    "json": "output\\_smoke_test\\metrics\\test_report_latest.json",
+    "csv": "output\\_smoke_test\\metrics\\test_report_latest.csv",
+    "markdown": "output\\_smoke_test\\metrics\\smoke_test_report.md",
+    "md": "output\\_smoke_test\\metrics\\test_report_latest.md"
+  }
+}

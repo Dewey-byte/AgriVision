@@ -1,0 +1,80 @@
+{
+  "system": "AgriVision",
+  "exported_at": "2026-09-17T04:32:27",
+  "video_source": "scrcpy",
+  "geo": {
+    "latitude": 7.686831,
+    "longitude": 126.01834,
+    "altitude_m": null,
+    "accuracy_m": 111.0,
+    "source": "windows_gps"
+  },
+  "detection_summary": {
+    "total": 0,
+    "healthy": 0,
+    "stressed": 0,
+    "diseased": 0
+  },
+  "detections": [],
+  "vegetation": {},
+  "session": {
+    "session_id": "",
+    "flight_id": "",
+    "video_id": "",
+    "field_name": "",
+    "storage_folder": "",
+    "started_at": "2026-09-16T20:30:59+00:00",
+    "frames_processed": 0,
+    "frames_analyzed": 0,
+    "total_detections": 0,
+    "peak_detections": 0,
+    "last_detection_summary": {
+      "total": 0,
+      "healthy": 0,
+      "stressed": 0,
+      "diseased": 0
+    },
+    "last_vegetation": {},
+    "heatmap_point_count": 0,
+    "geo_marker_count": 0,
+    "manual_tag_count": 2,
+    "manual_tags": [
+      {
+        "id": "3cf3c1ec",
+        "lat": 7.6862401,
+        "lon": 126.0190201,
+        "category": "diseased",
+        "label": "High stress (manual)",
+        "source": "manual_tag"
+      },
+      {
+        "id": "6c46cc97",
+        "lat": 7.6867079,
+        "lon": 126.017561,
+        "category": "diseased",
+        "label": "High stress (manual)",
+        "source": "manual_tag"
+      }
+    ],
+    "last_geo": {},
+    "detector": {
+      "id": "yolov8n",
+      "name": "YOLOv8n",
+      "weights": "D:\\GitHub\\AgriVision\\models\\yolov8n_banana.pt"
+    }
+  },
+  "flight_id": "",
+  "video_id": "",
+  "session_id": "",
+  "capture_id": "20260917_043227",
+  "detector": {
+    "id": "yolov8n",
+    "name": "YOLOv8n",
+    "weights": "D:\\GitHub\\AgriVision\\models\\yolov8n_banana.pt"
+  },
+  "artifacts": {
+    "frame": "D:\\GitHub\\AgriVision\\output\\reports\\agrivision_20260917_043227_frame.jpg",
+    "leaflet_map": "D:\\GitHub\\AgriVision\\output\\reports\\agrivision_20260917_043227_map.html",
+    "report_json": "D:\\GitHub\\AgriVision\\output\\reports\\agrivision_20260917_043227_report.json"
+  }
+}
