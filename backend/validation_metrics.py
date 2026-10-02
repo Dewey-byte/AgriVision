@@ -16,7 +16,9 @@ try:
 except ImportError:
     torch = None
 
-ROOT = Path(__file__).resolve().parents[1]
+from utils.app_paths import install_root
+
+ROOT = install_root()
 DEFAULT_DATASET = ROOT / "datasets" / "yolo_banana"
 DEFAULT_WEIGHTS = ROOT / "models" / "best.pt"
 DEFAULT_OUT = ROOT / "output" / "metrics"

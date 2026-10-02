@@ -11,7 +11,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
+from utils.app_paths import install_root
+
+ROOT = install_root()
 
 
 @dataclass(frozen=True)

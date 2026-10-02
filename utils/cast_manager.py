@@ -77,7 +77,9 @@ def _candidate_paths(exe: str, extra: list[str]) -> list[str]:
 
 
 def _repo_root() -> str:
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    from utils.app_paths import install_root
+
+    return str(install_root())
 
 
 def _winget_package_globs(exe: str) -> list[str]:

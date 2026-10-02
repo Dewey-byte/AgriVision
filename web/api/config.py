@@ -9,10 +9,14 @@ from __future__ import annotations
 
 import os
 import secrets
+import sys
 from pathlib import Path
 
 # web/api/config.py -> repo root is three levels up
-REPO_ROOT = Path(__file__).resolve().parents[2]
+if getattr(sys, "frozen", False):
+    REPO_ROOT = Path(sys.executable).resolve().parent
+else:
+    REPO_ROOT = Path(__file__).resolve().parents[2]
 
 OUTPUT_DIR = Path(os.environ.get("AGRIVISION_OUTPUT_DIR", REPO_ROOT / "output"))
 REPORTS_DIR = Path(os.environ.get("AGRIVISION_REPORTS_DIR", OUTPUT_DIR / "reports"))
@@ -29,7 +33,11 @@ ADMIN_PASSWORD = os.environ.get("AGRIVISION_ADMIN_PASSWORD", "agrivision")
 
 # HMAC secret for session tokens. Persisted next to this file so tokens
 # survive API restarts; delete .secret_key to invalidate all sessions.
-_SECRET_FILE = Path(__file__).resolve().parent / ".secret_key"
+_SECRET_FILE = (
+    REPO_ROOT / "output" / ".secret_key"
+    if getattr(sys, "frozen", False)
+    else Path(__file__).resolve().parent / ".secret_key"
+)
 
 
 def get_secret_key() -> str:

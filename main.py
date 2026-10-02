@@ -1,7 +1,13 @@
+import multiprocessing
 import os
 import sys
 
+from utils.app_paths import install_root, is_frozen
 from utils.python_runtime import require_desktop_python
+
+if is_frozen():
+    # Relative paths like "output/maps" must land next to the .exe.
+    os.chdir(install_root())
 
 require_desktop_python()
 
@@ -25,6 +31,7 @@ def _show_window(window: MainWindow) -> None:
 
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     app = QApplication(sys.argv)
     window = MainWindow()
     _show_window(window)

@@ -6,15 +6,18 @@ import os
 import socket
 import subprocess
 import sys
+import threading
 import webbrowser
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-FRONTEND_INDEX = REPO_ROOT / "web" / "frontend" / "dist" / "index.html"
+from utils.app_paths import install_root, is_frozen, resource_root
+
+REPO_ROOT = install_root()
+FRONTEND_INDEX = resource_root() / "web" / "frontend" / "dist" / "index.html"
 ENV_FILE = REPO_ROOT / ".env.deploy"
 LOG_PATH = REPO_ROOT / "output" / "dashboard.log"
 
-_child: subprocess.Popen | None = None
+_child: subprocess.Popen | threading.Thread | None = None
 _log_handle = None
 
 
@@ -57,7 +60,27 @@ def _load_dotenv(path: Path) -> dict[str, str]:
     return values
 
 
-def start_api() -> subprocess.Popen:
+def _serve_in_process(env: dict[str, str]) -> threading.Thread:
+    """Frozen build has no ``python -m uvicorn``; run the API on a thread."""
+    os.environ.update(env)
+    import uvicorn
+
+    from web.api.main import app
+
+    server = uvicorn.Server(
+        uvicorn.Config(
+            app,
+            host="127.0.0.1",
+            port=dashboard_port(),
+            log_config=None,
+        )
+    )
+    thread = threading.Thread(target=server.run, name="dashboard-api", daemon=True)
+    thread.start()
+    return thread
+
+
+def start_api() -> subprocess.Popen | threading.Thread:
     """Spawn uvicorn in the background. Raises RuntimeError if it cannot start."""
     global _child, _log_handle
 
@@ -68,6 +91,10 @@ def start_api() -> subprocess.Popen:
 
     env = os.environ.copy()
     env.update(_load_dotenv(ENV_FILE))
+
+    if is_frozen():
+        _child = _serve_in_process(_load_dotenv(ENV_FILE))
+        return _child
 
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     if _log_handle is None:

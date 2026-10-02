@@ -17,6 +17,8 @@ _RELAUNCH_ENV = "AGRIVISION_PYTHON_RELAUNCH"
 
 
 def require_desktop_python() -> None:
+    if getattr(sys, "frozen", False):
+        return
     if sys.version_info[:2] == REQUIRED:
         return
 
